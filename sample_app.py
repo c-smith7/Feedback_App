@@ -48,7 +48,6 @@ class Window(QMainWindow):
     def _createToolBars(self):
         file_toolbar = self.addToolBar('File')
         edit_toolbar = self.addToolBar('Edit')
-        help_toolbar = self.addToolBar('Help')
 
     def _createActions(self):
         self.new_action = QAction('&New', self)
