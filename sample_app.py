@@ -15,7 +15,7 @@ class Window(QMainWindow):
         super().__init__(parent)
         self.setWindowTitle('Sample GUI')
         self.setWindowIcon(QtGui.QIcon('vipkid.png'))
-        self.resize(400, 200)
+        self.resize(600, 900)
         self.centralWidget = QLabel('Hello, World')
         self.centralWidget.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.setCentralWidget(self.centralWidget)
