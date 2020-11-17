@@ -19,6 +19,7 @@ class Window(QMainWindow):
         self.centralWidget = QLabel('Hello, World')
         self.centralWidget.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.setCentralWidget(self.centralWidget)
+        self._createActions()
         self._createMenuBar()
         self._createToolBars()
 
@@ -36,13 +37,14 @@ class Window(QMainWindow):
     def _createActions(self):
         self.new_action = QAction('&New', self)
         self.open_action = QAction ('&Open...', self)
-        self.saveAction = QAction("&Save", self)
-        self.exitAction = QAction("&Exit", self)
-        self.copyAction = QAction("&Copy", self)
-        self.pasteAction = QAction("&Paste", self)
-        self.cutAction = QAction("&Cut", self)
-        self.helpContentAction = QAction("&Help Content", self)
-        self.aboutAction = QAction("&About", self)
+        self.save_action = QAction("&Save", self)
+        self.exit_action = QAction("&Exit", self)
+        self.copy_action = QAction("&Copy", self)
+        self.paste_action = QAction("&Paste", self)
+        self.cut_action = QAction("&Cut", self)
+        self.help_content_action = QAction("&Help Content", self)
+        self.about_action = QAction("&About", self)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
