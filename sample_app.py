@@ -36,6 +36,10 @@ class Window(QMainWindow):
         edit_menu.addAction(self.copy_action)
         edit_menu.addAction(self.paste_action)
         edit_menu.addAction(self.cut_action)
+        # add submenu in Edit menu
+        find_menu = edit_menu.addMenu('Find and Replace')
+        find_menu.addAction('Find...')
+        find_menu.addAction('Replace...')
         # Help Menu and actions
         help_menu = menu_bar.addMenu('&Help')
         help_menu.addAction(self.help_content_action)
