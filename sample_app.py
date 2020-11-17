@@ -25,9 +25,21 @@ class Window(QMainWindow):
 
     def _createMenuBar(self):
         menu_bar = self.menuBar()
+        # File menu and actions
         file_menu = menu_bar.addMenu('&File')
+        file_menu.addAction(self.new_action)
+        file_menu.addAction(self.open_action)
+        file_menu.addAction(self.save_action)
+        file_menu.addAction(self.exit_action)
+        # Edit menu and actions
         edit_menu = menu_bar.addMenu('&Edit')
+        edit_menu.addAction(self.copy_action)
+        edit_menu.addAction(self.paste_action)
+        edit_menu.addAction(self.cut_action)
+        # Help Menu and actions
         help_menu = menu_bar.addMenu('&Help')
+        help_menu.addAction(self.help_content_action)
+        help_menu.addAction(self.about_action)
 
     def _createToolBars(self):
         file_toolbar = self.addToolBar('File')
