@@ -33,6 +33,16 @@ class Window(QMainWindow):
         edit_toolbar = self.addToolBar('Edit')
         help_toolbar = self.addToolBar('Help')
 
+    def _createActions(self):
+        self.new_action = QAction('&New', self)
+        self.open_action = QAction ('&Open...', self)
+        self.saveAction = QAction("&Save", self)
+        self.exitAction = QAction("&Exit", self)
+        self.copyAction = QAction("&Copy", self)
+        self.pasteAction = QAction("&Paste", self)
+        self.cutAction = QAction("&Cut", self)
+        self.helpContentAction = QAction("&Help Content", self)
+        self.aboutAction = QAction("&About", self)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
