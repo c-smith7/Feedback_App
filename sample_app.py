@@ -21,6 +21,9 @@ class Window(QMainWindow):
         self.setCentralWidget(self.centralWidget)
         self._createActions()
         self._createMenuBar()
+        self._createContextMenu()
+
+    # def _window_widget(self):
 
     def _createMenuBar(self):
         menu_bar = self.menuBar()
@@ -29,12 +32,14 @@ class Window(QMainWindow):
         file_menu.addAction(self.new_action)
         file_menu.addAction(self.open_action)
         file_menu.addAction(self.save_action)
+        file_menu.addSeparator()
         file_menu.addAction(self.exit_action)
         # Edit menu and actions
         edit_menu = menu_bar.addMenu('&Edit')
         edit_menu.addAction(self.copy_action)
         edit_menu.addAction(self.paste_action)
         edit_menu.addAction(self.cut_action)
+        edit_menu.addSeparator()
         # add submenu in Edit menu
         find_menu = edit_menu.addMenu('Find and Replace')
         find_menu.addAction('Find...')
@@ -50,7 +55,7 @@ class Window(QMainWindow):
 
     def _createActions(self):
         self.new_action = QAction('&New', self)
-        self.open_action = QAction ('&Open...', self)
+        self.open_action = QAction('&Open...', self)
         self.save_action = QAction("&Save", self)
         self.exit_action = QAction("&Exit", self)
         self.copy_action = QAction("&Copy", self)
@@ -59,6 +64,11 @@ class Window(QMainWindow):
         self.help_content_action = QAction("&Help Content", self)
         self.about_action = QAction("&About", self)
 
+    def _createContextMenu(self):
+        self.centralWidget.setContextMenuPolicy(Qt.ActionsContextMenu)
+        self.centralWidget.addAction(self.copy_action)
+        self.centralWidget.addAction(self.paste_action)
+        self.centralWidget.addAction(self.cut_action)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
