@@ -41,6 +41,7 @@ class Window(QMainWindow):
         edit_menu.addAction(self.copy_action)
         edit_menu.addAction(self.paste_action)
         edit_menu.addAction(self.cut_action)
+        edit_menu.addAction(self.select_action)
         edit_menu.addSeparator()
         # add submenu in Edit menu
         find_menu = edit_menu.addMenu('Find and Replace')
@@ -69,6 +70,7 @@ class Window(QMainWindow):
         self.copy_action = QAction("&Copy", self)
         self.paste_action = QAction("&Paste", self)
         self.cut_action = QAction("&Cut", self)
+        self.select_action = QAction("&Select All", self)
         self.copy_action.setShortcut(QKeySequence.Copy)
         self.paste_action.setShortcut(QKeySequence.Paste)
         self.cut_action.setShortcut(QKeySequence.Cut)
