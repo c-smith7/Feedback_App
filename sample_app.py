@@ -21,7 +21,6 @@ class Window(QMainWindow):
         self.setCentralWidget(self.centralWidget)
         self._createActions()
         self._createMenuBar()
-        self._createToolBars()
 
     def _createMenuBar(self):
         menu_bar = self.menuBar()
@@ -45,9 +44,9 @@ class Window(QMainWindow):
         help_menu.addAction(self.help_content_action)
         help_menu.addAction(self.about_action)
 
-    def _createToolBars(self):
-        file_toolbar = self.addToolBar('File')
-        edit_toolbar = self.addToolBar('Edit')
+    # def _createToolBars(self):
+    #     file_toolbar = self.addToolBar('File')
+    #     edit_toolbar = self.addToolBar('Edit')
 
     def _createActions(self):
         self.new_action = QAction('&New', self)
