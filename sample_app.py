@@ -2,6 +2,7 @@ import sys
 
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import *
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
 
 
@@ -22,6 +23,7 @@ class Window(QMainWindow):
         self._createActions()
         self._createMenuBar()
         self._createContextMenu()
+        self._connectActions()
 
     # def _window_widget(self):
 
@@ -49,6 +51,12 @@ class Window(QMainWindow):
         help_menu.addAction(self.help_content_action)
         help_menu.addAction(self.about_action)
 
+    def _createContextMenu(self):
+        self.centralWidget.setContextMenuPolicy(Qt.ActionsContextMenu)
+        self.centralWidget.addAction(self.copy_action)
+        self.centralWidget.addAction(self.paste_action)
+        self.centralWidget.addAction(self.cut_action)
+
     # def _createToolBars(self):
     #     file_toolbar = self.addToolBar('File')
     #     edit_toolbar = self.addToolBar('Edit')
@@ -61,14 +69,27 @@ class Window(QMainWindow):
         self.copy_action = QAction("&Copy", self)
         self.paste_action = QAction("&Paste", self)
         self.cut_action = QAction("&Cut", self)
+        self.copy_action.setShortcut(QKeySequence.Copy)
+        self.paste_action.setShortcut(QKeySequence.Paste)
+        self.cut_action.setShortcut(QKeySequence.Cut)
         self.help_content_action = QAction("&Help Content", self)
         self.about_action = QAction("&About", self)
 
-    def _createContextMenu(self):
-        self.centralWidget.setContextMenuPolicy(Qt.ActionsContextMenu)
-        self.centralWidget.addAction(self.copy_action)
-        self.centralWidget.addAction(self.paste_action)
-        self.centralWidget.addAction(self.cut_action)
+    def copyContent(self):
+        self.centralWidget.setText("<b>Edit > Copy</b> clicked")
+
+    def pasteContent(self):
+        self.centralWidget.setText("<b>Edit > Pate</b> clicked")
+
+    def cutContent(self):
+        self.centralWidget.setText("<b>Edit > Cut</b> clicked")
+
+    def _connectActions(self):
+        self.copy_action.triggered.connect(self.copyContent)
+        self.paste_action.triggered.connect(self.pasteContent)
+        self.cut_action.triggered.connect(self.cutContent)
+        self.exit_action.triggered.connect(self.close)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
