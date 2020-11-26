@@ -16,7 +16,7 @@ class Window(QMainWindow):
         super().__init__(parent)
         self.setWindowTitle('Sample GUI')
         self.setWindowIcon(QtGui.QIcon('vipkid.png'))
-        self.resize(600, 900)
+        self.resize(500, 600)
         self.centralWidget = QLabel('Hello, World')
         self.centralWidget.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.setCentralWidget(self.centralWidget)
@@ -57,6 +57,7 @@ class Window(QMainWindow):
         self.centralWidget.addAction(self.copy_action)
         self.centralWidget.addAction(self.paste_action)
         self.centralWidget.addAction(self.cut_action)
+        self.centralWidget.addAction(self.select_action)
 
     # def _createToolBars(self):
     #     file_toolbar = self.addToolBar('File')
@@ -74,6 +75,7 @@ class Window(QMainWindow):
         self.copy_action.setShortcut(QKeySequence.Copy)
         self.paste_action.setShortcut(QKeySequence.Paste)
         self.cut_action.setShortcut(QKeySequence.Cut)
+        self.select_action.setShortcut(QKeySequence.SelectAll)
         self.help_content_action = QAction("&Help Content", self)
         self.about_action = QAction("&About", self)
 
@@ -86,10 +88,14 @@ class Window(QMainWindow):
     def cutContent(self):
         self.centralWidget.setText("<b>Edit > Cut</b> clicked")
 
+    def selectText(self):
+        self.centralWidget.setText("<b>Edit > Select All</b> clicked")
+
     def _connectActions(self):
         self.copy_action.triggered.connect(self.copyContent)
         self.paste_action.triggered.connect(self.pasteContent)
         self.cut_action.triggered.connect(self.cutContent)
+        self.select_action.triggered.connect(self.selectText)
         self.exit_action.triggered.connect(self.close)
 
 
