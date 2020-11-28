@@ -20,6 +20,7 @@ class Window(QWidget):
         self.no_button = QRadioButton('&No')
         self.feedback_temp = QTextEdit(self)
         self.feedback_output = QTextEdit(self)
+        self.generate_output = QPushButton('Generate Feedback')
         self.copy_output = QPushButton('Copy Output Feedback')
         # Add widgets to layout
         layout.addWidget(QLabel('Student Name:'))
@@ -31,6 +32,8 @@ class Window(QWidget):
         layout.addSpacing(4)
         layout.addWidget(QLabel('Feedback Template:'))
         layout.addWidget(self.feedback_temp)
+        layout.addSpacing(2)
+        layout.addWidget(self.generate_output)
         layout.addSpacing(4)
         layout.addWidget(QLabel('Output Feedback:'))
         layout.addWidget(self.feedback_output)
