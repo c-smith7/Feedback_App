@@ -47,6 +47,7 @@ class Window(QWidget):
         self.feedback_output.setTabChangesFocus(True)
         self.yes_button.setFocusPolicy(Qt.NoFocus)
         self.no_button.setFocusPolicy(Qt.NoFocus)
+        self.feedback_output.setFocusPolicy(Qt.NoFocus)
         self.feedback_script()
         copy_button()
         self.generate_output.clicked.connect(self.feedback_script)
@@ -54,12 +55,36 @@ class Window(QWidget):
 
     def feedback_script(self):
         global new_student
+        global output
         new_student = ''
         student_name = self.student.text()
-        feedback = self.feedback_temp.toPlainText()
+        feedback_input = self.feedback_temp.toPlainText()
+        feedback_output = feedback_input.replace('we', f'{student_name} and I', 1)
         if self.yes_button.isChecked():
-            new_student = self.yes_button.text()
-        self.feedback_output.insertPlainText(new_student)
+            new_student = 'yes'
+        elif self.no_button.isChecked():
+            new_student = 'no'
+        if new_student == 'no':
+            output = f'{feedback_output} Fantastic job today {student_name}! ' \
+                     f'Keep practicing your English and working hard, you are ' \
+                     f'improving every class! See you next time {student_name}. ' \
+                     f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
+                     f'From, Teacher Carlos ZDG.'
+        elif new_student == 'yes':
+            output = f'{feedback_output} Fantastic job today {student_name}! ' \
+                     f'It was great meeting you. Keep up the great work, and I hope ' \
+                     f'to see you in my class again soon. ' \
+                     f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
+                     f'From, Teacher Carlos ZDG.'
+        if student_name == '':
+            self.feedback_output.clear()
+        else:
+            self.feedback_output.insertPlainText(output)
+
+
+def copy_button():
+    clipboard = QtGui.QGuiApplication.clipboard()
+    clipboard.setText(output)
 
 
 if __name__ == "__main__":
