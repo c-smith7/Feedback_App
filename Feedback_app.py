@@ -38,6 +38,12 @@ class Window(QWidget):
         layout.addSpacing(2)
         layout.addWidget(self.copy_output)
         self.setLayout(layout)
+        self.no_button.setChecked(True)
+        self.copy_output.setDefault(True)
+        self.feedback_temp.setTabChangesFocus(True)
+        self.feedback_output.setTabChangesFocus(True)
+        self.yes_button.setFocusPolicy(Qt.NoFocus)
+        self.no_button.setFocusPolicy(Qt.NoFocus)
         self.feedback_script()
         self.copy_output.clicked.connect(self.feedback_script)
 
