@@ -51,7 +51,6 @@ class Window(QWidget):
         self.feedback_output.insertPlainText(new_student)
 
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
