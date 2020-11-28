@@ -41,13 +41,16 @@ class Window(QWidget):
         layout.addWidget(self.copy_output)
         self.setLayout(layout)
         self.no_button.setChecked(True)
+        self.generate_output.setDefault(True)
         self.copy_output.setDefault(True)
         self.feedback_temp.setTabChangesFocus(True)
         self.feedback_output.setTabChangesFocus(True)
         self.yes_button.setFocusPolicy(Qt.NoFocus)
         self.no_button.setFocusPolicy(Qt.NoFocus)
         self.feedback_script()
-        self.copy_output.clicked.connect(self.feedback_script)
+        copy_button()
+        self.generate_output.clicked.connect(self.feedback_script)
+        self.copy_output.clicked.connect(copy_button)
 
     def feedback_script(self):
         global new_student
