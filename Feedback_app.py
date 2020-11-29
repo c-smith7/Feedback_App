@@ -2,6 +2,7 @@ import sys
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import *
+from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import *
 
 
@@ -40,6 +41,7 @@ class Window(QWidget):
         layout.addSpacing(2)
         layout.addWidget(self.copy_output)
         self.setLayout(layout)
+        # Button configs
         self.no_button.setChecked(True)
         self.generate_output.setDefault(True)
         self.copy_output.setDefault(True)
@@ -48,6 +50,17 @@ class Window(QWidget):
         self.yes_button.setFocusPolicy(Qt.NoFocus)
         self.no_button.setFocusPolicy(Qt.NoFocus)
         self.feedback_output.setFocusPolicy(Qt.NoFocus)
+        # Dark theme
+        palette = QPalette()
+        palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        palette.setColor(QPalette.WindowText, Qt.white)
+        self.setPalette(palette)
+        self.generate_output.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
+        self.copy_output.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
+        self.feedback_temp.setStyleSheet('background-color: rgb(200, 200, 200)')
+        self.feedback_output.setStyleSheet('background-color: rgb(200, 200, 200)')
+        self.student.setStyleSheet('background-color: rgb(200, 200, 200)')
+        # Signals and slots
         self.feedback_script()
         copy_button()
         self.generate_output.clicked.connect(self.feedback_script)
