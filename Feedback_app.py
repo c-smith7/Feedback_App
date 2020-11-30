@@ -21,8 +21,8 @@ class Window(QWidget):
         self.student = QLineEdit(self)
         self.yes_button = QRadioButton('&Yes')
         self.no_button = QRadioButton('&No')
-        self.feedback_temp = QTextEdit(self)
-        self.feedback_output = QTextEdit(self)
+        self.feedback_temp = QPlainTextEdit(self)
+        self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
         self.copy_output = QPushButton('Copy Output Feedback')
         # Add widgets to layout
@@ -71,10 +71,10 @@ class Window(QWidget):
     def feedback_script(self):
         global new_student
         global output
-        new_student = ''
         student_name = self.student.text()
         feedback_input = self.feedback_temp.toPlainText()
         feedback_output = feedback_input.replace('we', f'{student_name} and I', 1)
+        feedback_output = ' '.join(feedback_output.split())
         if self.yes_button.isChecked():
             new_student = 'yes'
         elif self.no_button.isChecked():
@@ -94,6 +94,7 @@ class Window(QWidget):
         if student_name == '':
             self.feedback_output.clear()
         else:
+            self.feedback_output.clear()
             self.feedback_output.insertPlainText(output)
 
 
