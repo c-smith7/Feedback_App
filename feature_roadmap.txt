@@ -1,0 +1,3 @@
+1. Seperate widget window that stores the copied outputs, basically a built in clipboard. 
+2. Add seperaate widget to allow editing of the part of the feedback that is added at the end. 
+3. Use Selenium to automate getting the feedback template from vipkid.com.
