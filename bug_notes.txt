@@ -1,6 +1,0 @@
-Bugs:
-- Paste plain text into 'Feedback Template' QTextEdit box: try to change Widget to a QPlainTextEdit?
-- Output Feedback does not clear before generating a new output. Maybe think about clearing the student name
-	field and the template field as well when the copy output button is pressed, or have a dedicated button to
-	refresh the app. Or maybe just refresh and clear the template box, and not the student name so that you can
-	remember who the previous student was you generted a feedback for. 
