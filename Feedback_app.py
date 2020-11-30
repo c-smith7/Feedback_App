@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import *
@@ -9,10 +9,12 @@ from PyQt5.QtWidgets import *
 class Window(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Window options
-        self.setWindowIcon(QtGui.QIcon('vipkid.png'))
+        # Window config
         self.setWindowTitle('VIPKid Feedback App')
         self.resize(425, 500)
+        app_icon = QtGui.QIcon()
+        app_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+        self.setWindowIcon(app_icon)
         # Create layout instance
         layout = QVBoxLayout()
         # Widgets
