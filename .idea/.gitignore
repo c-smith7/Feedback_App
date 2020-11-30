@@ -1,6 +1,5 @@
 # Default ignored files
 /shelf/
 /workspace.xml
-sample_app.py
-bug_notes.txt
-feature_roadmap.txt
+/bug_notes.txt
+/feature_roadmap.txt
