@@ -39,6 +39,7 @@ class SeleniumAutomation:
         # options = Options()
         # options.headless = True
         browser = webdriver.Chrome()
+        # browser.minimize_window()
         browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Flist')  # using this until I have a missing lesson to test with
         # https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing
         # Sign in
@@ -48,11 +49,22 @@ class SeleniumAutomation:
         login_password.send_keys(password)
         sign_in = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[2]/div/form/div[2]/button')
         sign_in.click()
-        verification_error = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[2]/div/form/div[2]')
-        if WebDriverWait(browser, 2).until(EC.visibility_of(browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[2]/div/form/div[2]'))):
-            print('Please Type in code & Press Enter.')
-        print('yay!')
 
+        def text_present(text):
+            return str(text) in browser.page_source
+        if text_present('Verification'):
+            print('Please Type in Verification Code & Press Enter.')  # popup widget or message in gui.
+            browser.maximize_window()  # window will be minimized unless verification is required.
+        else:
+            print('No Verification needed!')  # don't print anything, just remove this else portion.
+
+        # Something may need to be added here like WebDriverWait.until(...) so that user can enter code, and then
+        # script can continue once an element is found on the following page.
+
+    def get_feedback_template(self):
+        # AT THIS POINT I DECIDED TO SWITCH LIBRARIES AND USE PYWINAUTO TO AUTOMATE THIS PROCESS THROUGH THE
+        # VIPKID DESKTOP APP INSTEAD OF THE WEBPAGE.
+        # HOWEVER, I WILL KEEP THIS FILE FOR POTENTIAL FUTURE REFERENCE.
 
 test = SeleniumAutomation()
 test.config_json()
