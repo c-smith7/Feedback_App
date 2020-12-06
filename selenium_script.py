@@ -31,6 +31,11 @@ class SeleniumAutomation:
         # except OSError as e:
         #     print('File deleted')
 
+    global browser
+    browser = webdriver.Chrome()
+    browser.get('https://www.vipkid.com/tp/home')
+    browser.implicitly_wait(30)
+
     def login(self):
         with open('config.json', 'r') as openfile:
             config_file = json.load(openfile)
@@ -38,9 +43,9 @@ class SeleniumAutomation:
         password = config_file['password']
         # options = Options()
         # options.headless = True
-        browser = webdriver.Chrome()
+        # browser = webdriver.Chrome()
         # browser.minimize_window()
-        browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Flist')  # using this until I have a missing lesson to test with
+        # browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')  # using this until I have a missing lesson to test with
         # https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing
         # Sign in
         login_email = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[2]/div/form/div[1]/div[1]/div/div[1]/input')
@@ -49,10 +54,11 @@ class SeleniumAutomation:
         login_password.send_keys(password)
         sign_in = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[2]/div/form/div[2]/button')
         sign_in.click()
+        browser.implicitly_wait(30)
 
-        def text_present(text):
+        def text_verification(text):
             return str(text) in browser.page_source
-        if text_present('Verification'):
+        if text_verification('Verification'):
             print('Please Type in Verification Code & Press Enter.')  # popup widget or message in gui.
             browser.maximize_window()  # window will be minimized unless verification is required.
         else:
@@ -62,13 +68,21 @@ class SeleniumAutomation:
         # script can continue once an element is found on the following page.
 
     def get_feedback_template(self):
-        # AT THIS POINT I DECIDED TO SWITCH LIBRARIES AND USE PYWINAUTO TO AUTOMATE THIS PROCESS THROUGH THE
-        # VIPKID DESKTOP APP INSTEAD OF THE WEBPAGE.
-        # HOWEVER, I WILL KEEP THIS FILE FOR POTENTIAL FUTURE REFERENCE.
+        missing_cf = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div/div[4]/div[2]/div/a[1]')
+        missing_cf.click()
+        time.sleep(1)
+        materials_button = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')
+        materials_button.click()
+        browser.switch_to.window(browser.window_handles[-1])
+        time.sleep(1)
+        template_button = browser.find_element_by_xpath('//*[@id="tab-5"]')
+        template_button.click()
+
 
 test = SeleniumAutomation()
 test.config_json()
 test.login()
+test.get_feedback_template()
 input('Press ENTER to end program')
 
 
