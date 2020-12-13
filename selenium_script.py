@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import ElementNotVisibleException, StaleElementReferenceException
 from selenium.webdriver.chrome.options import Options
 import time
 import json
@@ -6,6 +7,7 @@ import os
 from os import path
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 
 class SeleniumAutomation:
@@ -41,9 +43,6 @@ class SeleniumAutomation:
             config_file = json.load(openfile)
         user_name = config_file['user_name']
         password = config_file['password']
-        # options = Options()
-        # options.headless = True
-        # browser = webdriver.Chrome()
         # browser.minimize_window()
         # browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')  # using this until I have a missing lesson to test with
         # https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing
@@ -55,14 +54,19 @@ class SeleniumAutomation:
         sign_in = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[2]/div/form/div[2]/button')
         sign_in.click()
         browser.implicitly_wait(30)
-
-        def text_verification(text):
-            return str(text) in browser.page_source
-        if text_verification('Verification'):
+        verification_element = browser.find_element_by_xpath("//*[@id='__layout']/div/div[2]/div/div[2]/div/form/div[1]/div[3]/div/div/input")
+        if verification_element.is_displayed():
             print('Please Type in Verification Code & Press Enter.')  # popup widget or message in gui.
             browser.maximize_window()  # window will be minimized unless verification is required.
         else:
             print('No Verification needed!')  # don't print anything, just remove this else portion.
+        # def text_verification(text):
+        #     return str(text) in browser.page_source
+        # if text_verification('Verification'):
+        #     print('Please Type in Verification Code & Press Enter.')  # popup widget or message in gui.
+        #     browser.maximize_window()  # window will be minimized unless verification is required.
+        # else:
+        #     print('No Verification needed!')  # don't print anything, just remove this else portion.
 
         # Something may need to be added here like WebDriverWait.until(...) so that user can enter code, and then
         # script can continue once an element is found on the following page.
@@ -75,14 +79,37 @@ class SeleniumAutomation:
         materials_button.click()
         browser.switch_to.window(browser.window_handles[-1])
         time.sleep(1)
-        template_button = browser.find_element_by_xpath('//*[@id="tab-5"]')
-        template_button.click()
+        template_button = browser.find_element_by_xpath("//*[@id='tab-5']")
+        browser.execute_script("arguments[0].click();", template_button)
+        time.sleep(1)
+
+    def select_template_text(self):
+        # click show more button until all templates are shown.
+        show_more_button = browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button")
+        try:
+            while show_more_button.is_displayed():
+                browser.execute_script("arguments[0].click()", show_more_button)
+        except StaleElementReferenceException as e:
+            print('All templates showing!')
+        # WebDriverWait(browser, 10, 0.5, (ElementNotVisibleException)).until_not(browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button").is_displayed())
+        # for length of li tags:
+        # teacher_name = browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/ul/li[1]/div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
+        # print(teacher_name)
+
+
+
+
+
+
+
+
 
 
 test = SeleniumAutomation()
 test.config_json()
 test.login()
 test.get_feedback_template()
+test.select_template_text()
 input('Press ENTER to end program')
 
 
