@@ -25,6 +25,7 @@ class Window(QWidget):
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
         self.copy_output = QPushButton('Copy Output Feedback')
+        self.clear_form = QPushButton('Clear Form')
         # Add widgets to layout
         layout.addWidget(QLabel('Student Name:'))
         layout.addWidget(self.student)
@@ -42,11 +43,13 @@ class Window(QWidget):
         layout.addWidget(self.feedback_output)
         layout.addSpacing(2)
         layout.addWidget(self.copy_output)
+        layout.addWidget(self.clear_form)
         self.setLayout(layout)
         # Button configs
         self.no_button.setChecked(True)
         self.generate_output.setDefault(True)
         self.copy_output.setDefault(True)
+        self.clear_form.setDefault(True)
         self.feedback_temp.setTabChangesFocus(True)
         self.feedback_output.setTabChangesFocus(True)
         self.yes_button.setFocusPolicy(Qt.NoFocus)
@@ -59,14 +62,15 @@ class Window(QWidget):
         self.setPalette(palette)
         self.generate_output.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
         self.copy_output.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
+        self.clear_form.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
         self.feedback_temp.setStyleSheet('background-color: rgb(200, 200, 200)')
         self.feedback_output.setStyleSheet('background-color: rgb(200, 200, 200)')
         self.student.setStyleSheet('background-color: rgb(200, 200, 200)')
         # Signals and slots
         self.feedback_script()
-        copy_button()
         self.generate_output.clicked.connect(self.feedback_script)
-        self.copy_output.clicked.connect(copy_button)
+        self.copy_output.clicked.connect(self.copy_button)
+        self.clear_form.clicked.connect(self.clear_form_button)
 
     def feedback_script(self):
         global new_student
@@ -97,10 +101,16 @@ class Window(QWidget):
             self.feedback_output.clear()
             self.feedback_output.insertPlainText(output)
 
+    def clear_form_button(self):
+        self.student.clear()
+        self.feedback_temp.clear()
 
-def copy_button():
-    clipboard = QtGui.QGuiApplication.clipboard()
-    clipboard.setText(output)
+    def copy_button(self):
+        clipboard = QtGui.QGuiApplication.clipboard()
+        clipboard.setText(output)
+
+
+
 
 
 if __name__ == "__main__":
