@@ -1,3 +1,4 @@
+import pandas
 from selenium import webdriver
 from selenium.common.exceptions import ElementNotVisibleException, StaleElementReferenceException, \
     NoSuchElementException, TimeoutException
@@ -36,17 +37,14 @@ class SeleniumAutomation:
 
     global browser
     browser = webdriver.Chrome()
-    browser.get('https://www.vipkid.com/tp/home')
-    browser.implicitly_wait(30)
+    browser.minimize_window()
+    browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
 
     def login(self):
         with open('config.json', 'r') as openfile:
             config_file = json.load(openfile)
         user_name = config_file['user_name']
         password = config_file['password']
-        # browser.minimize_window()
-        # browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')  # using this until I have a missing lesson to test with
-        # https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing
         # Sign in
         login_email = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[2]/div/form/div[1]/div[1]/div/div[1]/input')
         login_email.send_keys(user_name)
@@ -54,6 +52,7 @@ class SeleniumAutomation:
         login_password.send_keys(password)
         sign_in = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[2]/div/form/div[2]/button')
         sign_in.click()
+        time.sleep(1)
         try:
             WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, "//*[@id='__layout']/div/div[2]/div/div[2]/div/form/div[1]/div[3]/div/div/input")))
         except TimeoutException:
@@ -61,25 +60,12 @@ class SeleniumAutomation:
         else:
             print('Please Type in Verification Code & Press Enter.')  # popup widget or message in gui.
             browser.maximize_window()  # window will be minimized unless verification is required.
-        time.sleep(1)
-        # def text_verification(text):
-        #     return str(text) in browser.page_source
-        # if text_verification('Verification'):
-        #     print('Please Type in Verification Code & Press Enter.')  # popup widget or message in gui.
-        #     browser.maximize_window()  # window will be minimized unless verification is required.
-        # else:
-        #     print('No Verification needed!')  # don't print anything, just remove this else portion.
-
-        # Something may need to be added here like WebDriverWait.until(...) so that user can enter code, and then
-        # script can continue once an element is found on the following page.
 
     def get_feedback_template(self):
-        missing_cf = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div/div[4]/div[2]/div/a[1]')
-        missing_cf.click()
-        time.sleep(1)
-        materials_button = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')
+        materials_button = WebDriverWait(browser, 120).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')))
         materials_button.click()
         browser.switch_to.window(browser.window_handles[-1])
+        browser.minimize_window()
         time.sleep(1)
         template_button = browser.find_element_by_xpath("//*[@id='tab-5']")
         browser.execute_script("arguments[0].click();", template_button)
@@ -93,32 +79,19 @@ class SeleniumAutomation:
                 browser.execute_script("arguments[0].click()", show_more_button)
         except StaleElementReferenceException as e:
             print('All templates showing!')
-        time.sleep(2)
+        time.sleep(1)
         # Now we can just iterate through every <li> tag until we find a teacher name in csv file.
         # Find length of li tags to iterate through.
         ul_list = browser.find_element_by_class_name('shared-notes-list-container')
         li_tags = ul_list.find_elements_by_tag_name('li')
-        teachers = []
-        templates = []
+        valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Katie EAV', 'Kimberly BDP',
+                          'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH review', 'Thomas CH']
         for li_tag in li_tags:
             teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-            template = li_tag.find_element_by_xpath(".//div[2]/div[2]").text
-            teachers.append(teacher_name)
-            templates.append(template)
-        print(len(teachers))
-        print(teachers)
-        print(len(templates))
-        print(templates)
-        # Up to this point we can return a list of all teacher names and their respective template.
-        # Now we just need to add an if statement to search the teacher csv.
-
-        # WebDriverWait(browser, 10, 0.5, (ElementNotVisibleException)).until_not(browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button").is_displayed())
-        # for length of li tags:
-        # teacher_name = browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/ul/li[1]/div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-        # print(teacher_name)
-
-
-
+            if teacher_name in valid_teachers:
+                template = li_tag.find_element_by_xpath(".//div[2]/div[2]").text
+                print(template)
+                break
 
 
 test = SeleniumAutomation()
