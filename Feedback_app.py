@@ -1,5 +1,5 @@
 import sys
-
+import re
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QPalette, QColor
@@ -77,7 +77,7 @@ class Window(QWidget):
         global output
         student_name = self.student.text()
         feedback_input = self.feedback_temp.toPlainText()
-        feedback_output = feedback_input.replace('we', f'{student_name} and I', 1)
+        feedback_output = re.sub('we|We', f'{student_name} and I', feedback_input, 1)
         feedback_output = ' '.join(feedback_output.split())
         if self.yes_button.isChecked():
             new_student = 'yes'
