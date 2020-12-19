@@ -52,9 +52,10 @@ class SeleniumAutomation:
     # else:
     #     print('Please Type in Verification Code & Press Enter.')  # popup widget or message in gui.
     options = Options()
-    options.add_argument('--disable-extensions')
+    options.headless = True
     browser = webdriver.Chrome(options=options)
     browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+    print('Headless browser started!')
 
     def save_cookie(self):
         with open('cookie', 'wb') as file:
@@ -87,7 +88,7 @@ class SeleniumAutomation:
         materials_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')))
         materials_button.click()
         self.browser.switch_to.window(self.browser.window_handles[-1])
-        self.browser.minimize_window()
+        # self.browser.minimize_window()
         time.sleep(1)
         template_button = self.browser.find_element_by_xpath("//*[@id='tab-5']")
         self.browser.execute_script("arguments[0].click();", template_button)
@@ -120,6 +121,9 @@ class SeleniumAutomation:
         if non_valid_teacher_count == 0:
             print('No valid teacher templates :(')
 
+    def quit_driver(self):
+        self.browser.quit()
+
 
 test = SeleniumAutomation()
 # test.config_json()
@@ -129,4 +133,5 @@ test.get_student_name()
 test.nav_to_template()
 test.select_template_text()
 input('Press ENTER to end program')
+test.quit_driver()
 
