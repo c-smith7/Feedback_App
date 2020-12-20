@@ -51,6 +51,7 @@ class SeleniumAutomation:
     #     print('No Verification needed!')  # don't print anything, just remove this else portion.
     # else:
     #     print('Please Type in Verification Code & Press Enter.')  # popup widget or message in gui.
+
     options = Options()
     options.headless = True
     browser = webdriver.Chrome(options=options)
@@ -123,15 +124,15 @@ class SeleniumAutomation:
 
     def quit_driver(self):
         self.browser.quit()
+        print('Driver quit.')
 
 
-test = SeleniumAutomation()
-# test.config_json()
-# test.verification_login()
-test.load_cookie()
-test.get_student_name()
-test.nav_to_template()
-test.select_template_text()
-input('Press ENTER to end program')
-test.quit_driver()
+if __name__ == "__main__":
+    auto = SeleniumAutomation()
+    auto.load_cookie()
+    auto.get_student_name()
+    auto.nav_to_template()
+    auto.select_template_text()
+    input('Press ENTER to end program')
+    auto.quit_driver()
 
