@@ -4,6 +4,7 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import *
+import selenium_script
 
 
 class Window(QWidget):
@@ -18,6 +19,7 @@ class Window(QWidget):
         # Create layout instance
         layout = QVBoxLayout()
         # Widgets
+        self.get_template = QPushButton('Get Feedback Template')
         self.student = QLineEdit(self)
         self.yes_button = QRadioButton('&Yes')
         self.no_button = QRadioButton('&No')
@@ -27,6 +29,7 @@ class Window(QWidget):
         self.copy_output = QPushButton('Copy Output Feedback')
         self.clear_form = QPushButton('Clear Form')
         # Add widgets to layout
+        layout.addWidget(self.get_template)
         layout.addWidget(QLabel('Student Name:'))
         layout.addWidget(self.student)
         layout.addSpacing(4)
@@ -63,6 +66,7 @@ class Window(QWidget):
         self.generate_output.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
         self.copy_output.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
         self.clear_form.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
+        self.get_template.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
         self.feedback_temp.setStyleSheet('background-color: rgb(200, 200, 200)')
         self.feedback_output.setStyleSheet('background-color: rgb(200, 200, 200)')
         self.student.setStyleSheet('background-color: rgb(200, 200, 200)')
@@ -71,6 +75,7 @@ class Window(QWidget):
         self.generate_output.clicked.connect(self.feedback_script)
         self.copy_output.clicked.connect(self.copy_button)
         self.clear_form.clicked.connect(self.clear_form_button)
+        self.get_template.clicked.connect(self.get_template_button)
 
     def feedback_script(self):
         global new_student
@@ -109,7 +114,8 @@ class Window(QWidget):
         clipboard = QtGui.QGuiApplication.clipboard()
         clipboard.setText(output)
 
-
+    def get_template_button(self):
+        selenium_script.SeleniumAutomation()
 
 
 
