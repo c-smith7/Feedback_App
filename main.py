@@ -126,7 +126,10 @@ class Window(QWidget):
         options.headless = True
         browser = webdriver.Chrome(options=options)
         browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-        # Add cookies to login into teacher portal.
+        # Clear any previous text from text boxes.
+        self.student.clear()
+        self.feedback_temp.clear()
+        # Add cookies to login to teacher portal.
         try:
             with open('cookie', 'rb') as cookiesfile:
                 cookies = pickle.load(cookiesfile)
