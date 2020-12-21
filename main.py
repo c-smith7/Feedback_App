@@ -20,7 +20,7 @@ class Window(QWidget):
         super().__init__(*args, **kwargs)
         # Window config
         self.setWindowTitle('VIPKid Feedback App')
-        self.resize(425, 500)
+        self.resize(500, 675)
         app_icon = QtGui.QIcon()
         app_icon.addFile('pencil.png', QtCore.QSize(16, 16))
         self.setWindowIcon(app_icon)
