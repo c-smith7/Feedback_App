@@ -1,3 +1,4 @@
+import path
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -10,27 +11,27 @@ import sys
 
 
 class SeleniumAutomation:
-    # def config_json(self):
-    #     # from qt widget, function will get user name and password to dump into json config file.
-    #     # this will run when login button is clicked on gui, but if user doesn't want automation, don't press login.
-    #     if path.exists('config.json'):
-    #         print('Logged In!')  # Print 'Logged in' next to button with Qlabel or something.
-    #     else:
-    #         # open login widget window
-    #         # pyqt_user and pyqt_password are entered by the user
-    #         # create config file to be used in get_feedback_template()
-    #         pyqt_user = 'carlosvsmith7@gmail.com'    # input from gui
-    #         pyqt_password = 'brazil4444'            # input from gui
-    #         login_dict = dict(user_name=pyqt_user, password=pyqt_password)
-    #         with open('config.json', 'w') as outfile:
-    #             json.dump(login_dict, outfile)
-    #         print('Logged In!!')
-    # include a reset user_name and password button that deletes the config file and let's user reenter login info.
-    # def reset_button():
-    # try:
-    #     os.remove('config.json')
-    # except OSError as e:
-    #     print('File deleted')
+#     def config_json(self):
+#         # from qt widget, function will get user name and password to dump into json config file.
+#         # this will run when login button is clicked on gui, but if user doesn't want automation, don't press login.
+#         if path.exists('config.json'):
+#             print('Logged In!')  # Print 'Logged in' next to button with Qlabel or something.
+#         else:
+#             # open login widget window
+#             # pyqt_user and pyqt_password are entered by the user
+#             # create config file to be used in get_feedback_template()
+#             pyqt_user = 'carlosvsmith7@gmail.com'    # input from gui
+#             pyqt_password = 'brazil4444'            # input from gui
+#             login_dict = dict(user_name=pyqt_user, password=pyqt_password)
+#             with open('config.json', 'w') as outfile:
+#                 json.dump(login_dict, outfile)
+#             print('Logged In!!')
+#     include a reset user_name and password button that deletes the config file and let's user reenter login info.
+#     def reset_button():
+#     try:
+#         os.remove('config.json')
+#     except OSError as e:
+#         print('File deleted')
 
     # def verification_login(self):
     # with open('config.json', 'r') as openfile:
@@ -76,18 +77,22 @@ class SeleniumAutomation:
 
     def get_student_name(self):
         # Wait to find the "missing cf/ua" tab"
-        WebDriverWait(self.browser, 120).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
-        self.save_cookie()
+        # WebDriverWait(self.browser, 120).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
+        # self.save_cookie()
         try:
             student_name = WebDriverWait(self.browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0]
             print(student_name)  # populate this name in 'student name' box in GUI.
         except TimeoutException:
             print('All student feedbacks completed!')
+            # options = Options()
+            # options.headless = True
+            # browser = webdriver.Chrome(options=options)
+            # browser.quit()
             sys.exit(1)
 
     def nav_to_template(self):
         materials_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')))
-        materials_button.click()
+        self.browser.execute_script("arguments[0].click();", materials_button)
         self.browser.switch_to.window(self.browser.window_handles[-1])
         # self.browser.minimize_window()
         time.sleep(1)
