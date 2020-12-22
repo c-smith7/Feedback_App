@@ -11,7 +11,7 @@ from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 
 
@@ -127,155 +127,220 @@ class Window(QWidget):
         self.student.clear()
         self.feedback_temp.clear()
         if os.path.exists('cookie'):
-            options = Options()
-            options.headless = True
-            browser = webdriver.Chrome(options=options)
-            browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-            print('Headless browser started!')
-            # Add cookies to login to teacher portal.
-            with open('cookie', 'rb') as cookiesfile:
-                cookies = pickle.load(cookiesfile)
-                for cookie in cookies:
-                    browser.add_cookie(cookie)
-                browser.refresh()
-                missing_cf_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
-                missing_cf_button.click()
-                print('Logged In!')
-                time.sleep(1)
-            # Get student name
-            if browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p'):
+            try:
+                options = Options()
+                options.headless = True
+                browser = webdriver.Chrome(options=options)
+                browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+                print('Headless browser started!')
+                # Add cookies to login to teacher portal.
+                with open('cookie', 'rb') as cookiesfile:
+                    cookies = pickle.load(cookiesfile)
+                    for cookie in cookies:
+                        browser.add_cookie(cookie)
+                    browser.refresh()
+                    missing_cf_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
+                    missing_cf_button.click()
+                    print('Logged In!')
+                    time.sleep(1)
+                # Get student name, if there is one.
+                try:
+                    browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')
+                    msgBox = QMessageBox()
+                    msgBox.setIcon(QMessageBox.Information)
+                    msgBox.setText('All student feedback completed!')
+                    msgBox.setWindowTitle('VIPKid Feedback App')
+                    msgBox_icon = QtGui.QIcon()
+                    msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+                    msgBox.setWindowIcon(msgBox_icon)
+                    msgBox.setStandardButtons(QMessageBox.Ok)
+                    msgBox.setDefaultButton(QMessageBox.Ok)
+                    msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+                    msgBox.exec()
+                    browser.quit()
+                except NoSuchElementException:
+                    print("There are feedbacks due.")
+                    student_name = str(WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
+                    student_name = student_name.title()
+                    # print(student_name)
+                    self.student.setText(student_name)
+                # try:
+                #     student_name = str(WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
+                #     student_name = student_name.title()
+                #     print(student_name)
+                #     self.student.setText(student_name)  # populate this name in 'student name' box in GUI.
+                # except TimeoutException:
+                #     print('exception hit.')
+                #     msgBox = QMessageBox()
+                #     msgBox.setIcon(QMessageBox.Information)
+                #     msgBox.setText('All student feedback completed!')
+                #     msgBox.setStandardButtons(QMessageBox.Ok)
+                #     returnValue = msgBox.exec()
+                #     if returnValue == QMessageBox.Ok:
+                #         print('Ok clicked.')
+                #     browser.quit()
+                # Navigate to templates window
+
+                    materials_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')))
+                    browser.execute_script("arguments[0].click();", materials_button)
+                    # print('materials button clicked.')
+                    browser.switch_to.window(browser.window_handles[-1])
+                    time.sleep(1)
+                    template_button = browser.find_element_by_xpath("//*[@id='tab-5']")
+                    browser.execute_script("arguments[0].click();", template_button)
+                    # print('template button clicked.')
+                    time.sleep(1)
+                    # Click show 'more' button until all templates are shown.
+                    show_more_button = browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button")
+                    try:
+                        while show_more_button.is_displayed():
+                            browser.execute_script("arguments[0].click()", show_more_button)
+                    except StaleElementReferenceException:
+                        time.sleep(1)
+                    # print('all templates showing.')
+                    # Iterate through every <li> tag until we find a teacher name in csv file.
+                    ul_list = browser.find_element_by_class_name('shared-notes-list-container')
+                    li_tags = ul_list.find_elements_by_tag_name('li')
+                    valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
+                                      'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
+                    invalid_teacher_count = int(len(li_tags))
+                    for li_tag in li_tags:
+                        teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
+                        if teacher_name in valid_teachers:
+                            template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
+                            # print(template)
+                            self.feedback_temp.insertPlainText(template)
+                            break
+                        elif teacher_name not in valid_teachers:
+                            invalid_teacher_count -= 1
+                            continue
+                    if invalid_teacher_count == 0:
+                        msgBox = QMessageBox()
+                        msgBox.setIcon(QMessageBox.Information)
+                        msgBox.setText('No valid teacher templates :(')
+                        msgBox.setWindowTitle('VIPKid Feedback App')
+                        msgBox_icon = QtGui.QIcon()
+                        msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+                        msgBox.setWindowIcon(msgBox_icon)
+                        msgBox.setStandardButtons(QMessageBox.Ok)
+                        msgBox.setDefaultButton(QMessageBox.Ok)
+                        msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+                        msgBox.exec()
+                    browser.quit()
+            except Exception as e:
                 msgBox = QMessageBox()
                 msgBox.setIcon(QMessageBox.Information)
-                msgBox.setText('All student feedback completed!')
+                msgBox.setText('There was a problem getting student feedback..')
+                msgBox.setInformativeText('Please try again by clicking the "Get Feedback Template" button.')
+                msgBox.setDetailedText(f'{e}'
+                                       ' If the issue persists after trying several times to get student feedback, '
+                                       'please email *****')
                 msgBox.setWindowTitle('VIPKid Feedback App')
                 msgBox_icon = QtGui.QIcon()
                 msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
                 msgBox.setWindowIcon(msgBox_icon)
-                msgBox.setStandardButtons(QMessageBox.Close)
-                msgBox.setDefaultButton(QMessageBox.Close)
+                msgBox.setStandardButtons(QMessageBox.Ok)
+                msgBox.setDefaultButton(QMessageBox.Ok)
                 msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                 msgBox.exec()
                 browser.quit()
-                sys.exit(1)
-            else:
-                student_name = str(WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
-                student_name = student_name.title()
-                print(student_name)
-                self.student.setText(student_name)
-            # try:
-            #     student_name = str(WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
-            #     student_name = student_name.title()
-            #     print(student_name)
-            #     self.student.setText(student_name)  # populate this name in 'student name' box in GUI.
-            # except TimeoutException:
-            #     print('exception hit.')
-            #     msgBox = QMessageBox()
-            #     msgBox.setIcon(QMessageBox.Information)
-            #     msgBox.setText('All student feedback completed!')
-            #     msgBox.setStandardButtons(QMessageBox.Ok)
-            #     returnValue = msgBox.exec()
-            #     if returnValue == QMessageBox.Ok:
-            #         print('Ok clicked.')
-            #     browser.quit()
-            # Navigate to templates window
-            materials_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')))
-            browser.execute_script("arguments[0].click();", materials_button)
-            print('materials button clicked.')
-            browser.switch_to.window(browser.window_handles[-1])
-            time.sleep(1)
-            template_button = browser.find_element_by_xpath("//*[@id='tab-5']")
-            browser.execute_script("arguments[0].click();", template_button)
-            print('template button clicked.')
-            time.sleep(1)
-            # Click show 'more' button until all templates are shown.
-            show_more_button = browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button")
-            try:
-                while show_more_button.is_displayed():
-                    browser.execute_script("arguments[0].click()", show_more_button)
-            except StaleElementReferenceException:
-                time.sleep(1)
-            print('all templates showing.')
-            # Iterate through every <li> tag until we find a teacher name in csv file.
-            ul_list = browser.find_element_by_class_name('shared-notes-list-container')
-            li_tags = ul_list.find_elements_by_tag_name('li')
-            valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
-                              'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
-            non_valid_teacher_count = int(len(li_tags))
-            for li_tag in li_tags:
-                teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-                if teacher_name in valid_teachers:
-                    template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
-                    print(template)
-                    self.feedback_temp.insertPlainText(template)
-                    break
-                elif teacher_name not in valid_teachers:
-                    non_valid_teacher_count -= 1
-                    continue
-            if non_valid_teacher_count == 0:
-                pop_up = QMessageBox()
-                pop_up.setText('No valid teacher templates :(')
-                pop_up.addButton(QPushButton('OK'), QMessageBox.Close)
-            browser.quit()
         else:
-            browser = webdriver.Chrome()
-            browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-            print('Login Please!')
-            # Wait for user login.
-            WebDriverWait(browser, 120).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
-            # Save cookies file after login
-            with open('cookie', 'wb') as file:
-                pickle.dump(browser.get_cookies(), file)
-            # Get student name
             try:
-                student_name = str(WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
-                student_name = student_name.title()
-                print(student_name)
-                self.student.setText(student_name)  # populate this name in 'student name' box in GUI.
-            except TimeoutException:
-                pop_up = QMessageBox()
-                pop_up.setText('All student feedback completed!')
-                pop_up.addButton(QPushButton('OK'), QMessageBox.Close)
-                browser.quit()
-            # Navigate to templates window
-            materials_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')))
-            browser.execute_script("arguments[0].click();", materials_button)
-            print('materials button clicked.')
-            browser.switch_to.window(browser.window_handles[-1])
-            browser.minimize_window()
-            time.sleep(1)
-            template_button = browser.find_element_by_xpath("//*[@id='tab-5']")
-            browser.execute_script("arguments[0].click();", template_button)
-            print('template button clicked.')
-            time.sleep(1)
-            # Click show 'more' button until all templates are shown.
-            show_more_button = browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button")
-            try:
-                while show_more_button.is_displayed():
-                    browser.execute_script("arguments[0].click()", show_more_button)
-            except StaleElementReferenceException:
+                browser = webdriver.Chrome()
+                browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+                print('Login Please!')
+                # Wait for user login.
+                WebDriverWait(browser, 120).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
                 time.sleep(1)
-            print('all templates showing.')
-            # Iterate through every <li> tag until we find a teacher name in csv file.
-            ul_list = browser.find_element_by_class_name('shared-notes-list-container')
-            li_tags = ul_list.find_elements_by_tag_name('li')
-            valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
-                              'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
-            non_valid_teacher_count = int(len(li_tags))
-            for li_tag in li_tags:
-                teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-                if teacher_name in valid_teachers:
-                    template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
-                    print(template)
-                    self.feedback_temp.insertPlainText(template)
-                    break
-                elif teacher_name not in valid_teachers:
-                    non_valid_teacher_count -= 1
-                    continue
-            if non_valid_teacher_count == 0:
-                pop_up = QMessageBox()
-                pop_up.setText('No valid teacher templates :(')
-                pop_up.addButton(QPushButton('OK'), QMessageBox.Close)
-            browser.quit()
+                # Save cookies file after login
+                with open('cookie', 'wb') as file:
+                    pickle.dump(browser.get_cookies(), file)
+                # Get student name if there is one.
+                try:
+                    browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')
+                    msgBox = QMessageBox()
+                    msgBox.setIcon(QMessageBox.Information)
+                    msgBox.setText('All student feedback completed!')
+                    msgBox.setWindowTitle('VIPKid Feedback App')
+                    msgBox_icon = QtGui.QIcon()
+                    msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+                    msgBox.setWindowIcon(msgBox_icon)
+                    msgBox.setStandardButtons(QMessageBox.Ok)
+                    msgBox.setDefaultButton(QMessageBox.Ok)
+                    msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+                    msgBox.exec()
+                    browser.quit()
+                except NoSuchElementException:
+                    # print("There are feedbacks due.")
+                    student_name = str(WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
+                    student_name = student_name.title()
+                    # print(student_name)
+                    self.student.setText(student_name)
+                    # Navigate to templates window
+                    materials_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')))
+                    browser.execute_script("arguments[0].click();", materials_button)
+                    # print('materials button clicked.')
+                    browser.switch_to.window(browser.window_handles[-1])
+                    browser.minimize_window()
+                    time.sleep(1)
+                    template_button = browser.find_element_by_xpath("//*[@id='tab-5']")
+                    browser.execute_script("arguments[0].click();", template_button)
+                    # print('template button clicked.')
+                    time.sleep(1)
+                    # Click show 'more' button until all templates are shown.
+                    show_more_button = browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button")
+                    try:
+                        while show_more_button.is_displayed():
+                            browser.execute_script("arguments[0].click()", show_more_button)
+                    except StaleElementReferenceException:
+                        time.sleep(1)
+                    # print('all templates showing.')
+                    # Iterate through every <li> tag until we find a teacher name in csv file.
+                    ul_list = browser.find_element_by_class_name('shared-notes-list-container')
+                    li_tags = ul_list.find_elements_by_tag_name('li')
+                    valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
+                                      'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
+                    non_valid_teacher_count = int(len(li_tags))
+                    for li_tag in li_tags:
+                        teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
+                        if teacher_name in valid_teachers:
+                            template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
+                            # print(template)
+                            self.feedback_temp.insertPlainText(template)
+                            break
+                        elif teacher_name not in valid_teachers:
+                            non_valid_teacher_count -= 1
+                            continue
+                    if non_valid_teacher_count == 0:
+                        msgBox = QMessageBox()
+                        msgBox.setIcon(QMessageBox.Information)
+                        msgBox.setText('No valid teacher templates :(')
+                        msgBox.setWindowTitle('VIPKid Feedback App')
+                        msgBox_icon = QtGui.QIcon()
+                        msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+                        msgBox.setWindowIcon(msgBox_icon)
+                        msgBox.setStandardButtons(QMessageBox.Ok)
+                        msgBox.setDefaultButton(QMessageBox.Ok)
+                        msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+                        msgBox.exec()
+                    browser.quit()
+            except Exception as e:
+                msgBox = QMessageBox()
+                msgBox.setIcon(QMessageBox.Information)
+                msgBox.setText('There was a problem getting student feedback..')
+                msgBox.setInformativeText('Please try again by clicking the "Get Feedback Template" button.')
+                msgBox.setDetailedText(f'{e}'
+                                       ' If the issue persists after trying several times to get student feedback, '
+                                       'please email *****')
+                msgBox.setWindowTitle('VIPKid Feedback App')
+                msgBox_icon = QtGui.QIcon()
+                msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+                msgBox.setWindowIcon(msgBox_icon)
+                msgBox.setStandardButtons(QMessageBox.Ok)
+                msgBox.setDefaultButton(QMessageBox.Ok)
+                msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+                msgBox.exec()
+                browser.quit()
 
 
 if __name__ == "__main__":
