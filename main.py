@@ -162,6 +162,8 @@ class Window(QWidget):
                     print("There are feedbacks due.")
                     student_name = str(WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
                     student_name = student_name.title()
+                    if student_name.isupper():
+                        student_name = ''.join(student_name.split()).title()
                     # print(student_name)
                     self.student.setText(student_name)
                 # try:
@@ -246,10 +248,11 @@ class Window(QWidget):
                 msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                 msgBox.exec()
                 if msgBox.clickedButton() == retry_button:
-                    # browser.quit()
+                    browser.quit()
                     print('Running again..')
                     self.get_template.click()
-                browser.quit()
+                else:
+                    browser.quit()
         else:
             try:
                 msgBox = QMessageBox()
@@ -305,7 +308,7 @@ class Window(QWidget):
                     browser.switch_to.window(browser.window_handles[-1])
                     browser.minimize_window()
                     time.sleep(1)
-                    template_button = browser.find_element_by_xpath("//*[@id='tab-5']")
+                    template_button = browser.find_element_by_xpath("//*[@id='tabb-5']")
                     browser.execute_script("arguments[0].click();", template_button)
                     # print('template button clicked.')
                     time.sleep(1)
@@ -350,19 +353,26 @@ class Window(QWidget):
                 msgBox = QMessageBox()
                 msgBox.setIcon(QMessageBox.Information)
                 msgBox.setText('There was a problem getting student feedback..')
-                msgBox.setInformativeText('Please try again by clicking the "Get Feedback Template" button.')
-                msgBox.setDetailedText(f'{e}'
-                                       ' If the issue persists after trying several times to get student feedback, '
+                msgBox.setInformativeText('Please try again by clicking the "Retry" button below.')
+                msgBox.setDetailedText(f'{e}\n'
+                                       'If the issue persists after trying several times to get student feedback,\n'
                                        'please email *****')
                 msgBox.setWindowTitle('VIPKid Feedback App')
                 msgBox_icon = QtGui.QIcon()
                 msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
                 msgBox.setWindowIcon(msgBox_icon)
-                msgBox.setStandardButtons(QMessageBox.Ok)
+                msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                retry_button = msgBox.button(QMessageBox.Ok)
+                retry_button.setText('Retry')
                 msgBox.setDefaultButton(QMessageBox.Ok)
                 msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                 msgBox.exec()
-                browser.quit()
+                if msgBox.clickedButton() == retry_button:
+                    browser.quit()
+                    print('Running again..')
+                    self.get_template.click()
+                else:
+                    browser.quit()
 
 
 if __name__ == "__main__":
