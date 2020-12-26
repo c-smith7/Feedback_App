@@ -90,7 +90,7 @@ class Window(QWidget):
         global output
         student_name = self.student.text()
         feedback_input = self.feedback_temp.toPlainText()
-        feedback_output = re.sub('we|We', f'{student_name} and I', feedback_input, 1)
+        feedback_output = re.sub(' we |We', f' {student_name} and I ', feedback_input, 1)
         feedback_output = ' '.join(feedback_output.split())
         if self.yes_button.isChecked():
             new_student = 'yes'
@@ -231,26 +231,48 @@ class Window(QWidget):
                 msgBox = QMessageBox()
                 msgBox.setIcon(QMessageBox.Information)
                 msgBox.setText('There was a problem getting student feedback..')
-                msgBox.setInformativeText('Please try again by clicking the "Get Feedback Template" button.')
-                msgBox.setDetailedText(f'{e}'
-                                       ' If the issue persists after trying several times to get student feedback, '
+                msgBox.setInformativeText('Please try again by clicking the "Retry" button below.')
+                msgBox.setDetailedText(f'{e}\n'
+                                       'If the issue persists after trying several times to get student feedback,\n'
                                        'please email *****')
                 msgBox.setWindowTitle('VIPKid Feedback App')
                 msgBox_icon = QtGui.QIcon()
                 msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
                 msgBox.setWindowIcon(msgBox_icon)
-                msgBox.setStandardButtons(QMessageBox.Ok)
+                msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                retry_button = msgBox.button(QMessageBox.Ok)
+                retry_button.setText('Retry')
                 msgBox.setDefaultButton(QMessageBox.Ok)
                 msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                 msgBox.exec()
+                if msgBox.clickedButton() == retry_button:
+                    # browser.quit()
+                    print('Running again..')
+                    self.get_template.click()
                 browser.quit()
         else:
             try:
+                msgBox = QMessageBox()
+                msgBox.setIcon(QMessageBox.Information)
+                msgBox.setText('Please login to VIPKid Website.')
+                msgBox.setInformativeText('Click "Login" button below, and a separate window will open to login.\n'
+                                          '\n'
+                                          'You will only need to log into VIPKid once.\n'
+                                          'From now on, you will NOT need to login when you use this app.')
+                msgBox.setWindowTitle('VIPKid Feedback App')
+                msgBox_icon = QtGui.QIcon()
+                msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+                msgBox.setWindowIcon(msgBox_icon)
+                msgBox.setStandardButtons(QMessageBox.Ok)
+                ok_button = msgBox.button(QMessageBox.Ok)
+                ok_button.setText('Login')
+                msgBox.setDefaultButton(QMessageBox.Ok)
+                msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+                msgBox.exec()
                 browser = webdriver.Chrome()
                 browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-                print('Login Please!')
                 # Wait for user login.
-                WebDriverWait(browser, 120).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
+                WebDriverWait(browser, 300).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
                 time.sleep(1)
                 # Save cookies file after login
                 with open('cookie', 'wb') as file:
