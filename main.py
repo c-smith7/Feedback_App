@@ -127,12 +127,34 @@ class Window(QWidget):
         self.student.clear()
         self.feedback_temp.clear()
         if os.path.exists('cookie'):
+            progress_bar = QProgressDialog('Getting feedback template...', '', 0, 100, self)
+            progress_bar.setWindowModality(Qt.WindowModal)
+            progress_bar.forceShow()
+            progress_bar.setCancelButton(None)
+            progress_bar.setWindowTitle('VIPKid Feedback App')
+            progress_bar.setFixedWidth(400)
+            progress_bar.setStyleSheet("QProgressBar"
+                                       "{"
+                                       "border: solid grey;"
+                                       "border-radius: 5px;"
+                                       "color: black;"
+                                       "text-align: center;"
+                                       "}"
+                                       "QProgressBar::chunk"
+                                       "{"
+                                       "background-color: #05B8CC;"
+                                       "border-radius: 5px;"
+                                       "}")
+            progress_bar.setValue(0)
             try:
                 options = Options()
                 options.headless = True
                 browser = webdriver.Chrome(options=options)
                 browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
                 print('Headless browser started!')
+                progress_bar.setValue(20)
+                if progress_bar.wasCanceled():
+                    browser.quit()
                 # Add cookies to login to teacher portal.
                 with open('cookie', 'rb') as cookiesfile:
                     cookies = pickle.load(cookiesfile)
@@ -142,6 +164,7 @@ class Window(QWidget):
                     missing_cf_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
                     missing_cf_button.click()
                     print('Logged In!')
+                    progress_bar.setValue(40)
                     time.sleep(1)
                 # Get student name, if there is one.
                 try:
@@ -166,6 +189,7 @@ class Window(QWidget):
                         student_name = ''.join(student_name.split()).title()
                     # print(student_name)
                     self.student.setText(student_name)
+                    progress_bar.setValue(60)
                 # try:
                 #     student_name = str(WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
                 #     student_name = student_name.title()
@@ -199,6 +223,7 @@ class Window(QWidget):
                             browser.execute_script("arguments[0].click()", show_more_button)
                     except StaleElementReferenceException:
                         time.sleep(1)
+                    progress_bar.setValue(80)
                     # print('all templates showing.')
                     # Iterate through every <li> tag until we find a teacher name in csv file.
                     ul_list = browser.find_element_by_class_name('shared-notes-list-container')
@@ -212,6 +237,7 @@ class Window(QWidget):
                             template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
                             # print(template)
                             self.feedback_temp.insertPlainText(template)
+                            progress_bar.setValue(100)
                             break
                         elif teacher_name not in valid_teachers:
                             invalid_teacher_count -= 1
