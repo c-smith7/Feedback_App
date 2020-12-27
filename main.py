@@ -34,8 +34,13 @@ class Window(QWidget):
         self.feedback_temp = QPlainTextEdit(self)
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
+        # HBox button group
+        self.hbox_buttons = QWidget()
+        self.hbox_buttonsLayout = QHBoxLayout(self.hbox_buttons)
         self.copy_output = QPushButton('Copy Output Feedback')
-        self.clear_form = QPushButton('Clear Form')
+        self.clear_form = QPushButton('Clear Feedback')
+        self.hbox_buttonsLayout.addWidget(self.copy_output)
+        self.hbox_buttonsLayout.addWidget(self.clear_form)
         # Add widgets to layout
         layout.addWidget(self.get_template)
         layout.addWidget(QLabel('Student Name:'))
@@ -53,31 +58,39 @@ class Window(QWidget):
         layout.addWidget(QLabel('Output Feedback:'))
         layout.addWidget(self.feedback_output)
         layout.addSpacing(2)
-        layout.addWidget(self.copy_output)
-        layout.addWidget(self.clear_form)
+        layout.addWidget(self.hbox_buttons)
         self.setLayout(layout)
         # Button configs
         self.no_button.setChecked(True)
         self.generate_output.setDefault(True)
         self.copy_output.setDefault(True)
         self.clear_form.setDefault(True)
+        self.get_template.setDefault(True)
         self.feedback_temp.setTabChangesFocus(True)
         self.feedback_output.setTabChangesFocus(True)
         self.yes_button.setFocusPolicy(Qt.NoFocus)
         self.no_button.setFocusPolicy(Qt.NoFocus)
         self.feedback_output.setFocusPolicy(Qt.NoFocus)
-        # Dark theme
+        # Dark mode
         palette = QPalette()
         palette.setColor(QPalette.Window, QColor(53, 53, 53))
         palette.setColor(QPalette.WindowText, Qt.white)
         self.setPalette(palette)
-        self.generate_output.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
-        self.copy_output.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
-        self.clear_form.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
-        self.get_template.setStyleSheet('background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);')
-        self.feedback_temp.setStyleSheet('background-color: rgb(200, 200, 200)')
-        self.feedback_output.setStyleSheet('background-color: rgb(200, 200, 200)')
-        self.student.setStyleSheet('background-color: rgb(200, 200, 200)')
+        self.generate_output.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                           'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                           'QPushButton:pressed {background-color: rgb(53, 53, 53)}')
+        self.copy_output.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                       'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                       'QPushButton:pressed {background-color: rgb(53, 53, 53)}')
+        self.clear_form.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                      'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                      'QPushButton:pressed {background-color: rgb(53, 53, 53)}')
+        self.get_template.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                        'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                        'QPushButton:pressed {background-color: rgb(53, 53, 53)}')
+        self.feedback_temp.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 2px')
+        self.feedback_output.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 2px')
+        self.student.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 2px')
         # Signals and slots
         # self.feedback_script()
         self.generate_output.clicked.connect(self.feedback_script)
@@ -133,23 +146,15 @@ class Window(QWidget):
             progress_bar.setCancelButton(None)
             progress_bar.setWindowTitle('VIPKid Feedback App')
             progress_bar.setFixedWidth(400)
-            progress_bar.setStyleSheet("QProgressBar"
-                                       "{"
-                                       "border: solid grey;"
-                                       "border-radius: 5px;"
-                                       "color: black;"
-                                       "text-align: center;"
-                                       "}"
-                                       "QProgressBar::chunk"
-                                       "{"
-                                       "background-color: #05B8CC;"
-                                       "border-radius: 5px;"
-                                       "}")
+            progress_bar.setStyleSheet("QProgressDialog {background-color: rgb(115, 115, 115);}"
+                                       "QProgressBar {border: 0.5px solid white; border-radius: 5px; background-color: rgb(115, 115, 115); color: rgb(200, 200, 200); text-align: center;}"
+                                       "QProgressBar::chunk {background-color: rgb(53, 53, 53); border-radius: 5px;}")
             progress_bar.setValue(0)
             try:
                 options = Options()
                 options.headless = True
                 browser = webdriver.Chrome(options=options)
+                progress_bar.setValue(10)
                 browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
                 print('Headless browser started!')
                 progress_bar.setValue(20)
@@ -161,8 +166,9 @@ class Window(QWidget):
                     for cookie in cookies:
                         browser.add_cookie(cookie)
                     browser.refresh()
+                    progress_bar.setValue(25)
                     missing_cf_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
-                    missing_cf_button.click()
+                    browser.execute_script("arguments[0].click();", missing_cf_button)
                     print('Logged In!')
                     progress_bar.setValue(40)
                     time.sleep(1)
@@ -180,9 +186,11 @@ class Window(QWidget):
                     msgBox.setDefaultButton(QMessageBox.Ok)
                     msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                     msgBox.exec()
+                    progress_bar.deleteLater()
                     browser.quit()
                 except NoSuchElementException:
                     print("There are feedbacks due.")
+                    progress_bar.setValue(50)
                     student_name = str(WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
                     student_name = student_name.title()
                     if student_name.isupper():
@@ -209,11 +217,13 @@ class Window(QWidget):
 
                     materials_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')))
                     browser.execute_script("arguments[0].click();", materials_button)
+                    progress_bar.setValue(65)
                     # print('materials button clicked.')
                     browser.switch_to.window(browser.window_handles[-1])
                     time.sleep(1)
                     template_button = browser.find_element_by_xpath("//*[@id='tab-5']")
                     browser.execute_script("arguments[0].click();", template_button)
+                    progress_bar.setValue(70)
                     # print('template button clicked.')
                     time.sleep(1)
                     # Click show 'more' button until all templates are shown.
@@ -231,6 +241,7 @@ class Window(QWidget):
                     valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
                                       'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
                     invalid_teacher_count = int(len(li_tags))
+                    progress_bar.setValue(95)
                     for li_tag in li_tags:
                         teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
                         if teacher_name in valid_teachers:
@@ -254,6 +265,7 @@ class Window(QWidget):
                         msgBox.setDefaultButton(QMessageBox.Ok)
                         msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                         msgBox.exec()
+                        progress_bar.deleteLater()
                     browser.quit()
             except Exception as e:
                 msgBox = QMessageBox()
@@ -273,6 +285,7 @@ class Window(QWidget):
                 msgBox.setDefaultButton(QMessageBox.Ok)
                 msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                 msgBox.exec()
+                progress_bar.deleteLater()
                 if msgBox.clickedButton() == retry_button:
                     browser.quit()
                     print('Running again..')
