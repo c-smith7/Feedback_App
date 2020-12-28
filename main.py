@@ -20,7 +20,7 @@ import qtmodern.windows
 class QHline(QFrame):
     def __init__(self):
         super(QHline, self).__init__()
-        self.setFixedHeight(5)
+        # self.setFixedHeight(5)
         self.setFrameShape(QFrame.HLine)
         self.setStyleSheet('color: rgb(115, 115, 115)')
 
@@ -44,6 +44,8 @@ class Window(QWidget):
         self.feedback_temp = QPlainTextEdit(self)
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setVisible(False)
         # HBox button group
         self.hbox_buttons = QWidget()
         self.hbox_buttonsLayout = QHBoxLayout(self.hbox_buttons)
@@ -53,6 +55,8 @@ class Window(QWidget):
         self.hbox_buttonsLayout.addWidget(self.clear_form)
         # Add widgets to layout
         layout.addWidget(self.get_template)
+        layout.addSpacing(10)
+        layout.addWidget(self.progress_bar)
         layout.addWidget(QHline())
         layout.addWidget(QLabel('Student Name:'))
         layout.addWidget(self.student)
@@ -162,42 +166,38 @@ class Window(QWidget):
         self.student.clear()
         self.feedback_temp.clear()
         if os.path.exists('cookie'):
-            progress_bar = QProgressDialog('Getting feedback template...', '', 0, 100, self)
-            progress_bar.setWindowModality(Qt.WindowModal)
-            progress_bar.forceShow()
-            progress_bar.setCancelButton(None)
-            progress_bar.setWindowTitle('VIPKid Feedback App')
-            progress_bar.setFixedWidth(400)
-            progress_bar.setStyleSheet("QProgressDialog {background-color: rgb(115, 115, 115);}"
-                                       "QProgressBar {border: 0.5px solid white; border-radius: 5px; background-color: rgb(115, 115, 115); color: rgb(200, 200, 200); text-align: center;}"
-                                       "QProgressBar::chunk {background-color: rgb(53, 53, 53); border-radius: 5px;}")
-            progress_bar.setValue(0)
+            self.progress_bar.setVisible(True)
+            self.progress_bar.setTextVisible(False)
+            self.progress_bar.setFixedHeight(10)
+            self.progress_bar.setStyleSheet('QProgressBar {border: 1px solid grey; border-radius: 5px; background-color: rgb(53, 53, 53);}'
+                                            'QProgressBar::chunk {background-color: rgb(200, 200, 200); border-radius: 4px;}')
+            self.progress_bar.setValue(0)
             try:
                 options = Options()
                 options.headless = True
                 browser = webdriver.Chrome(options=options)
-                progress_bar.setValue(5)
+                self.progress_bar.setValue(5)
                 browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
                 print('Headless browser started!')
-                progress_bar.setValue(10)
-                if progress_bar.wasCanceled():
-                    browser.quit()
+                self.progress_bar.setValue(10)
+                # if self.progress_bar.wasCanceled():
+                #     browser.quit()
                 # Add cookies to login to teacher portal.
                 with open('cookie', 'rb') as cookiesfile:
                     cookies = pickle.load(cookiesfile)
                     for cookie in cookies:
                         browser.add_cookie(cookie)
                     browser.refresh()
-                    progress_bar.setValue(20)
+                    self.progress_bar.setValue(20)
                     missing_cf_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
                     browser.execute_script("arguments[0].click();", missing_cf_button)
                     print('Logged In!')
-                    progress_bar.setValue(35)
+                    self.progress_bar.setValue(35)
                     time.sleep(1)
                 # Get student name, if there is one.
                 try:
                     browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')
-                    progress_bar.deleteLater()
+                    self.progress_bar.setVisible(False)
                     msgBox = QMessageBox()
                     msgBox.setIcon(QMessageBox.Information)
                     msgBox.setText('All student feedback completed!')
@@ -212,14 +212,14 @@ class Window(QWidget):
                     browser.quit()
                 except NoSuchElementException:
                     print("There are feedbacks due.")
-                    progress_bar.setValue(40)
+                    self.progress_bar.setValue(40)
                     student_name = str(WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
                     student_name = student_name.title()
                     if student_name.isupper():
                         student_name = ''.join(student_name.split()).title()
                     # print(student_name)
                     self.student.setText(student_name)
-                    progress_bar.setValue(55)
+                    self.progress_bar.setValue(55)
                 # try:
                 #     student_name = str(WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
                 #     student_name = student_name.title()
@@ -239,13 +239,13 @@ class Window(QWidget):
 
                     materials_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]')))
                     browser.execute_script("arguments[0].click();", materials_button)
-                    progress_bar.setValue(65)
+                    self.progress_bar.setValue(65)
                     # print('materials button clicked.')
                     browser.switch_to.window(browser.window_handles[-1])
                     time.sleep(1)
                     template_button = browser.find_element_by_xpath("//*[@id='tab-5']")
                     browser.execute_script("arguments[0].click();", template_button)
-                    progress_bar.setValue(70)
+                    self.progress_bar.setValue(70)
                     # print('template button clicked.')
                     time.sleep(1)
                     # Click show 'more' button until all templates are shown.
@@ -255,7 +255,7 @@ class Window(QWidget):
                             browser.execute_script("arguments[0].click()", show_more_button)
                     except StaleElementReferenceException:
                         time.sleep(1)
-                    progress_bar.setValue(85)
+                    self.progress_bar.setValue(85)
                     # print('all templates showing.')
                     # Iterate through every <li> tag until we find a teacher name in csv file.
                     ul_list = browser.find_element_by_class_name('shared-notes-list-container')
@@ -263,20 +263,20 @@ class Window(QWidget):
                     valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
                                       'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
                     invalid_teacher_count = int(len(li_tags))
-                    progress_bar.setValue(90)
+                    self.progress_bar.setValue(90)
                     for li_tag in li_tags:
                         teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
                         if teacher_name in valid_teachers:
                             template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
                             # print(template)
                             self.feedback_temp.insertPlainText(template)
-                            progress_bar.setValue(100)
+                            self.progress_bar.setValue(100)
                             break
                         elif teacher_name not in valid_teachers:
                             invalid_teacher_count -= 1
                             continue
                     if invalid_teacher_count == 0:
-                        progress_bar.deleteLater()
+                        self.progress_bar.setVisible(False)
                         msgBox = QMessageBox()
                         msgBox.setIcon(QMessageBox.Information)
                         msgBox.setText('No valid teacher templates :(')
@@ -290,7 +290,7 @@ class Window(QWidget):
                         msgBox.exec()
                     browser.quit()
             except Exception as e:
-                progress_bar.deleteLater()
+                self.progress_bar.Visible(False)
                 msgBox = QMessageBox()
                 msgBox.setIcon(QMessageBox.Information)
                 msgBox.setText('There was a problem getting student feedback..')
