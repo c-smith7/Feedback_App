@@ -3,9 +3,9 @@ import sys
 import re
 import time
 import pickle
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import *
-from PyQt5.QtGui import QPalette, QColor
+from PyQt5.QtGui import QPalette, QColor, QMouseEvent
 from PyQt5.QtWidgets import *
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
@@ -13,6 +13,16 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import StaleElementReferenceException, TimeoutException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
+import qtmodern.styles
+import qtmodern.windows
+
+
+class QHline(QFrame):
+    def __init__(self):
+        super(QHline, self).__init__()
+        self.setFixedHeight(5)
+        self.setFrameShape(QFrame.HLine)
+        self.setStyleSheet('color: rgb(115, 115, 115)')
 
 
 class Window(QWidget):
@@ -43,6 +53,7 @@ class Window(QWidget):
         self.hbox_buttonsLayout.addWidget(self.clear_form)
         # Add widgets to layout
         layout.addWidget(self.get_template)
+        layout.addWidget(QHline())
         layout.addWidget(QLabel('Student Name:'))
         layout.addWidget(self.student)
         layout.addSpacing(4)
@@ -55,6 +66,7 @@ class Window(QWidget):
         layout.addSpacing(2)
         layout.addWidget(self.generate_output)
         layout.addSpacing(4)
+        layout.addWidget(QHline())
         layout.addWidget(QLabel('Output Feedback:'))
         layout.addWidget(self.feedback_output)
         layout.addSpacing(2)
@@ -78,21 +90,28 @@ class Window(QWidget):
         self.setPalette(palette)
         self.generate_output.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                            'border-radius: 12px; padding: 5px; font: bold 12px;}'
-                                           'QPushButton:pressed {background-color: rgb(53, 53, 53)}')
+                                           'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                           'QPushButton:hover {border: 0.5px solid white}')
         self.copy_output.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                        'border-radius: 12px; padding: 5px; font: bold 12px;}'
-                                       'QPushButton:pressed {background-color: rgb(53, 53, 53)}')
+                                       'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                       'QPushButton:hover {border: 0.5px solid white}')
         self.clear_form.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                       'border-radius: 12px; padding: 5px; font: bold 12px;}'
-                                      'QPushButton:pressed {background-color: rgb(53, 53, 53)}')
+                                      'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                      'QPushButton:hover {border: 0.5px solid white}')
         self.get_template.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                         'border-radius: 12px; padding: 5px; font: bold 12px;}'
-                                        'QPushButton:pressed {background-color: rgb(53, 53, 53)}')
+                                        'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                        'QPushButton:hover {border: 0.5px solid white}')
         self.feedback_temp.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 2px')
         self.feedback_output.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 2px')
         self.student.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 2px')
+        # Tool Tips
+        self.get_template.setToolTip('Automatically get feedback template')
+        self.copy_output.setToolTip('Copies output to clipboard')
+        # self.student.setToolTip('Get template for specific student') //needed after search function implemented
         # Signals and slots
-        # self.feedback_script()
         self.generate_output.clicked.connect(self.feedback_script)
         self.copy_output.clicked.connect(self.copy_button)
         self.clear_form.clicked.connect(self.clear_form_button)
@@ -132,8 +151,11 @@ class Window(QWidget):
         self.feedback_temp.clear()
 
     def copy_button(self):
-        clipboard = QtGui.QGuiApplication.clipboard()
-        clipboard.setText(output)
+        try:
+            clipboard = QtGui.QGuiApplication.clipboard()
+            clipboard.setText(output)
+        except Exception:
+            pass
 
     def feedback_automation_button(self):
         # Clear any previous text from text boxes.
@@ -154,10 +176,10 @@ class Window(QWidget):
                 options = Options()
                 options.headless = True
                 browser = webdriver.Chrome(options=options)
-                progress_bar.setValue(10)
+                progress_bar.setValue(5)
                 browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
                 print('Headless browser started!')
-                progress_bar.setValue(20)
+                progress_bar.setValue(10)
                 if progress_bar.wasCanceled():
                     browser.quit()
                 # Add cookies to login to teacher portal.
@@ -166,15 +188,16 @@ class Window(QWidget):
                     for cookie in cookies:
                         browser.add_cookie(cookie)
                     browser.refresh()
-                    progress_bar.setValue(25)
+                    progress_bar.setValue(20)
                     missing_cf_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
                     browser.execute_script("arguments[0].click();", missing_cf_button)
                     print('Logged In!')
-                    progress_bar.setValue(40)
+                    progress_bar.setValue(35)
                     time.sleep(1)
                 # Get student name, if there is one.
                 try:
                     browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')
+                    progress_bar.deleteLater()
                     msgBox = QMessageBox()
                     msgBox.setIcon(QMessageBox.Information)
                     msgBox.setText('All student feedback completed!')
@@ -186,18 +209,17 @@ class Window(QWidget):
                     msgBox.setDefaultButton(QMessageBox.Ok)
                     msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                     msgBox.exec()
-                    progress_bar.deleteLater()
                     browser.quit()
                 except NoSuchElementException:
                     print("There are feedbacks due.")
-                    progress_bar.setValue(50)
+                    progress_bar.setValue(40)
                     student_name = str(WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
                     student_name = student_name.title()
                     if student_name.isupper():
                         student_name = ''.join(student_name.split()).title()
                     # print(student_name)
                     self.student.setText(student_name)
-                    progress_bar.setValue(60)
+                    progress_bar.setValue(55)
                 # try:
                 #     student_name = str(WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
                 #     student_name = student_name.title()
@@ -233,7 +255,7 @@ class Window(QWidget):
                             browser.execute_script("arguments[0].click()", show_more_button)
                     except StaleElementReferenceException:
                         time.sleep(1)
-                    progress_bar.setValue(80)
+                    progress_bar.setValue(85)
                     # print('all templates showing.')
                     # Iterate through every <li> tag until we find a teacher name in csv file.
                     ul_list = browser.find_element_by_class_name('shared-notes-list-container')
@@ -241,7 +263,7 @@ class Window(QWidget):
                     valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
                                       'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
                     invalid_teacher_count = int(len(li_tags))
-                    progress_bar.setValue(95)
+                    progress_bar.setValue(90)
                     for li_tag in li_tags:
                         teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
                         if teacher_name in valid_teachers:
@@ -254,6 +276,7 @@ class Window(QWidget):
                             invalid_teacher_count -= 1
                             continue
                     if invalid_teacher_count == 0:
+                        progress_bar.deleteLater()
                         msgBox = QMessageBox()
                         msgBox.setIcon(QMessageBox.Information)
                         msgBox.setText('No valid teacher templates :(')
@@ -265,9 +288,9 @@ class Window(QWidget):
                         msgBox.setDefaultButton(QMessageBox.Ok)
                         msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                         msgBox.exec()
-                        progress_bar.deleteLater()
                     browser.quit()
             except Exception as e:
+                progress_bar.deleteLater()
                 msgBox = QMessageBox()
                 msgBox.setIcon(QMessageBox.Information)
                 msgBox.setText('There was a problem getting student feedback..')
@@ -285,7 +308,6 @@ class Window(QWidget):
                 msgBox.setDefaultButton(QMessageBox.Ok)
                 msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                 msgBox.exec()
-                progress_bar.deleteLater()
                 if msgBox.clickedButton() == retry_button:
                     browser.quit()
                     print('Running again..')
@@ -417,5 +439,7 @@ class Window(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
+    # qtmodern.styles.dark(app)
+    # mw = qtmodern.windows.ModernWindow(window)
     window.show()
     sys.exit(app.exec_())
