@@ -1,20 +1,18 @@
 import os
-import sys
-import re
-import time
 import pickle
-from PyQt5 import QtGui, QtCore, QtWidgets
+import re
+import sys
+import time
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import *
-from PyQt5.QtGui import QPalette, QColor, QMouseEvent
+from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import *
 from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import StaleElementReferenceException, TimeoutException, NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
-import qtmodern.styles
-import qtmodern.windows
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 class QHline(QFrame):
@@ -163,6 +161,7 @@ class Window(QWidget):
 
     def feedback_automation_button(self):
         # Clear any previous text from text boxes.
+        global browser
         self.student.clear()
         self.feedback_temp.clear()
         if os.path.exists('cookie'):
@@ -439,7 +438,5 @@ class Window(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
-    # qtmodern.styles.dark(app)
-    # mw = qtmodern.windows.ModernWindow(window)
     window.show()
     sys.exit(app.exec_())
