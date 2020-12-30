@@ -64,32 +64,38 @@ class Window(QWidget):
         # HBox button group
         self.hbox_buttons = QWidget()
         self.hbox_buttonsLayout = QHBoxLayout(self.hbox_buttons)
-        self.copy_output = QPushButton('Copy Output Feedback')
-        self.clear_form = QPushButton('Clear Feedback')
+        self.copy_output = QPushButton('Copy Feedback')
+        self.clear_form = QPushButton('Clear')
         self.hbox_buttonsLayout.addWidget(self.copy_output)
         self.hbox_buttonsLayout.addWidget(self.clear_form)
         # Add widgets to layout
+        layout.addSpacing(7)
         layout.addWidget(self.get_template)
-        layout.addSpacing(5)
+        layout.addSpacing(7)
         # layout.addWidget(self.progress_bar)
         # self.progress_bar.hide_bar()
-        layout.addSpacing(2)
+        # layout.addSpacing(2)
         # layout.addWidget(self.progress_bar)
         layout.addWidget(QHline())
+        layout.addSpacing(5)
         layout.addWidget(QLabel('Student Name:'))
+        layout.addSpacing(2)
         layout.addWidget(self.student)
-        layout.addSpacing(4)
+        layout.addSpacing(7)
         layout.addWidget(QLabel('New Student?'))
         layout.addWidget(self.yes_button)
         layout.addWidget(self.no_button)
-        layout.addSpacing(4)
+        layout.addSpacing(7)
         layout.addWidget(QLabel('Feedback Template:'))
-        layout.addWidget(self.feedback_temp)
         layout.addSpacing(2)
+        layout.addWidget(self.feedback_temp)
+        layout.addSpacing(5)
         layout.addWidget(self.generate_output)
-        layout.addSpacing(4)
+        layout.addSpacing(5)
         layout.addWidget(QHline())
-        layout.addWidget(QLabel('Output Feedback:'))
+        layout.addSpacing(5)
+        layout.addWidget(QLabel('Feedback:'))
+        layout.addSpacing(2)
         layout.addWidget(self.feedback_output)
         layout.addSpacing(2)
         layout.addWidget(self.hbox_buttons)
@@ -126,12 +132,14 @@ class Window(QWidget):
                                         'border-radius: 12px; padding: 5px; font: bold 12px;}'
                                         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                         'QPushButton:hover {border: 0.5px solid white}')
-        self.feedback_temp.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 2px')
-        self.feedback_output.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 2px')
+        self.feedback_temp.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 4px')
+        self.feedback_output.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 4px')
         self.student.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 2px')
         # Tool Tips
         self.get_template.setToolTip('Automatically get feedback template')
         self.copy_output.setToolTip('Copies output to clipboard')
+        self.generate_output.setToolTip('Generate feedback from template')
+        self.clear_form.setToolTip('Clear student name & template')
         # self.student.setToolTip('Get template for specific student') //needed after search function implemented
         # Signals and slots
         self.generate_output.clicked.connect(self.feedback_script)
@@ -187,17 +195,21 @@ class Window(QWidget):
         if os.path.exists('cookie'):
             progress_bar = QProgressDialog('', '', 0, 100, self)
             progress_bar.setWindowModality(Qt.WindowModal)
-            progress_bar.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint)
+            progress_bar.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
             progress_bar.setFixedWidth(375)
-            # Fix width, and position on parent window.
+            progress_bar.setFixedHeight(80)
+            bar = QProgressBar()
+            bar.setFixedHeight(15)
+            bar.setTextVisible(False)
+            progress_bar.setBar(bar)
             progress_bar.setWindowTitle('VIPKid Feedback App')
             label = QLabel('Getting feedback template...')
             label.setStyleSheet('color: rgb(200, 200, 200); font: 12px')
             progress_bar.setLabel(label)
             progress_bar.setStyleSheet('QProgressDialog {background-color: rgb(53, 53, 53);}'
-                                       'QProgressBar {border: 1px solid grey; border-radius: 5px; '
-                                       'background-color: rgb(53, 53, 53); color: rgba(0, 0, 0, 0%);}'
-                                       'QProgressBar::chunk {background-color: rgb(200, 200, 200); border-radius: 4px;}')
+                                       'QProgressBar {border: 1px solid grey; border-radius: 7px; '
+                                       'background-color: rgb(53, 53, 53);}'
+                                       'QProgressBar::chunk {background-color: rgb(200, 200, 200); border-radius: 6px;}')
             progress_bar.setCancelButton(None)
             progress_bar.forceShow()
             progress_bar.setValue(0)
@@ -205,7 +217,6 @@ class Window(QWidget):
                 options = Options()
                 options.headless = True
                 browser = webdriver.Chrome(options=options)
-                # self.progress_bar.setValue(5)
                 progress_bar.setValue(5)
                 browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
                 print('Headless browser started!')
@@ -216,7 +227,7 @@ class Window(QWidget):
                         browser.add_cookie(cookie)
                     browser.refresh()
                     progress_bar.setValue(20)
-                    missing_cf_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
+                    missing_cf_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, '   to-do-type')))
                     browser.execute_script("arguments[0].click();", missing_cf_button)
                     print('Logged In!')
                     progress_bar.setValue(35)
@@ -224,8 +235,8 @@ class Window(QWidget):
                 # Get student name, if there is one.
                 try:
                     browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')
-                    # self.progress_bar.setVisible(False)
-                    # self.progress_bar.hide_bar()
+                    progress_bar.close()
+                    progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
                     msgBox = QMessageBox(self)
                     msgBox.setIcon(QMessageBox.Information)
                     msgBox.setText('All student feedback completed!')
@@ -248,21 +259,6 @@ class Window(QWidget):
                     # print(student_name)
                     self.student.setText(student_name)
                     progress_bar.setValue(55)
-                # try:
-                #     student_name = str(WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
-                #     student_name = student_name.title()
-                #     print(student_name)
-                #     self.student.setText(student_name)  # populate this name in 'student name' box in GUI.
-                # except TimeoutException:
-                #     print('exception hit.')
-                #     msgBox = QMessageBox()
-                #     msgBox.setIcon(QMessageBox.Information)
-                #     msgBox.setText('All student feedback completed!')
-                #     msgBox.setStandardButtons(QMessageBox.Ok)
-                #     returnValue = msgBox.exec()
-                #     if returnValue == QMessageBox.Ok:
-                #         print('Ok clicked.')
-                #     browser.quit()
                 # Navigate to templates window
                     materials_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__layout']/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]")))
                     browser.execute_script("arguments[0].click();", materials_button)
@@ -302,7 +298,8 @@ class Window(QWidget):
                             invalid_teacher_count -= 1
                             continue
                     if invalid_teacher_count == 0:
-                        # self.progress_bar.hide_bar()
+                        progress_bar.close()
+                        progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
                         msgBox = QMessageBox(self)
                         msgBox.setIcon(QMessageBox.Information)
                         msgBox.setText('No valid teacher templates :(')
@@ -316,7 +313,8 @@ class Window(QWidget):
                         msgBox.exec()
                     browser.quit()
             except Exception as e:
-                # self.progress_bar.hide_bar()
+                progress_bar.close()
+                progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
                 msgBox = QMessageBox(self)
                 msgBox.setIcon(QMessageBox.Information)
                 msgBox.setText('There was a problem getting student feedback.')
