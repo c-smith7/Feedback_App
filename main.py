@@ -233,6 +233,7 @@ class Window(QWidget):
                     browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')
                     progress_bar.close()
                     progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
+                    self.feedback_output.clear()
                     msgBox = QMessageBox(self)
                     msgBox.setIcon(QMessageBox.Information)
                     msgBox.setText('All student feedback completed!')
