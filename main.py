@@ -261,13 +261,14 @@ class Window(QWidget):
                     progress_bar.setValue(65)
                     # print('materials button clicked.')
                     browser.switch_to.window(browser.window_handles[-1])
-                    template_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='tab-5']")))
+                    template_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.ID, 'tab-5')))
                     browser.execute_script("arguments[0].click();", template_button)
                     progress_bar.setValue(70)
                     # print('template button clicked.')
-                    time.sleep(1)
+                    # time.sleep(1)
                     # Click show 'more' button until all templates are shown.
-                    show_more_button = browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button")
+                    show_more_button = WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button')))
+                    # browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button")
                     try:
                         while show_more_button.is_displayed():
                             browser.execute_script("arguments[0].click()", show_more_button)
