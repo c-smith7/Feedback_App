@@ -134,9 +134,13 @@ class Window(QWidget):
         self.generate_output.setToolTip('Generate feedback from template')
         self.clear_form.setToolTip('Clear student name & template')
         # self.student.setToolTip('Get template for specific student') //needed after search function implemented
-        # Spell checker for PLainTextEdit boxes.
-        # self.spell_check = SpellChecker(self.feedback_temp)
-        # self.spell_check.setDict(enchant.Dict())
+        # Start global browser
+        options = Options()
+        options.headless = True
+        browser = webdriver.Chrome(options=options)
+        progress_bar.setValue(5)
+        browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+        print('Headless browser started!')
         # Signals and slots
         self.generate_output.clicked.connect(self.feedback_script)
         self.copy_output.clicked.connect(self.copy_button)
