@@ -188,8 +188,8 @@ class Window(QWidget):
             msgBox.setText('Please login to VIPKid Website.')
             msgBox.setInformativeText('Click "Login" button below, and a separate window will open to login.\n'
                                       '\n'
-                                      'You will only need to log into VIPKid once.\n'
-                                      'From now on, you will NOT need to login when you use this app.')
+                                      'You will only need to log into VIPKid the first time you use this app.\n'
+                                      'You will NOT need to login from now on.')
             msgBox.setWindowTitle('VIPKid Feedback App')
             msgBox_icon = QtGui.QIcon()
             msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
@@ -208,6 +208,29 @@ class Window(QWidget):
             # Save cookies file after login
             with open('cookie', 'wb') as file:
                 pickle.dump(self.browser.get_cookies(), file)
+            time.sleep(1)
+            self.browser.close()
+            self.browser.quit()
+            options = Options()
+            options.headless = True
+            self.browser = webdriver.Chrome(options=options)
+            self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+            try:
+                with open('cookie', 'rb') as cookiesfile:
+                    # print('opened')
+                    cookies = pickle.load(cookiesfile)
+                    for cookie in cookies:
+                        self.browser.add_cookie(cookie)
+                    self.browser.refresh()
+                    missing_cf_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
+                    self.browser.execute_script("arguments[0].click();", missing_cf_button)
+                    print('Logged In!')
+            except Exception as e:
+                msgBox = QMessageBox(self)
+                msgBox.setIcon(QMessageBox.Critical)
+                msgBox.setText('Error')
+                msgBox.setDetailedText(e)
+
         # Signals and slots
         self.generate_output.clicked.connect(self.feedback_script)
         self.copy_output.clicked.connect(self.copy_button)
@@ -328,9 +351,11 @@ class Window(QWidget):
             # missing_cf_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
             # self.browser.execute_script("arguments[0].click();", missing_cf_button)
             # print('Logged In!')
-            progress_bar.setValue(10)
+            # progress_bar.setValue(10)
             # time.sleep(1)
             # Get student name, if there is one.
+            progress_bar.setValue(5)
+            time.sleep(1)
             try:
                 self.browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')
                 progress_bar.close()
@@ -347,18 +372,18 @@ class Window(QWidget):
                 msgBox.setDefaultButton(QMessageBox.Ok)
                 msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                 msgBox.exec()
-                # browser.quit()
+                self.browser.quit()
             except NoSuchElementException:
                 print("There are feedbacks due.")
-                progress_bar.setValue(25)
+                progress_bar.setValue(10)
                 student_name = str(WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
                 student_name = student_name.title()
-                progress_bar.setValue(35)
+                progress_bar.setValue(15)
                 if student_name.isupper():
                     student_name = ''.join(student_name.split()).title()
                 # print(student_name)
                 self.student.setText(student_name)
-                progress_bar.setValue(50)
+                progress_bar.setValue(25)
             # Navigate to templates window
             #     if WebDriverWait(self.browser, 1).until(EC.alert_is_present()):
             #         alert = self.browser.switch_to.alert
@@ -366,13 +391,13 @@ class Window(QWidget):
             #         print('alert accepted')
                 materials_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__layout']/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]")))
                 self.browser.execute_script("arguments[0].click();", materials_button)
-                progress_bar.setValue(60)
+                progress_bar.setValue(40)
                 # print('materials button clicked.')
                 self.browser.switch_to.window(self.browser.window_handles[-1])
-                progress_bar.setValue(75)
+                progress_bar.setValue(50)
                 template_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.ID, 'tab-5')))
                 self.browser.execute_script("arguments[0].click();", template_button)
-                progress_bar.setValue(85)
+                progress_bar.setValue(75)
                 # print('template button clicked.')
                 # time.sleep(1)
                 # Click show 'more' button until all templates are shown.
@@ -391,7 +416,6 @@ class Window(QWidget):
                 valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
                                   'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
                 invalid_teacher_count = int(len(li_tags))
-                progress_bar.setValue(95)
                 for li_tag in li_tags:
                     teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
                     if teacher_name in valid_teachers:
@@ -419,8 +443,8 @@ class Window(QWidget):
                     msgBox.setDefaultButton(QMessageBox.Ok)
                     msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                     msgBox.exec()
-                    # self.browser.get('https://www.vipkid.com/tc/missing')
-
+                    self.browser.close()
+                    self.browser.switch_to.window(self.browser.window_handles[0])
                 # browser.quit()
         except Exception as e:
             print(e)
@@ -446,6 +470,9 @@ class Window(QWidget):
             if msgBox.clickedButton() == retry_button:
                 # browser.quit()
                 print('Running again..')
+                self.browser.switch_to.window(self.browser.window_handles[0])
+                self.browser.refresh()
+                time.sleep(2)
                 self.get_template.click()
             # else:
             #     browser.quit()
