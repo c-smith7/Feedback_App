@@ -10,6 +10,7 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QPalette, QColor, QSyntaxHighlighter, QTextCharFormat, QCloseEvent, QPixmap, QMovie
 from PyQt5.QtWidgets import *
+import traceback
 from selenium import webdriver
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException
 from selenium.webdriver.chrome.options import Options
@@ -41,8 +42,9 @@ class Window(QWidget):
         self.app_icon = QtGui.QIcon()
         self.app_icon.addFile('pencil.png', QtCore.QSize(16, 16))
         self.setWindowIcon(self.app_icon)
+        self.threadpool = QThreadPool()
         # Create layout instance
-        layout = QVBoxLayout()
+        self.layout = QVBoxLayout()
         # Widgets
         self.student = QLineEdit(self)
         self.yes_button = QRadioButton('&Yes')
@@ -50,13 +52,20 @@ class Window(QWidget):
         self.feedback_temp = SpellTextEdit()
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
+        # self.login_success = QLabel()
         # HBox button group 1
         self.hbox_buttons1 = QWidget()
         self.hbox_buttonsLayout1 = QHBoxLayout(self.hbox_buttons1)
         self.login_button = QPushButton('Login')
         self.get_template_button = QPushButton('Get Feedback Template')
+        self.loading = QLabel()
+        self.loading.setVisible(False)
+        self.login_success = QLabel('Logged In!')
+        self.login_success.setVisible(False)
         self.hbox_buttonsLayout1.addWidget(self.get_template_button, 3)
         self.hbox_buttonsLayout1.addWidget(self.login_button, 1)
+        self.hbox_buttonsLayout1.addWidget(self.loading)
+        self.hbox_buttonsLayout1.addWidget(self.login_success)
         # HBox button group 2
         self.hbox_buttons2 = QWidget()
         self.hbox_buttonsLayout2 = QHBoxLayout(self.hbox_buttons2)
@@ -65,31 +74,32 @@ class Window(QWidget):
         self.hbox_buttonsLayout2.addWidget(self.copy_output_button)
         self.hbox_buttonsLayout2.addWidget(self.clear_form_button)
         # Add widgets to layout
-        layout.addWidget(self.hbox_buttons1)
-        layout.addWidget(QHline())
-        layout.addSpacing(5)
-        layout.addWidget(QLabel('Student Name:'))
-        layout.addSpacing(2)
-        layout.addWidget(self.student)
-        layout.addSpacing(7)
-        layout.addWidget(QLabel('New Student?'))
-        layout.addWidget(self.yes_button)
-        layout.addWidget(self.no_button)
-        layout.addSpacing(7)
-        layout.addWidget(QLabel('Feedback Template:'))
-        layout.addSpacing(2)
-        layout.addWidget(self.feedback_temp)
-        layout.addSpacing(5)
-        layout.addWidget(self.generate_output)
-        layout.addSpacing(5)
-        layout.addWidget(QHline())
-        layout.addSpacing(5)
-        layout.addWidget(QLabel('Feedback:'))
-        layout.addSpacing(2)
-        layout.addWidget(self.feedback_output)
-        layout.addSpacing(2)
-        layout.addWidget(self.hbox_buttons2)
-        self.setLayout(layout)
+        self.layout.addWidget(self.hbox_buttons1)
+        # self.layout.addWidget(self.login_success)
+        self.layout.addWidget(QHline())
+        self.layout.addSpacing(5)
+        self.layout.addWidget(QLabel('Student Name:'))
+        self.layout.addSpacing(2)
+        self.layout.addWidget(self.student)
+        self.layout.addSpacing(7)
+        self.layout.addWidget(QLabel('New Student?'))
+        self.layout.addWidget(self.yes_button)
+        self.layout.addWidget(self.no_button)
+        self.layout.addSpacing(7)
+        self.layout.addWidget(QLabel('Feedback Template:'))
+        self.layout.addSpacing(2)
+        self.layout.addWidget(self.feedback_temp)
+        self.layout.addSpacing(5)
+        self.layout.addWidget(self.generate_output)
+        self.layout.addSpacing(5)
+        self.layout.addWidget(QHline())
+        self.layout.addSpacing(5)
+        self.layout.addWidget(QLabel('Feedback:'))
+        self.layout.addSpacing(2)
+        self.layout.addWidget(self.feedback_output)
+        self.layout.addSpacing(2)
+        self.layout.addWidget(self.hbox_buttons2)
+        self.setLayout(self.layout)
         # Button configs
         self.no_button.setChecked(True)
         self.generate_output.setDefault(True)
@@ -146,7 +156,7 @@ class Window(QWidget):
         self.copy_output_button.clicked.connect(self.copy)
         self.clear_form_button.clicked.connect(self.clear_form)
         self.get_template_button.clicked.connect(self.feedback_automation)
-        self.login_button.clicked.connect(self.login)
+        self.login_button.clicked.connect(self.show_gif)
 
     def feedback_script(self):
         global new_student
@@ -193,7 +203,8 @@ class Window(QWidget):
 
     def login(self):
         print('Logging in...')
-        # login_msg = QMessageBox()
+        # login_msg = QMessageBox(self)
+        # login_msg.setStandardButtons(QMessageBox.NoButton)
         # login_msg.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         # login_msg.setAttribute(Qt.WA_TranslucentBackground)
         # login_msg.setIconPixmap(QPixmap('pencil_load.gif'))
@@ -203,6 +214,14 @@ class Window(QWidget):
         # icon_label.setMovie(movie)
         # movie.start()
         # login_msg.show()
+        # start = time.time()
+        # gif = QMovie('pencil_load.gif')
+        # self.login_loading.setMovie(gif)
+        # gif.start()
+        # self.login_loading.show()
+        # while time.time() - start < 2:
+        #     time.sleep(0.001)
+        #     app.processEvents()
         if os.path.exists('cookie'):
             # options = Options()
             # options.headless = True
@@ -619,6 +638,56 @@ class Window(QWidget):
         #         else:
         #             browser.quit()
 
+    def login_started(self):
+        gif = QMovie('loading.gif')
+        self.loading.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.loading.setAttribute(Qt.WA_TranslucentBackground)
+        self.loading.setMovie(gif)
+        gif.start()
+        self.loading.show()
+
+    def login_finished(self):
+        self.loading.close()
+
+    def login_msg(self):
+        self.login_success.setVisible(True)
+
+    def login_msg_close(self):
+        self.login_success.setVisible(False)
+
+    def show_gif(self):
+        worker = WorkerThread(self.login)
+        worker.signal.started.connect(self.login_started)
+        worker.signal.finished.connect(self.login_finished)
+        worker.signal.login_open.connect(self.login_msg)
+        worker.signal.login_close.connect(self.login_msg_close)
+        self.threadpool.start(worker)
+
+
+class WorkerSignals(QObject):
+    started = pyqtSignal()
+    finished = pyqtSignal()
+    login_open = pyqtSignal()
+    login_close = pyqtSignal()
+
+
+class WorkerThread(QRunnable):
+    def __init__(self, fn, *args, **kwargs):
+        super(WorkerThread, self).__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signal = WorkerSignals()
+
+    @pyqtSlot()
+    def run(self):
+        self.signal.started.emit()
+        self.fn(*self.args, **self.kwargs)
+        self.signal.finished.emit()
+        self.signal.login_open.emit()
+        time.sleep(4)
+        self.signal.login_close.emit()
+
 
 class SpellTextEdit(QPlainTextEdit):
     """QPlainTextEdit subclass which does spell-checking using PyEnchant"""
@@ -702,8 +771,8 @@ class Splashscreen:
             time.sleep(0.001)
             app.processEvents()
 
-    def stop(self):
-        self.splash.finish(window)
+    def stop(self, widget):
+        self.splash.finish(widget)
 
 
 if __name__ == "__main__":
@@ -711,5 +780,5 @@ if __name__ == "__main__":
     splash = Splashscreen()
     window = Window()
     window.show()
-    splash.stop()
+    splash.stop(window)
     app.exec()
