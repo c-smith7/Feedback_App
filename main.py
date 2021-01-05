@@ -692,8 +692,24 @@ class QHline(QFrame):
         self.setStyleSheet('color: rgb(115, 115, 115)')
 
 
+class Splashscreen:
+    def __init__(self):
+        start = time.time()
+        splash_pix = QPixmap('pencil_432x432.png')
+        self.splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+        self.splash.show()
+        while time.time() - start < 2:
+            time.sleep(0.001)
+            app.processEvents()
+
+    def stop(self):
+        self.splash.finish(window)
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    splash = Splashscreen()
     window = Window()
     window.show()
+    splash.stop()
     app.exec()
