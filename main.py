@@ -52,6 +52,7 @@ class Window(QWidget):
         self.feedback_temp = SpellTextEdit()
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
+        # self.login_button_counter = Q
         # self.login_success = QLabel()
         # HBox button group 1
         self.hbox_buttons1 = QWidget()
@@ -62,10 +63,13 @@ class Window(QWidget):
         self.loading.setVisible(False)
         self.login_success = QLabel('Logged In!')
         self.login_success.setVisible(False)
+        self.logged_in_already = QLabel('Already logged in!')
+        self.logged_in_already.setVisible(False)
         self.hbox_buttonsLayout1.addWidget(self.get_template_button, 3)
         self.hbox_buttonsLayout1.addWidget(self.login_button, 1)
         self.hbox_buttonsLayout1.addWidget(self.loading)
         self.hbox_buttonsLayout1.addWidget(self.login_success)
+        self.hbox_buttonsLayout1.addWidget(self.logged_in_already)
         # HBox button group 2
         self.hbox_buttons2 = QWidget()
         self.hbox_buttonsLayout2 = QHBoxLayout(self.hbox_buttons2)
@@ -149,14 +153,18 @@ class Window(QWidget):
         if os.path.exists('cookie'):
             options = Options()
             options.headless = True
-            self.browser = webdriver.Chrome(options=options)
-
+            self.browser = webdriver.Chrome()
+            print('driver connected')
         # Signals and slots
         self.generate_output.clicked.connect(self.feedback_script)
         self.copy_output_button.clicked.connect(self.copy)
         self.clear_form_button.clicked.connect(self.clear_form)
         self.get_template_button.clicked.connect(self.feedback_automation)
-        self.login_button.clicked.connect(self.show_gif)
+        if os.path.exists('cookie'):
+            self.login_button.clicked.connect(self.login_slots)
+        else:
+            self.login_button.clicked.connect(self.login_nocookies)
+        self.login_button_counter = 0
 
     def feedback_script(self):
         global new_student
@@ -203,122 +211,123 @@ class Window(QWidget):
 
     def login(self):
         print('Logging in...')
-        # login_msg = QMessageBox(self)
-        # login_msg.setStandardButtons(QMessageBox.NoButton)
-        # login_msg.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
-        # login_msg.setAttribute(Qt.WA_TranslucentBackground)
-        # login_msg.setIconPixmap(QPixmap('pencil_load.gif'))
-        # icon_label = login_msg.findChild(QLabel, 'qt_msgboxex_icon_label')
-        # movie = QMovie('pencil_load.gif')
-        # setattr(login_msg, 'icon_label', movie)
-        # icon_label.setMovie(movie)
-        # movie.start()
-        # login_msg.show()
-        # start = time.time()
-        # gif = QMovie('pencil_load.gif')
-        # self.login_loading.setMovie(gif)
-        # gif.start()
-        # self.login_loading.show()
-        # while time.time() - start < 2:
-        #     time.sleep(0.001)
-        #     app.processEvents()
-        if os.path.exists('cookie'):
-            # options = Options()
-            # options.headless = True
-            # self.browser.create_options(options)
-            self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-            try:
-                with open('cookie', 'rb') as cookiesfile:
-                    # print('opened')
-                    cookies = pickle.load(cookiesfile)
-                    for cookie in cookies:
-                        self.browser.add_cookie(cookie)
-                    self.browser.refresh()
-                    missing_cf_button = WebDriverWait(self.browser, 5).until(
-                        EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
-                    self.browser.execute_script("arguments[0].click();", missing_cf_button)
-                    print('Logged In!')
-            except Exception:
-                print("Couldn't log in, try resetting cookies.")
-                msgBox = QMessageBox(self)
-                msgBox.setIcon(QMessageBox.Information)
-                msgBox.setText('There was a problem logging into VIPKid.')
-                msgBox.setInformativeText('Please try again by clicking the "Retry" button below.\n'
-                                          '\n'
-                                          'If issue persists after trying several times, please email *****')
-                msgBox.setWindowTitle('VIPKid Feedback App')
-                msgBox_icon = QtGui.QIcon()
-                msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
-                msgBox.setWindowIcon(msgBox_icon)
-                msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-                retry_button = msgBox.button(QMessageBox.Ok)
-                retry_button.setText('Retry')
-                msgBox.setDefaultButton(QMessageBox.Ok)
-                msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
-                msgBox.exec()
-                if msgBox.clickedButton() == retry_button:
-                    # browser.quit()
-                    print('Trying to login again..')
-                    os.remove('cookie')
-                    # time.sleep(1)
-                    self.browser.quit()
-                    self.browser = webdriver.Chrome()
-                    self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-                    WebDriverWait(self.browser, 300).until(
-                        EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
-                    time.sleep(1)
-                    with open('cookie', 'wb') as file:
-                        pickle.dump(self.browser.get_cookies(), file)
-        else:
+        print(self.login_button_counter)
+        self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+        try:
+            with open('cookie', 'rb') as cookiesfile:
+                # print('opened')
+                cookies = pickle.load(cookiesfile)
+                for cookie in cookies:
+                    self.browser.add_cookie(cookie)
+                self.browser.refresh()
+                missing_cf_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
+                self.browser.execute_script("arguments[0].click();", missing_cf_button)
+                self.login_button_counter = 1
+                print('Logged In!')
+        except Exception:
+            print("Couldn't log in, try resetting cookies.")
             msgBox = QMessageBox(self)
             msgBox.setIcon(QMessageBox.Information)
-            msgBox.setText('Please login to VIPKid Website.')
-            msgBox.setInformativeText('Click "Login" button below, and a separate window will open to login.\n'
+            msgBox.setText('There was a problem logging into VIPKid.')
+            msgBox.setInformativeText('Please try again by clicking the "Retry" button below.\n'
                                       '\n'
-                                      'You will only need to log into VIPKid the first time you use this app.\n'
-                                      'You will NOT need to login from now on.')
+                                      'If issue persists after trying several times, please email *****')
             msgBox.setWindowTitle('VIPKid Feedback App')
             msgBox_icon = QtGui.QIcon()
             msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
             msgBox.setWindowIcon(msgBox_icon)
-            msgBox.setStandardButtons(QMessageBox.Ok)
-            ok_button = msgBox.button(QMessageBox.Ok)
-            ok_button.setText('Login')
+            msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            retry_button = msgBox.button(QMessageBox.Ok)
+            retry_button.setText('Retry')
             msgBox.setDefaultButton(QMessageBox.Ok)
             msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
             msgBox.exec()
-            self.browser = webdriver.Chrome()
-            self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-            # Wait for user login.
-            WebDriverWait(self.browser, 300).until(
-                EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
-            time.sleep(1)
-            # Save cookies file after login
-            with open('cookie', 'wb') as file:
-                pickle.dump(self.browser.get_cookies(), file)
-            time.sleep(1)
-            self.browser.close()
-            self.browser.quit()
-            options = Options()
-            options.headless = True
-            self.browser = webdriver.Chrome(options=options)
-            self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-            try:
-                with open('cookie', 'rb') as cookiesfile:
-                    # print('opened')
-                    cookies = pickle.load(cookiesfile)
-                    for cookie in cookies:
-                        self.browser.add_cookie(cookie)
-                    self.browser.refresh()
-                    missing_cf_button = WebDriverWait(self.browser, 5).until(
-                        EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
-                    self.browser.execute_script("arguments[0].click();", missing_cf_button)
-                    print('Logged In!')
-            except Exception as e:
-                msgBox = QMessageBox(self)
-                msgBox.setIcon(QMessageBox.Critical)
-                msgBox.setText('Error')
-                msgBox.setDetailedText(e)
+            if msgBox.clickedButton() == retry_button:
+                # browser.quit()
+                print('Trying to login again..')
+                os.remove('cookie')
+                # time.sleep(1)
+                self.browser.quit()
+                self.browser = webdriver.Chrome()
+                self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+                WebDriverWait(self.browser, 300).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
+                time.sleep(1)
+                with open('cookie', 'wb') as file:
+                    pickle.dump(self.browser.get_cookies(), file)
+                time.sleep(1)
+                self.browser.quit()
+                options = Options()
+                options.headless = True
+                self.browser = webdriver.Chrome(options=options)
+                self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+                try:
+                    with open('cookie', 'rb') as cookiesfile:
+                        # print('opened')
+                        cookies = pickle.load(cookiesfile)
+                        for cookie in cookies:
+                            self.browser.add_cookie(cookie)
+                        self.browser.refresh()
+                        missing_cf_button = WebDriverWait(self.browser, 5).until(
+                            EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
+                        self.browser.execute_script("arguments[0].click();", missing_cf_button)
+                        print('Logged In!')
+                        self.login_button_counter += 1
+                except Exception as e:
+                    msgBox = QMessageBox(self)
+                    msgBox.setIcon(QMessageBox.Critical)
+                    msgBox.setText('Error')
+                    msgBox.setDetailedText(e)
+
+    def login_nocookies(self):
+        msgBox = QMessageBox(self)
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setText('Please login to VIPKid Website.')
+        msgBox.setInformativeText('Click "Login" button below, and a separate window will open to login.\n'
+                                  '\n'
+                                  'You will only need to log into VIPKid the first time you use this app.\n'
+                                  'You will NOT need to login from now on.')
+        msgBox.setWindowTitle('VIPKid Feedback App')
+        msgBox_icon = QtGui.QIcon()
+        msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+        msgBox.setWindowIcon(msgBox_icon)
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        ok_button = msgBox.button(QMessageBox.Ok)
+        ok_button.setText('Login')
+        msgBox.setDefaultButton(QMessageBox.Ok)
+        msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+        msgBox.exec()
+        self.login_nocookies_slots()
+
+    def login_nocookies_prompt(self):
+        self.browser = webdriver.Chrome()
+        self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+        # Wait for user login.
+        WebDriverWait(self.browser, 300).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
+        time.sleep(1)
+        # Save cookies file after login
+        with open('cookie', 'wb') as file:
+            pickle.dump(self.browser.get_cookies(), file)
+        time.sleep(1)
+        self.browser.quit()
+        options = Options()
+        options.headless = True
+        self.browser = webdriver.Chrome(options=options)
+        self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+        try:
+            with open('cookie', 'rb') as cookiesfile:
+                # print('opened')
+                cookies = pickle.load(cookiesfile)
+                for cookie in cookies:
+                    self.browser.add_cookie(cookie)
+                self.browser.refresh()
+                missing_cf_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
+                self.browser.execute_script("arguments[0].click();", missing_cf_button)
+                print('Logged In!')
+        except Exception as e:
+            msgBox = QMessageBox(self)
+            msgBox.setIcon(QMessageBox.Critical)
+            msgBox.setText('Error')
+            msgBox.setDetailedText(e)
 
     def feedback_automation(self):
         # Clear any previous text from text boxes.
@@ -425,11 +434,11 @@ class Window(QWidget):
                 # print(student_name)
                 self.student.setText(student_name)
                 progress_bar.setValue(25)
-            # Navigate to templates window
-            #     if WebDriverWait(self.browser, 1).until(EC.alert_is_present()):
-            #         alert = self.browser.switch_to.alert
-            #         alert.accept()
-            #         print('alert accepted')
+                # Navigate to templates window
+                #     if WebDriverWait(self.browser, 1).until(EC.alert_is_present()):
+                #         alert = self.browser.switch_to.alert
+                #         alert.accept()
+                #         print('alert accepted')
                 materials_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__layout']/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]")))
                 self.browser.execute_script("arguments[0].click();", materials_button)
                 progress_bar.setValue(40)
@@ -509,6 +518,7 @@ class Window(QWidget):
             msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
             msgBox.exec()
             if msgBox.clickedButton() == retry_button:
+                """Configure this retry block correctly"""
                 # browser.quit()
                 print('Running again..')
                 self.browser.switch_to.window(self.browser.window_handles[0])
@@ -655,8 +665,28 @@ class Window(QWidget):
     def login_msg_close(self):
         self.login_success.setVisible(False)
 
-    def show_gif(self):
-        worker = WorkerThread(self.login)
+    def login_already_msg(self):
+        self.logged_in_already.setVisible(True)
+
+    def login_already_msg_close(self):
+        self.logged_in_already.setVisible(False)
+
+    def login_slots(self):
+        if self.login_button_counter == 0:
+            worker = WorkerThread(self.login)
+            worker.signal.started.connect(self.login_started)
+            worker.signal.finished.connect(self.login_finished)
+            worker.signal.login_open.connect(self.login_msg)
+            worker.signal.login_close.connect(self.login_msg_close)
+            self.threadpool.start(worker)
+        else:
+            worker = WorkerThreadAlreadyLogin()
+            worker.signal.started.connect(self.login_already_msg)
+            worker.signal.finished.connect(self.login_already_msg_close)
+            self.threadpool.start(worker)
+
+    def login_nocookies_slots(self):
+        worker = WorkerThreadNocookies(self.login_nocookies_prompt)
         worker.signal.started.connect(self.login_started)
         worker.signal.finished.connect(self.login_finished)
         worker.signal.login_open.connect(self.login_msg)
@@ -669,6 +699,8 @@ class WorkerSignals(QObject):
     finished = pyqtSignal()
     login_open = pyqtSignal()
     login_close = pyqtSignal()
+    nocookies_msg = pyqtSignal()
+    login_prompt = pyqtSignal()
 
 
 class WorkerThread(QRunnable):
@@ -687,6 +719,38 @@ class WorkerThread(QRunnable):
         self.signal.login_open.emit()
         time.sleep(4)
         self.signal.login_close.emit()
+
+
+class WorkerThreadNocookies(QRunnable):
+    def __init__(self, fn, *args, **kwargs):
+        super(WorkerThreadNocookies, self).__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signal = WorkerSignals()
+
+    @pyqtSlot()
+    def run(self):
+        self.signal.started.emit()
+        self.fn(*self.args, **self.kwargs)
+        self.signal.finished.emit()
+        self.signal.login_open.emit()
+        time.sleep(5)
+        self.signal.login_close.emit()
+
+
+class WorkerThreadAlreadyLogin(QRunnable):
+    def __init__(self, *args, **kwargs):
+        super(WorkerThreadAlreadyLogin, self).__init__()
+        self.args = args
+        self.kwargs = kwargs
+        self.signal = WorkerSignals()
+
+    @pyqtSlot()
+    def run(self):
+        self.signal.started.emit()
+        time.sleep(3)
+        self.signal.finished.emit()
 
 
 class SpellTextEdit(QPlainTextEdit):
