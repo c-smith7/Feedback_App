@@ -13,8 +13,17 @@ config.json
 debug.log
 >>>>>>> Selenium_integration
 Feedback_automation.py
+<<<<<<< HEAD
 cookie
 loading.gif
 pencil_432x432.png
 pencil_load.gif
 
+||||||| 7217393
+cookie
+=======
+cookie
+pencil_load.gif
+pencil_432x432.png
+loading.gif
+>>>>>>> External_driver_instance
