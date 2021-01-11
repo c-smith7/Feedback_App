@@ -12,7 +12,7 @@ from PyQt5.QtGui import QPalette, QColor, QSyntaxHighlighter, QTextCharFormat, Q
 from PyQt5.QtWidgets import *
 import traceback
 from selenium import webdriver
-from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException, WebDriverException, RemoteDriverServerException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -38,7 +38,7 @@ class Window(QWidget):
         super(Window, self).__init__(*args, **kwargs)
         # Window config
         self.setWindowTitle('VIPKid Feedback App')
-        self.resize(500, 675)
+        self.resize(525, 725)
         self.app_icon = QtGui.QIcon()
         self.app_icon.addFile('pencil.png', QtCore.QSize(16, 16))
         self.setWindowIcon(self.app_icon)
@@ -50,6 +50,7 @@ class Window(QWidget):
         self.yes_button = QRadioButton('&Yes')
         self.no_button = QRadioButton('&No')
         self.feedback_temp = SpellTextEdit()
+        # self.feedback_temp.setFixedHeight(300)
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
         # self.login_button_counter = Q
@@ -92,7 +93,7 @@ class Window(QWidget):
         self.layout.addSpacing(7)
         self.layout.addWidget(QLabel('Feedback Template:'))
         self.layout.addSpacing(2)
-        self.layout.addWidget(self.feedback_temp)
+        self.layout.addWidget(self.feedback_temp, 6)
         self.layout.addSpacing(5)
         self.layout.addWidget(self.generate_output)
         self.layout.addSpacing(5)
@@ -100,7 +101,7 @@ class Window(QWidget):
         self.layout.addSpacing(5)
         self.layout.addWidget(QLabel('Feedback:'))
         self.layout.addSpacing(2)
-        self.layout.addWidget(self.feedback_output)
+        self.layout.addWidget(self.feedback_output, 5)
         self.layout.addSpacing(2)
         self.layout.addWidget(self.hbox_buttons2)
         self.setLayout(self.layout)
@@ -207,7 +208,10 @@ class Window(QWidget):
             pass
 
     def closeEvent(self, event):
-        self.browser.quit()
+        try:
+            self.browser.quit()
+        except:
+            pass
 
     def login(self):
         print('Logging in...')
@@ -220,10 +224,10 @@ class Window(QWidget):
             for cookie in cookies:
                 self.browser.add_cookie(cookie)
             self.browser.refresh()
-            missing_cf_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'tto-do-type')))
+            missing_cf_button = WebDriverWait(self.browser, 3).until(EC.element_to_be_clickable((By.CLASS_NAME, 'tto-do-type')))
             self.browser.execute_script("arguments[0].click();", missing_cf_button)
-            print('Logged In!')
             self.login_button_counter = 1
+            print('Logged In!')
         os.remove('cookie')
         with open('cookie', 'wb') as file:
             pickle.dump(self.browser.get_cookies(), file)
@@ -233,6 +237,8 @@ class Window(QWidget):
         print("Couldn't log in, try resetting cookies.")
         msgBox = QMessageBox(self)
         msgBox.setIcon(QMessageBox.Information)
+        msgBox.setWindowModality(Qt.WindowModal)
+        msgBox.setWindowFlag(Qt.Popup)
         msgBox.setText('There was a problem logging into VIPKid.')
         msgBox.setInformativeText('Please try again by clicking the "Retry" button below.\n'
                                   '\n'
@@ -246,39 +252,13 @@ class Window(QWidget):
         retry_button.setText('Retry')
         msgBox.setDefaultButton(QMessageBox.Ok)
         msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
-        msgBox.exec()
-        if msgBox.clickedButton() == retry_button:
+        result = msgBox.exec()
+        if result == QMessageBox.Ok:
             print('Trying to login again..')
             os.remove('cookie')
             self.browser.quit()
             time.sleep(2)
             self.login_nocookies()
-
-            # self.browser.quit()
-            # self.browser = webdriver.Chrome()
-            # self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-            # WebDriverWait(self.browser, 300).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
-            # time.sleep(1)
-            # with open('cookie', 'wb') as file:
-            #     pickle.dump(self.browser.get_cookies(), file)
-            # time.sleep(1)
-            # self.browser.quit()
-            # options = Options()
-            # options.headless = True
-            # self.browser = webdriver.Chrome(options=options)
-            # self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-            # try:
-            #     with open('cookie', 'rb') as cookiesfile:
-            #         # print('opened')
-            #         cookies = pickle.load(cookiesfile)
-            #         for cookie in cookies:
-            #             self.browser.add_cookie(cookie)
-            #         self.browser.refresh()
-            #         missing_cf_button = WebDriverWait(self.browser, 5).until(
-            #             EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
-            #         self.browser.execute_script("arguments[0].click();", missing_cf_button)
-            #         print('Logged In!')
-            #         self.login_button_counter += 1
             # except Exception as e:
             #     msgBox = QMessageBox(self)
             #     msgBox.setIcon(QMessageBox.Critical)
@@ -286,30 +266,36 @@ class Window(QWidget):
             #     msgBox.setDetailedText(e)
 
     def login_nocookies(self):
-        msgBox = QMessageBox(self)
-        msgBox.setIcon(QMessageBox.Information)
-        msgBox.setText('Please login to VIPKid Website.')
-        msgBox.setInformativeText('Click "Login" button below, and a separate window will open to login.\n'
-                                  '\n'
-                                  'You will only need to log into VIPKid the first time you use this app.\n'
-                                  'You will NOT need to login from now on.')
-        msgBox.setWindowTitle('VIPKid Feedback App')
-        msgBox_icon = QtGui.QIcon()
-        msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
-        msgBox.setWindowIcon(msgBox_icon)
-        msgBox.setStandardButtons(QMessageBox.Ok)
-        ok_button = msgBox.button(QMessageBox.Ok)
-        ok_button.setText('Login')
-        msgBox.setDefaultButton(QMessageBox.Ok)
-        msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
-        msgBox.exec()
-        self.login_nocookies_slots()
+        if self.login_button_counter == 0:
+            msgBox = QMessageBox(self)
+            # msgBox.setWindowModality(Qt.WindowModal)
+            msgBox.setWindowFlag(Qt.ToolTip)
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText('Please login to VIPKid Website.')
+            msgBox.setInformativeText('Click "Login" button below, and a separate window will open to login.\n'
+                                      '\n'
+                                      'You will only need to log into VIPKid the first time you use this app.\n'
+                                      'You will NOT need to login from now on.')
+            # msgBox.setWindowTitle('VIPKid Feedback App')
+            # msgBox_icon = QtGui.QIcon()
+            # msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+            # msgBox.setWindowIcon(msgBox_icon)
+            msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            ok_button = msgBox.button(QMessageBox.Ok)
+            ok_button.setText('Login')
+            msgBox.setDefaultButton(QMessageBox.Ok)
+            msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+            result = msgBox.exec()
+            if result == QMessageBox.Ok:
+                self.login_nocookies_slots()
+        elif self.login_button_counter == 1:
+            self.login_slots()
 
     def login_nocookies_prompt(self):
         self.browser = webdriver.Chrome()
         self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
         # Wait for user login.
-        WebDriverWait(self.browser, 300).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
+        WebDriverWait(self.browser, 2147483647).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
         time.sleep(1)
         # Save cookies file after login
         with open('cookie', 'wb') as file:
@@ -329,6 +315,7 @@ class Window(QWidget):
                 self.browser.refresh()
                 missing_cf_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
                 self.browser.execute_script("arguments[0].click();", missing_cf_button)
+                self.login_button_counter = 1
                 print('Logged In!')
         except Exception as e:
             msgBox = QMessageBox(self)
@@ -746,11 +733,14 @@ class WorkerThreadNocookies(QRunnable):
     @pyqtSlot()
     def run(self):
         self.signal.started.emit()
-        self.fn(*self.args, **self.kwargs)
-        self.signal.finished.emit()
-        self.signal.login_open.emit()
-        time.sleep(5)
-        self.signal.login_close.emit()
+        try:
+            self.fn(*self.args, **self.kwargs)
+            self.signal.finished.emit()
+            self.signal.login_open.emit()
+            time.sleep(5)
+            self.signal.login_close.emit()
+        except Exception:
+            self.signal.finished.emit()
 
 
 class WorkerThreadAlreadyLogin(QRunnable):
