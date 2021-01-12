@@ -18,19 +18,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-# class ProgressBar(QProgressDialog):
-#     def __init__(self):
-#         super(ProgressBar, self).__init__()
-#         self.setStyleSheet('QProgressBar {border: 1px solid grey; border-radius: 5px; background-color: rgb(53, 53, 53);}'
-#                            'QProgressBar::chunk {background-color: rgb(200, 200, 200); border-radius: 4px;}')
-#         self.setMinimum(0)
-#         self.setWindowFlags(Qt.FramelessWindowHint)
-#         self.setWindowModality(Qt.WindowModal)
-#         self.setCancelButton(None)
-#         self.setFixedHeight(10)
-#         self.setTextVisible(False)
-#         progress_bar.setVisible(False)
-
 
 # noinspection PyArgumentList,PyTypeChecker,PyBroadException
 class Window(QWidget):
@@ -141,9 +128,12 @@ class Window(QWidget):
                                         'border-radius: 12px; padding: 5px; font: bold 12px;}'
                                         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                         'QPushButton:hover {border: 0.5px solid white}')
-        self.feedback_temp.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 4px')
-        self.feedback_output.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 4px')
-        self.student.setStyleSheet('background-color: rgb(200, 200, 200); border-radius: 2px')
+        self.feedback_temp.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px;'
+                                         'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
+        self.feedback_output.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; '
+                                           'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
+        self.student.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; '
+                                   'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         # Tool Tips
         self.get_template_button.setToolTip('Automatically get feedback template')
         self.copy_output_button.setToolTip('Copies output to clipboard')
@@ -157,15 +147,15 @@ class Window(QWidget):
             self.browser = webdriver.Chrome()
             print('driver connected')
         # Signals and slots
-        self.generate_output.clicked.connect(self.feedback_script)
-        self.copy_output_button.clicked.connect(self.copy)
-        self.clear_form_button.clicked.connect(self.clear_form)
-        self.get_template_button.clicked.connect(self.feedback_automation)
+        self.login_button_counter = 0
         if os.path.exists('cookie'):
             self.login_button.clicked.connect(self.login_slots)
         else:
             self.login_button.clicked.connect(self.login_nocookies)
-        self.login_button_counter = 0
+        self.get_template_button.clicked.connect(self.feedback_automation)
+        self.generate_output.clicked.connect(self.feedback_script)
+        self.copy_output_button.clicked.connect(self.copy)
+        self.clear_form_button.clicked.connect(self.clear_form)
 
     def feedback_script(self):
         global new_student
@@ -215,11 +205,9 @@ class Window(QWidget):
 
     def login(self):
         print('Logging in...')
-        print(self.login_button_counter)
         self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
         # try:
         with open('cookie', 'rb') as cookiesfile:
-            # print('opened')
             cookies = pickle.load(cookiesfile)
             for cookie in cookies:
                 self.browser.add_cookie(cookie)
@@ -231,14 +219,13 @@ class Window(QWidget):
         os.remove('cookie')
         with open('cookie', 'wb') as file:
             pickle.dump(self.browser.get_cookies(), file)
-        print('cookies updated')
 
     def login_error_msg(self):
         print("Couldn't log in, try resetting cookies.")
         msgBox = QMessageBox(self)
         msgBox.setIcon(QMessageBox.Information)
         msgBox.setWindowModality(Qt.WindowModal)
-        msgBox.setWindowFlag(Qt.Popup)
+        msgBox.setWindowFlag(Qt.ToolTip)
         msgBox.setText('There was a problem logging into VIPKid.')
         msgBox.setInformativeText('Please try again by clicking the "Retry" button below.\n'
                                   '\n'
@@ -276,10 +263,6 @@ class Window(QWidget):
                                       '\n'
                                       'You will only need to log into VIPKid the first time you use this app.\n'
                                       'You will NOT need to login from now on.')
-            # msgBox.setWindowTitle('VIPKid Feedback App')
-            # msgBox_icon = QtGui.QIcon()
-            # msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
-            # msgBox.setWindowIcon(msgBox_icon)
             msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
             ok_button = msgBox.button(QMessageBox.Ok)
             ok_button.setText('Login')
@@ -308,7 +291,6 @@ class Window(QWidget):
         self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
         try:
             with open('cookie', 'rb') as cookiesfile:
-                # print('opened')
                 cookies = pickle.load(cookiesfile)
                 for cookie in cookies:
                     self.browser.add_cookie(cookie)
@@ -323,203 +305,203 @@ class Window(QWidget):
             msgBox.setText('Error')
             msgBox.setDetailedText(e)
 
+    def login_first_msg(self):
+        msgBox = QMessageBox(self)
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setWindowFlag(Qt.ToolTip)
+        msgBox.setText('Please Login First!')
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        msgBox.setDefaultButton(QMessageBox.Ok)
+        msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+        msgBox.exec()
+
     def feedback_automation(self):
-        # Clear any previous text from text boxes.
-        self.student.clear()
-        self.feedback_temp.clear()
-        ''' create own class for progress bar'''
-        progress_bar = QProgressDialog('', '', 0, 100, self)
-        progress_bar.setWindowModality(Qt.WindowModal)
-        progress_bar.setWindowFlag(Qt.FramelessWindowHint)
-        progress_bar.setAttribute(Qt.WA_TranslucentBackground)
-        # progress_bar.setFixedWidth(375)
-        # progress_bar.setFixedHeight(80)
-        bar = QProgressBar()
-        bar.setFixedHeight(15)
-        bar.setTextVisible(False)
-        progress_bar.setBar(bar)
-        progress_bar.setWindowTitle('VIPKid Feedback App')
-        label = QLabel('Getting feedback template...')
-        label.setStyleSheet('color: rgb(53, 53, 53); font: 12px')
-        progress_bar.setLabel(label)
-        progress_bar.setStyleSheet('QProgressBar {border: 1px solid grey; border-radius: 7px;'
-                                   'background-color: rgb(200, 200, 200);}'
-                                   'QProgressBar::chunk {background-color: rgb(53, 53, 53); border-radius: 6px;}')
-        progress_bar.setCancelButton(None)
-        progress_bar.forceShow()
-        progress_bar.setValue(0)
-        self.browser.refresh()
-        progress_bar.setValue(10)
-        try:
-            # options = Options()
-            # options.headless = True
-            # browser = webdriver.Chrome()
-            # progress_bar.setValue(5)
-            # browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-            # print('Headless browser started!')
-            # progress_bar.setValue(10)
-            # try:
-            #     with open('cookie', 'rb') as cookiesfile:
-            #         # print('opened')
-            #         cookies = pickle.load(cookiesfile)
-            #         for cookie in cookies:
-            #             self.browser.add_cookie(cookie)
-            #         self.browser.refresh()
-            #         # print('refreshed')
-            # except Exception:
-            #     print("Couldn't log in, try resetting cookies.")
-            #     progress_bar.close()
-            #     progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
-            #     msgBox = QMessageBox(self)
-            #     msgBox.setIcon(QMessageBox.Information)
-            #     msgBox.setText('There was a problem logging into VIPKid.')
-            #     msgBox.setInformativeText('Please try again by clicking the "Retry" button below.\n'
-            #                               '\n'
-            #                               'If issue persists after trying several times, please email *****')
-            #     msgBox.setWindowTitle('VIPKid Feedback App')
-            #     msgBox_icon = QtGui.QIcon()
-            #     msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
-            #     msgBox.setWindowIcon(msgBox_icon)
-            #     msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-            #     retry_button = msgBox.button(QMessageBox.Ok)
-            #     retry_button.setText('Retry')
-            #     msgBox.setDefaultButton(QMessageBox.Ok)
-            #     msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
-            #     msgBox.exec()
-            #     if msgBox.clickedButton() == retry_button:
-            #         # browser.quit()
-            #         print('Trying to login again..')
-            #         os.remove('cookie')
-            #         # time.sleep(1)
-            #         self.get_template.click()
-            # progress_bar.setValue(10)
-            # missing_cf_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
-            # self.browser.execute_script("arguments[0].click();", missing_cf_button)
-            # print('Logged In!')
-            # progress_bar.setValue(10)
-            # time.sleep(1)
-            # Get student name, if there is one.
-            # time.sleep(1)
+        if self.login_button_counter == 0:
+            self.login_first_msg()
+        else:
+            # Clear any previous text from text boxes.
+            self.student.clear()
+            self.feedback_temp.clear()
+            ''' create own class for progress bar'''
+            progress_bar = QProgressDialog('', '', 0, 100, self)
+            progress_bar.setWindowModality(Qt.WindowModal)
+            progress_bar.setWindowFlag(Qt.FramelessWindowHint)
+            progress_bar.setAttribute(Qt.WA_TranslucentBackground)
+            bar = QProgressBar()
+            bar.setFixedHeight(15)
+            bar.setTextVisible(False)
+            progress_bar.setBar(bar)
+            progress_bar.setWindowTitle('VIPKid Feedback App')
+            label = QLabel('Getting feedback template...')
+            label.setStyleSheet('color: rgb(53, 53, 53); font: 12px')
+            progress_bar.setLabel(label)
+            progress_bar.setStyleSheet('QProgressBar {border: 1px solid grey; border-radius: 7px;'
+                                       'background-color: rgb(200, 200, 200);}'
+                                       'QProgressBar::chunk {background-color: rgb(53, 53, 53); border-radius: 6px;}')
+            progress_bar.setCancelButton(None)
+            progress_bar.forceShow()
+            progress_bar.setValue(0)
+            self.browser.refresh()
+            progress_bar.setValue(10)
             try:
-                WebDriverWait(self.browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')))
-                # progress_bar.close()
-                # progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
-                progress_bar.setValue(100)
-                self.feedback_output.clear()
-                msgBox = QMessageBox(self)
-                msgBox.setIcon(QMessageBox.Information)
-                msgBox.setText('All student feedback completed!')
-                msgBox.setWindowTitle('VIPKid Feedback App')
-                msgBox_icon = QtGui.QIcon()
-                msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
-                msgBox.setWindowIcon(msgBox_icon)
-                msgBox.setStandardButtons(QMessageBox.Ok)
-                msgBox.setDefaultButton(QMessageBox.Ok)
-                msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
-                msgBox.exec()
-            except TimeoutException:
-                print("There are feedbacks due.")
-                progress_bar.setValue(15)
-                student_name = str(WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
-                student_name = student_name.title()
-                if student_name.isupper():
-                    student_name = ''.join(student_name.split()).title()
-                # print(student_name)
-                self.student.setText(student_name)
-                progress_bar.setValue(25)
-                # Navigate to templates window
-                #     if WebDriverWait(self.browser, 1).until(EC.alert_is_present()):
-                #         alert = self.browser.switch_to.alert
-                #         alert.accept()
-                #         print('alert accepted')
-                materials_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__layout']/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]")))
-                self.browser.execute_script("arguments[0].click();", materials_button)
-                progress_bar.setValue(40)
-                # print('materials button clicked.')
-                self.browser.switch_to.window(self.browser.window_handles[-1])
-                progress_bar.setValue(50)
-                template_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.ID, 'tab-5')))
-                self.browser.execute_script("arguments[0].click();", template_button)
-                progress_bar.setValue(75)
-                # print('template button clicked.')
+                # options = Options()
+                # options.headless = True
+                # browser = webdriver.Chrome()
+                # progress_bar.setValue(5)
+                # browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+                # print('Headless browser started!')
+                # progress_bar.setValue(10)
+                # try:
+                #     with open('cookie', 'rb') as cookiesfile:
+                #         # print('opened')
+                #         cookies = pickle.load(cookiesfile)
+                #         for cookie in cookies:
+                #             self.browser.add_cookie(cookie)
+                #         self.browser.refresh()
+                #         # print('refreshed')
+                # except Exception:
+                #     print("Couldn't log in, try resetting cookies.")
+                #     progress_bar.close()
+                #     progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
+                #     msgBox = QMessageBox(self)
+                #     msgBox.setIcon(QMessageBox.Information)
+                #     msgBox.setText('There was a problem logging into VIPKid.')
+                #     msgBox.setInformativeText('Please try again by clicking the "Retry" button below.\n'
+                #                               '\n'
+                #                               'If issue persists after trying several times, please email *****')
+                #     msgBox.setWindowTitle('VIPKid Feedback App')
+                #     msgBox_icon = QtGui.QIcon()
+                #     msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+                #     msgBox.setWindowIcon(msgBox_icon)
+                #     msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                #     retry_button = msgBox.button(QMessageBox.Ok)
+                #     retry_button.setText('Retry')
+                #     msgBox.setDefaultButton(QMessageBox.Ok)
+                #     msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+                #     msgBox.exec()
+                #     if msgBox.clickedButton() == retry_button:
+                #         # browser.quit()
+                #         print('Trying to login again..')
+                #         os.remove('cookie')
+                #         # time.sleep(1)
+                #         self.get_template.click()
+                # progress_bar.setValue(10)
+                # missing_cf_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
+                # self.browser.execute_script("arguments[0].click();", missing_cf_button)
+                # print('Logged In!')
+                # progress_bar.setValue(10)
                 # time.sleep(1)
-                # Click show 'more' button until all templates are shown.
-                show_more_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button')))
-                # browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button")
+                # Get student name, if there is one.
+                # time.sleep(1)
                 try:
-                    while show_more_button.is_displayed():
-                        self.browser.execute_script("arguments[0].click()", show_more_button)
-                except StaleElementReferenceException:
-                    time.sleep(1)
-                progress_bar.setValue(90)
-                # print('all templates showing.')
-                # Iterate through every <li> tag until we find a teacher name in csv file.
-                ul_list = self.browser.find_element_by_class_name('shared-notes-list-container')
-                li_tags = ul_list.find_elements_by_tag_name('li')
-                valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
-                                  'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
-                invalid_teacher_count = int(len(li_tags))
-                for li_tag in li_tags:
-                    teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-                    if teacher_name in valid_teachers:
-                        template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
-                        # print(template)
-                        self.feedback_temp.insertPlainText(template)
-                        progress_bar.setValue(100)
-                        self.browser.close()
-                        self.browser.switch_to.window(self.browser.window_handles[0])
-                        break
-                    elif teacher_name not in valid_teachers:
-                        invalid_teacher_count -= 1
-                        continue
-                if invalid_teacher_count == 0:
-                    progress_bar.close()
-                    progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
+                    WebDriverWait(self.browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')))
+                    progress_bar.setValue(100)
+                    self.feedback_output.clear()
                     msgBox = QMessageBox(self)
                     msgBox.setIcon(QMessageBox.Information)
-                    msgBox.setText('No valid teacher templates :(')
-                    msgBox.setWindowTitle('VIPKid Feedback App')
-                    msgBox_icon = QtGui.QIcon()
-                    msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
-                    msgBox.setWindowIcon(msgBox_icon)
+                    msgBox.setWindowFlag(Qt.ToolTip)
+                    msgBox.setText('All student feedback completed!')
                     msgBox.setStandardButtons(QMessageBox.Ok)
                     msgBox.setDefaultButton(QMessageBox.Ok)
                     msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
                     msgBox.exec()
-                    self.browser.close()
+                except TimeoutException:
+                    progress_bar.setValue(15)
+                    student_name = str(WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
+                    student_name = student_name.title()
+                    if student_name.isupper():
+                        student_name = ''.join(student_name.split()).title()
+                    self.student.setText(student_name)
+                    progress_bar.setValue(25)
+                    # Navigate to templates window
+                    #     if WebDriverWait(self.browser, 1).until(EC.alert_is_present()):
+                    #         alert = self.browser.switch_to.alert
+                    #         alert.accept()
+                    #         print('alert accepted')
+                    materials_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__layout']/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]")))
+                    self.browser.execute_script("arguments[0].click();", materials_button)
+                    progress_bar.setValue(40)
+                    self.browser.switch_to.window(self.browser.window_handles[1])
+                    progress_bar.setValue(50)
+                    template_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.ID, 'tab-5')))
+                    self.browser.execute_script("arguments[0].click();", template_button)
+                    progress_bar.setValue(75)
+                    # Click show 'more' button until all templates are shown.
+                    show_more_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button')))
+                    # browser.find_element_by_xpath("//*[@id='__layout']/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button")
+                    try:
+                        while show_more_button.is_displayed():
+                            self.browser.execute_script("arguments[0].click()", show_more_button)
+                    except StaleElementReferenceException:
+                        time.sleep(1)
+                    progress_bar.setValue(90)
+                    # print('all templates showing.')
+                    # Iterate through every <li> tag until we find a teacher name in csv file.
+                    ul_list = self.browser.find_element_by_class_name('shared-notes-list-container')
+                    li_tags = ul_list.find_elements_by_tag_name('li')
+                    valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
+                                      'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
+                    invalid_teacher_count = int(len(li_tags))
+                    for li_tag in li_tags:
+                        teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
+                        if teacher_name in valid_teachers:
+                            template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
+                            # print(template)
+                            self.feedback_temp.insertPlainText(template)
+                            progress_bar.setValue(100)
+                            self.browser.close()
+                            self.browser.switch_to.window(self.browser.window_handles[0])
+                            if len(self.browser.window_handles) > 1:
+                                self.browser.switch_to.window(self.browser.window_handles[-1])
+                                self.browser.close()
+                                self.browser.switch_to.window(self.browser.window_handles[0])
+                            break
+                        elif teacher_name not in valid_teachers:
+                            invalid_teacher_count -= 1
+                            continue
+                    if invalid_teacher_count == 0:
+                        progress_bar.close()
+                        progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
+                        msgBox = QMessageBox(self)
+                        msgBox.setIcon(QMessageBox.Information)
+                        msgBox.setWindowFlag(Qt.ToolTip)
+                        msgBox.setText('No valid teacher templates :(')
+                        msgBox.setStandardButtons(QMessageBox.Ok)
+                        msgBox.setDefaultButton(QMessageBox.Ok)
+                        msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+                        msgBox.exec()
+                        self.browser.close()
+                        self.browser.switch_to.window(self.browser.window_handles[0])
+                        if len(self.browser.window_handles) > 1:
+                            self.browser.switch_to.window(self.browser.window_handles[-1])
+                            self.browser.close()
+                            self.browser.switch_to.window(self.browser.window_handles[0])
+            except Exception as e:
+                print(e)
+                progress_bar.close()
+                progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
+                msgBox = QMessageBox(self)
+                msgBox.setIcon(QMessageBox.Information)
+                msgBox.setWindowFlag(Qt.ToolTip)
+                msgBox.setText('There was a problem getting student feedback.')
+                msgBox.setInformativeText('Please try again by clicking the "Retry" button below.')
+                # msgBox.setDetailedText(f'{e}')
+                # msgBox.setWindowTitle('VIPKid Feedback App')
+                # msgBox_icon = QtGui.QIcon()
+                # msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+                # msgBox.setWindowIcon(msgBox_icon)
+                msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                retry_button = msgBox.button(QMessageBox.Ok)
+                retry_button.setText('Retry')
+                msgBox.setDefaultButton(QMessageBox.Ok)
+                msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
+                msgBox.exec()
+                if msgBox.clickedButton() == retry_button:
+                    print('Running again..')
                     self.browser.switch_to.window(self.browser.window_handles[0])
-                # browser.quit()
-        except Exception as e:
-            print(e)
-            progress_bar.close()
-            progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
-            msgBox = QMessageBox(self)
-            msgBox.setIcon(QMessageBox.Information)
-            msgBox.setText('There was a problem getting student feedback.')
-            msgBox.setInformativeText('Please try again by clicking the "Retry" button below.\n'
-                                      '\n'
-                                      'If issue persists after trying several times, please email *****')
-            msgBox.setDetailedText(f'{e}')
-            msgBox.setWindowTitle('VIPKid Feedback App')
-            msgBox_icon = QtGui.QIcon()
-            msgBox_icon.addFile('pencil.png', QtCore.QSize(16, 16))
-            msgBox.setWindowIcon(msgBox_icon)
-            msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-            retry_button = msgBox.button(QMessageBox.Ok)
-            retry_button.setText('Retry')
-            msgBox.setDefaultButton(QMessageBox.Ok)
-            msgBox.setStyleSheet('background-color: rgb(53, 53, 53); color: rgb(235, 235, 235);')
-            msgBox.exec()
-            if msgBox.clickedButton() == retry_button:
-                """Configure this retry block correctly"""
-                # browser.quit()
-                print('Running again..')
-                self.browser.switch_to.window(self.browser.window_handles[0])
-                self.browser.refresh()
-                time.sleep(2)
-                self.get_template.click()
-            # else:
-            #     browser.quit()
+                    self.browser.refresh()
+                    time.sleep(2)
+                    self.get_template_button.click()
         # else:
         #     try:
         #         msgBox = QMessageBox(self)
@@ -861,6 +843,9 @@ class Splashscreen:
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    # style = 'style.qss'
+    # with open(style, 'r') as qss:
+    #     app.setStyleSheet(qss.read())
     splash = Splashscreen()
     window = Window()
     window.show()
