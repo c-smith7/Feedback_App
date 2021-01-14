@@ -43,7 +43,7 @@ class Window(QWidget):
         self.hbox_buttons1 = QWidget()
         self.hbox_buttonsLayout1 = QHBoxLayout(self.hbox_buttons1)
         self.login_button = QPushButton('Login')
-        self.get_template_button = QPushButton('Get Feedback Template')
+        self.get_template_button = QPushButton('Get Feedback Template (Login Required)')
         self.get_template_button.setEnabled(False)
         self.loading = QLabel()
         self.loading.setVisible(False)
@@ -103,7 +103,7 @@ class Window(QWidget):
         # Dark mode
         palette = QPalette()
         palette.setColor(QPalette.Window, QColor(53, 53, 53))
-        palette.setColor(QPalette.WindowText, Qt.white)
+        palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
         self.setPalette(palette)
         self.generate_output.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                            'border-radius: 12px; padding: 5px; font: bold 12px;}'
@@ -120,7 +120,8 @@ class Window(QWidget):
         self.get_template_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                                'border-radius: 12px; padding: 5px; font: bold 12px;}'
                                                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                                               'QPushButton:hover {border: 0.5px solid white}')
+                                               'QPushButton:hover {border: 0.5px solid white}'
+                                               'QPushButton:disabled {color: rgb(53, 53, 53)}')
         self.login_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                         'border-radius: 12px; padding: 5px; font: bold 12px;}'
                                         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
@@ -135,8 +136,8 @@ class Window(QWidget):
         if self.get_template_button.isEnabled():
             self.get_template_button.setToolTip('Automatically get feedback template.')
         else:
-            self.get_template_button.setToolTip('Login to use feature.')
-        self.copy_output_button.setToolTip('Copies output to clipboard.')
+            self.get_template_button.setToolTip('Login to use this feature.')
+        self.copy_output_button.setToolTip('Copy feedback output to clipboard.')
         self.generate_output.setToolTip('Generate feedback from template.')
         self.clear_form_button.setToolTip('Clear student name & template.')
         self.login_button.setToolTip('Login & Connect to VIPKid.')
@@ -206,6 +207,7 @@ class Window(QWidget):
 
     def login(self):
         print('Logging in...')
+        self.login_button.setEnabled(False)
         self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
         # try:
         with open('cookie', 'rb') as cookiesfile:
@@ -213,10 +215,13 @@ class Window(QWidget):
             for cookie in cookies:
                 self.browser.add_cookie(cookie)
             self.browser.refresh()
-            missing_cf_button = WebDriverWait(self.browser, 3).until(EC.element_to_be_clickable((By.CLASS_NAME, 'tto-do-type')))
+            missing_cf_button = WebDriverWait(self.browser, 3).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
             self.browser.execute_script("arguments[0].click();", missing_cf_button)
             self.login_button_counter = 1
             print('Logged In!')
+            self.get_template_button.setEnabled(True)
+            self.login_button.setEnabled(True)
+            self.get_template_button.setText('Get Feedback Template')
         os.remove('cookie')
         with open('cookie', 'wb') as file:
             pickle.dump(self.browser.get_cookies(), file)
@@ -272,8 +277,7 @@ class Window(QWidget):
             # msgBox.setWindowModality(Qt.WindowModal)
             msgBox.setWindowFlag(Qt.ToolTip)
             msgBox.setIcon(QMessageBox.Information)
-            msgBox.setText('Click the "Login" button below.\nLogin to VIPKid in the window that opens.')
-            # msgBox.setInformativeText('You will only need to log into VIPKid the first time you use this app.')
+            msgBox.setText('Click the "Login" button below.\nLog in to VIPKid in the window that opens.')
             msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
             ok_button = msgBox.button(QMessageBox.Ok)
             ok_button.setText('Login')
@@ -294,6 +298,7 @@ class Window(QWidget):
             self.login_slots()
 
     def login_nocookies_prompt(self):
+        self.login_button.setEnabled(False)
         self.browser = webdriver.Chrome()
         self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
         # Wait for user login.
@@ -319,6 +324,8 @@ class Window(QWidget):
                 self.login_button_counter = 1
                 print('Logged In!')
                 self.get_template_button.setEnabled(True)
+                self.login_button.setEnabled(True)
+                self.get_template_button.setText('Get Feedback Template')
         except Exception as e:
             msgBox = QMessageBox(self)
             msgBox.setIcon(QMessageBox.Critical)
