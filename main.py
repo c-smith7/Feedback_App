@@ -47,6 +47,7 @@ class Window(QWidget):
         self.hbox_buttonsLayout1 = QHBoxLayout(self.hbox_buttons1)
         self.login_button = QPushButton('Login')
         self.get_template_button = QPushButton('Get Feedback Template')
+        self.get_template_button.setEnabled(False)
         self.loading = QLabel()
         self.loading.setVisible(False)
         self.login_success = QLabel('Logged In!')
@@ -295,7 +296,7 @@ class Window(QWidget):
         elif self.login_button_counter == 1:
             self.login_slots()
 
-    def nocookies_login_prompt(self):
+    def login_nocookies_prompt(self):
         self.browser = webdriver.Chrome()
         self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
         # Wait for user login.
@@ -306,8 +307,6 @@ class Window(QWidget):
             pickle.dump(self.browser.get_cookies(), file)
         time.sleep(1)
         self.browser.quit()
-
-    def nocookies_login_run(self):
         options = Options()
         options.headless = True
         self.browser = webdriver.Chrome(options=options)
@@ -322,6 +321,7 @@ class Window(QWidget):
                 self.browser.execute_script("arguments[0].click();", missing_cf_button)
                 self.login_button_counter = 1
                 print('Logged In!')
+                self.get_template_button.setEnabled(True)
         except Exception as e:
             msgBox = QMessageBox(self)
             msgBox.setIcon(QMessageBox.Critical)
@@ -672,21 +672,21 @@ class Window(QWidget):
     def login_already_msg_close(self):
         self.logged_in_already.setVisible(False)
 
-    def disable_buttons(self):
-        self.get_template_button.setEnabled(False)
-        self.get_template_button.blockSignals(True)
-        # self.generate_output.setEnabled(False)
-        # self.login_button.setEnabled(False)
-        # self.clear_form_button.setEnabled(False)
-        # self.copy_output_button.setEnabled(False)
-
-    def enable_buttons(self):
-        self.get_template_button.setEnabled(True)
-        self.get_template_button.blockSignals(False)
-        # self.generate_output.setEnabled(True)
-        # self.login_button.setEnabled(True)
-        # self.clear_form_button.setEnabled(True)
-        # self.copy_output_button.setEnabled(True)
+    # def disable_buttons(self):
+    #     self.get_template_button.setEnabled(False)
+    #     self.get_template_button.blockSignals(True)
+    #     # self.generate_output.setEnabled(False)
+    #     # self.login_button.setEnabled(False)
+    #     # self.clear_form_button.setEnabled(False)
+    #     # self.copy_output_button.setEnabled(False)
+    #
+    # def enable_buttons(self):
+    #     self.get_template_button.setEnabled(True)
+    #     # self.get_template_button.blockSignals(False)
+    #     # self.generate_output.setEnabled(True)
+    #     # self.login_button.setEnabled(True)
+    #     # self.clear_form_button.setEnabled(True)
+    #     # self.copy_output_button.setEnabled(True)
 
     def login_slots(self):
         if self.login_button_counter == 0:
@@ -706,14 +706,11 @@ class Window(QWidget):
             self.threadpool.start(worker)
 
     def login_nocookies_slots(self):
-        worker = WorkerThreadNocookies(self.nocookies_login_prompt)
-        worker.signal.login_run.connect(self.nocookies_login_run)
+        worker = WorkerThreadNoCookies(self.login_nocookies_prompt)
         worker.signal.started.connect(self.login_started)
         worker.signal.finished.connect(self.login_finished)
         worker.signal.login_open.connect(self.login_msg)
         worker.signal.login_close.connect(self.login_msg_close)
-        worker.signal.enable_buttons.connect(self.enable_buttons)
-        worker.signal.disable_buttons.connect(self.disable_buttons)
         self.threadpool.start(worker)
 
 
@@ -725,9 +722,6 @@ class WorkerSignals(QObject):
     nocookies_msg = pyqtSignal()
     login_prompt = pyqtSignal()
     login_error = pyqtSignal()
-    login_run = pyqtSignal()
-    disable_buttons = pyqtSignal()
-    enable_buttons = pyqtSignal()
 
 
 class WorkerThread(QRunnable):
@@ -752,9 +746,9 @@ class WorkerThread(QRunnable):
             self.signal.login_error.emit()
 
 
-class WorkerThreadNocookies(QRunnable):
+class WorkerThreadNoCookies(QRunnable):
     def __init__(self, fn, *args, **kwargs):
-        super(WorkerThreadNocookies, self).__init__()
+        super(WorkerThreadNoCookies, self).__init__()
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
@@ -763,17 +757,16 @@ class WorkerThreadNocookies(QRunnable):
     @pyqtSlot()
     def run(self):
         self.signal.started.emit()
-        self.signal.disable_buttons.emit()
+        # self.signal.disable_buttons.emit()
         try:
             self.fn(*self.args, **self.kwargs)
-            self.signal.login_run.emit()
             self.signal.finished.emit()
             self.signal.login_open.emit()
             time.sleep(5)
             self.signal.login_close.emit()
         except Exception:
             self.signal.finished.emit()
-        self.signal.enable_buttons.emit()
+        # self.signal.enable_buttons.emit()
 
 
 class WorkerThreadAlreadyLogin(QRunnable):
