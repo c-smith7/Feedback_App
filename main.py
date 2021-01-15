@@ -43,7 +43,7 @@ class Window(QWidget):
         self.hbox_buttons1 = QWidget()
         self.hbox_buttonsLayout1 = QHBoxLayout(self.hbox_buttons1)
         self.login_button = QPushButton('Login')
-        self.get_template_button = QPushButton('Get Feedback Template (Login Required)')
+        self.get_template_button = QPushButton('Get Feedback Template')
         self.get_template_button.setEnabled(False)
         self.loading = QLabel()
         self.loading.setVisible(False)
@@ -51,7 +51,12 @@ class Window(QWidget):
         self.login_success.setVisible(False)
         self.logged_in_already = QLabel('Already logged in!')
         self.logged_in_already.setVisible(False)
+        self.get_template_tip = QLabel()
+        pixmap = QPixmap('tooltip.svg')
+        self.get_template_tip.setPixmap(pixmap)
         self.hbox_buttonsLayout1.addWidget(self.get_template_button, 3)
+        self.hbox_buttonsLayout1.addWidget(self.get_template_tip)
+        self.hbox_buttonsLayout1.addSpacing(15)
         self.hbox_buttonsLayout1.addWidget(self.login_button, 1)
         self.hbox_buttonsLayout1.addWidget(self.loading)
         self.hbox_buttonsLayout1.addWidget(self.login_success)
@@ -61,8 +66,12 @@ class Window(QWidget):
         self.hbox_buttonsLayout2 = QHBoxLayout(self.hbox_buttons2)
         self.copy_output_button = QPushButton('Copy Feedback')
         self.clear_form_button = QPushButton('Clear')
-        self.hbox_buttonsLayout2.addWidget(self.copy_output_button)
-        self.hbox_buttonsLayout2.addWidget(self.clear_form_button)
+        self.copy_output_tip = QLabel()
+        self.copy_output_tip.setPixmap(pixmap)
+        self.hbox_buttonsLayout2.addWidget(self.copy_output_tip)
+        self.hbox_buttonsLayout2.addWidget(self.copy_output_button, 50)
+        self.hbox_buttonsLayout2.addSpacing(5)
+        self.hbox_buttonsLayout2.addWidget(self.clear_form_button, 49)
         # Add widgets to layout
         self.layout.addWidget(self.hbox_buttons1)
         self.layout.addWidget(QHline())
@@ -133,11 +142,15 @@ class Window(QWidget):
         self.student.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; '
                                    'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         # Tool Tips
-        if self.get_template_button.isEnabled():
-            self.get_template_button.setToolTip('Automatically get feedback template.')
-        else:
-            self.get_template_button.setToolTip('Login to use this feature.')
-        self.copy_output_button.setToolTip('Copy feedback output to clipboard.')
+        self.get_template_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
+                                         '<li>Automatically get lesson feedback template.</li>'
+                                         '<li>Login is required to use this feature.</li>'
+                                         '<li>Log in using the "Login" button.</li>'
+                                         '</ul>')
+        self.copy_output_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
+                                        '<li>Copy feedback output to clipboard.</li>'
+                                        '<li>Use windows key <img src="windows_logo.svg"> + V to access clipboard.</li>'
+                                        '</ul>')
         self.generate_output.setToolTip('Generate feedback from template.')
         self.clear_form_button.setToolTip('Clear student name & template.')
         self.login_button.setToolTip('Login & Connect to VIPKid.')
@@ -221,7 +234,6 @@ class Window(QWidget):
             print('Logged In!')
             self.get_template_button.setEnabled(True)
             self.login_button.setEnabled(True)
-            self.get_template_button.setText('Get Feedback Template')
         os.remove('cookie')
         with open('cookie', 'wb') as file:
             pickle.dump(self.browser.get_cookies(), file)
@@ -325,7 +337,6 @@ class Window(QWidget):
                 print('Logged In!')
                 self.get_template_button.setEnabled(True)
                 self.login_button.setEnabled(True)
-                self.get_template_button.setText('Get Feedback Template')
         except Exception as e:
             msgBox = QMessageBox(self)
             msgBox.setIcon(QMessageBox.Critical)
@@ -508,6 +519,7 @@ class Window(QWidget):
 
     def login_started(self):
         gif = QMovie('loading.gif')
+        tip = QLabel('ToolTip')
         self.loading.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.loading.setAttribute(Qt.WA_TranslucentBackground)
         self.loading.setMovie(gif)
