@@ -189,12 +189,16 @@ class Window(QWidget):
                      f'improving every class! See you next time {student_name}. ' \
                      f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
                      f'From, Teacher Carlos ZDG.'
+            if feedback_input.split(' ', 1)[0] in ['We', 'we']:
+                output = f'In this lesson, {output}'
         elif new_student == 'yes':
             output = f'{feedback_output} Fantastic job today {student_name}! ' \
                      f'It was great meeting you. Keep up the great work, and I hope ' \
                      f'to see you in my class again soon. ' \
                      f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
                      f'From, Teacher Carlos ZDG.'
+            if feedback_input.split(' ', 1)[0] in ['We', 'we']:
+                output = f'In this lesson, {output}'
         if student_name == '':
             self.feedback_output.clear()
         else:
