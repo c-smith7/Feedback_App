@@ -4,19 +4,44 @@ import re
 import sys
 import time
 import enchant
-from enchant import tokenize
-from enchant.errors import TokenizerNotFoundError
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import *
-from PyQt5.QtGui import QPalette, QColor, QSyntaxHighlighter, QTextCharFormat, QCloseEvent, QPixmap, QMovie
+from PyQt5.QtGui import QPalette, QColor, QSyntaxHighlighter, QTextCharFormat, QPixmap, QMovie
 from PyQt5.QtWidgets import *
-import traceback
+from enchant import tokenize
+from enchant.errors import TokenizerNotFoundError
 from selenium import webdriver
-from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException, WebDriverException, RemoteDriverServerException
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+
+
+class MainWindow(QMainWindow):
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent)
+        self.app_widget = Window()
+        self.setCentralWidget(self.app_widget)
+        self._createMenuBar()
+        # config
+        self.setWindowTitle('VIPKid Feedback App')
+        self.resize(525, 725)
+        self.app_icon = QtGui.QIcon()
+        self.app_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+        self.setWindowIcon(self.app_icon)
+        palette = QPalette()
+        palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
+        self.setPalette(palette)
+
+    def _createMenuBar(self):
+        menuBar = self.menuBar()
+        menuBar.setStyleSheet('QMenuBar {background: rgb(53, 53, 53); color: rgb(235, 235, 235);'
+                              'border-bottom: 1px solid rgba(36, 36, 36, .5)}'
+                              'QMenuBar::item:selected {background: rgb(115, 115, 115);}')
+        file_menu = menuBar.addMenu('&File')
+        help_menu = menuBar.addMenu('&Help')
 
 
 # noinspection PyArgumentList,PyTypeChecker,PyBroadException
@@ -24,13 +49,12 @@ class Window(QWidget):
     def __init__(self, *args, **kwargs):
         super(Window, self).__init__(*args, **kwargs)
         # Window config
-        self.setWindowTitle('VIPKid Feedback App')
-        self.resize(525, 725)
-        self.app_icon = QtGui.QIcon()
-        self.app_icon.addFile('pencil.png', QtCore.QSize(16, 16))
-        self.setWindowIcon(self.app_icon)
+        # self.setWindowTitle('VIPKid Feedback App')
+        # self.resize(525, 725)
+        # self.app_icon = QtGui.QIcon()
+        # self.app_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+        # self.setWindowIcon(self.app_icon)
         self.threadpool = QThreadPool()
-        # Create layout instance
         self.layout = QVBoxLayout()
         # Widgets
         self.student = QLineEdit(self)
@@ -68,7 +92,7 @@ class Window(QWidget):
         self.clear_form_button = QPushButton('Clear')
         self.copy_output_tip = QLabel()
         self.copy_output_tip.setPixmap(pixmap)
-        self.hbox_buttonsLayout2.addWidget(self.copy_output_tip)
+        self.hbox_buttonsLayout2.addWidget(self.copy_output_tip, 1)
         self.hbox_buttonsLayout2.addWidget(self.copy_output_button, 50)
         self.hbox_buttonsLayout2.addSpacing(5)
         self.hbox_buttonsLayout2.addWidget(self.clear_form_button, 49)
@@ -110,10 +134,10 @@ class Window(QWidget):
         self.no_button.setFocusPolicy(Qt.NoFocus)
         self.feedback_output.setFocusPolicy(Qt.NoFocus)
         # Dark mode
-        palette = QPalette()
-        palette.setColor(QPalette.Window, QColor(53, 53, 53))
-        palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
-        self.setPalette(palette)
+        # palette = QPalette()
+        # palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        # palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
+        # self.setPalette(palette)
         self.generate_output.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                            'border-radius: 12px; padding: 5px; font: bold 12px;}'
                                            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
@@ -731,7 +755,7 @@ if __name__ == "__main__":
     # with open(style, 'r') as qss:
     #     app.setStyleSheet(qss.read())
     splash = Splashscreen()
-    window = Window()
+    window = MainWindow()
     window.show()
     splash.stop(window)
     app.exec()
