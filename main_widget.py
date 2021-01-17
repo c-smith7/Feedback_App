@@ -18,42 +18,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 
-class MainWindow(QMainWindow):
-    def __init__(self, parent=None):
-        super(MainWindow, self).__init__(parent)
-        self.app_widget = Window()
-        self.setCentralWidget(self.app_widget)
-        self._createMenuBar()
-        # config
-        self.setWindowTitle('VIPKid Feedback App')
-        self.resize(525, 725)
-        self.app_icon = QtGui.QIcon()
-        self.app_icon.addFile('pencil.png', QtCore.QSize(16, 16))
-        self.setWindowIcon(self.app_icon)
-        palette = QPalette()
-        palette.setColor(QPalette.Window, QColor(53, 53, 53))
-        palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
-        self.setPalette(palette)
-
-    def _createMenuBar(self):
-        menuBar = self.menuBar()
-        menuBar.setStyleSheet('QMenuBar {background: rgb(53, 53, 53); color: rgb(235, 235, 235);'
-                              'border-bottom: 1px solid rgba(36, 36, 36, .5)}'
-                              'QMenuBar::item:selected {background: rgb(115, 115, 115);}')
-        file_menu = menuBar.addMenu('&File')
-        help_menu = menuBar.addMenu('&Help')
-
-
 # noinspection PyArgumentList,PyTypeChecker,PyBroadException
 class Window(QWidget):
     def __init__(self, *args, **kwargs):
         super(Window, self).__init__(*args, **kwargs)
-        # Window config
-        # self.setWindowTitle('VIPKid Feedback App')
-        # self.resize(525, 725)
-        # self.app_icon = QtGui.QIcon()
-        # self.app_icon.addFile('pencil.png', QtCore.QSize(16, 16))
-        # self.setWindowIcon(self.app_icon)
+        # Widget config
         self.threadpool = QThreadPool()
         self.layout = QVBoxLayout()
         # Widgets
@@ -238,12 +207,6 @@ class Window(QWidget):
             clipboard = QtGui.QGuiApplication.clipboard()
             clipboard.setText(output)
         except Exception:
-            pass
-
-    def closeEvent(self, event):
-        try:
-            self.browser.quit()
-        except:
             pass
 
     def login(self):
@@ -743,19 +706,19 @@ class Splashscreen:
         self.splash.show()
         while time.time() - start < 2:
             time.sleep(0.001)
-            app.processEvents()
+            qApp.processEvents()
 
     def stop(self, widget):
         self.splash.finish(widget)
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    # style = 'style.qss'
-    # with open(style, 'r') as qss:
-    #     app.setStyleSheet(qss.read())
-    splash = Splashscreen()
-    window = MainWindow()
-    window.show()
-    splash.stop(window)
-    app.exec()
+# if __name__ == "__main__":
+#     app = QApplication(sys.argv)
+#     # style = 'style.qss'
+#     # with open(style, 'r') as qss:
+#     #     app.setStyleSheet(qss.read())
+#     splash = Splashscreen()
+#     window = Window()
+#     window.show()
+#     splash.stop(window)
+#     app.exec()
