@@ -11,6 +11,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(parent)
         self.app_widget = Window()
         self.setCentralWidget(self.app_widget)
+        self._createActions()
         self._createMenuBar()
         # config
         self.setWindowTitle('VIPKid Feedback App')
@@ -29,7 +30,18 @@ class MainWindow(QMainWindow):
                               'border-bottom: 1px solid rgba(36, 36, 36, .5)}'
                               'QMenuBar::item:selected {background: rgb(115, 115, 115);}')
         file_menu = menuBar.addMenu('&File')
+        file_menu.addAction(self.sign_out)
+        edit_menu = menuBar.addMenu('&Edit')
+        edit_menu.addAction(self.edit_signature)
+        # submenu
+        teacher_menu = edit_menu.addMenu('Teacher Templates')
+        teacher_menu.addAction('Add Teachers..')
+        teacher_menu.addAction('Remove Teachers..')
         help_menu = menuBar.addMenu('&Help')
+
+    def _createActions(self):
+        self.sign_out = QAction('&Sign Out', self)
+        self.edit_signature = QAction('Edit Feedback Signature', self)
 
     def closeEvent(self, event):
         try:
