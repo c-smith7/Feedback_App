@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, Qt
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import *
 from main_widget import Window, Splashscreen
@@ -35,12 +35,12 @@ class MainWindow(QMainWindow):
         edit_menu.addAction(self.edit_signature)
         # submenu
         teacher_menu = edit_menu.addMenu('Teacher Templates')
-        teacher_menu.addAction('Add Teachers..')
-        teacher_menu.addAction('Remove Teachers..')
+        teacher_menu.addAction('Add Teachers...')
+        teacher_menu.addAction('Remove Teachers...')
         help_menu = menuBar.addMenu('&Help')
 
     def _createActions(self):
-        self.sign_out = QAction('&Sign Out', self)
+        self.sign_out = QAction('&Log Out', self)
         self.edit_signature = QAction('Edit Feedback Signature', self)
 
     def closeEvent(self, event):

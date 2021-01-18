@@ -32,6 +32,11 @@ class Window(QWidget):
         self.feedback_temp = SpellTextEdit()
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
+        # add combo box to button
+        templates = ['temp1', 'temp2', 'temp3']  # add all returned available templates to this list
+        self.available_templates = QComboBox(self)
+        self.available_templates.addItems(templates)
+        # add combo box to button
         # HBox button group 1
         self.hbox_buttons1 = QWidget()
         self.hbox_buttonsLayout1 = QHBoxLayout(self.hbox_buttons1)
@@ -82,6 +87,7 @@ class Window(QWidget):
         self.layout.addWidget(self.feedback_temp, 6)
         self.layout.addSpacing(5)
         self.layout.addWidget(self.generate_output)
+        self.layout.addWidget(self.available_templates)
         self.layout.addSpacing(5)
         self.layout.addWidget(QHline())
         self.layout.addSpacing(5)
@@ -164,6 +170,34 @@ class Window(QWidget):
         self.generate_output.clicked.connect(self.feedback_script)
         self.copy_output_button.clicked.connect(self.copy)
         self.clear_form_button.clicked.connect(self.clear_form)
+        self.available_templates.activated[str].connect(self.testFunc)
+
+    # def contextMenuEvent(self, event):
+    #     menu = QMenu(self.feedback_temp)
+    #     menu.addAction('Test', self.testFunc)
+    #     menu.exec_(event.globalPos())
+    # def context_menu(self):
+    #     self.normal_menu = self.createStandardContextMenu()
+    #     self.custom_menu_items(self.normal_menu)
+    #     self.normal_menu.exec_(QtGui.QCursor.pos())
+    #
+    # def custom_menu_items(self, menu):
+    #     menu.addSeparator()
+    #     menu.addAction('Test', self.testFunc)
+    #
+    def testFunc(self):
+        """ Each item will return its respective template"""
+        # Instead of if/elif, you can use a for loop for the len of available list, where each loop
+        # is an item index. Ex:
+        # for index in len(templates):
+        #   if self.available_templates.currentIndex() == index:
+        #       print('respective template')
+        if self.available_templates.currentIndex() == 0:
+            print('1st Template selected')
+        elif self.available_templates.currentIndex() == 1:
+            print('2nd Template selected')
+        elif self.available_templates.currentIndex() == 2:
+            print('3rd Template selected')
 
     def feedback_script(self):
         global new_student
@@ -374,7 +408,7 @@ class Window(QWidget):
         bar.setTextVisible(False)
         progress_bar.setBar(bar)
         progress_bar.setWindowTitle('VIPKid Feedback App')
-        label = QLabel('Getting feedback template...')
+        label = QLabel('  Getting feedback template...')
         label.setStyleSheet('color: rgb(235, 235, 235); font: 12px')
         progress_bar.setLabel(label)
         progress_bar.setStyleSheet('QProgressBar {border: 1px solid rgb(115, 115, 115); border-radius: 7px;'
@@ -437,11 +471,14 @@ class Window(QWidget):
                 valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
                                   'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
                 invalid_teacher_count = int(len(li_tags))
+                # teacher_list = []
+                # template_list = []
                 for li_tag in li_tags:
                     teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
                     if teacher_name in valid_teachers:
                         template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
-                        progress_bar.setValue(99)
+                        # teacher_list.append(teacher_name)
+                        # template_list.append(template)
                         time.sleep(1)
                         self.feedback_temp.insertPlainText(template)
                         progress_bar.setValue(100)
@@ -455,6 +492,9 @@ class Window(QWidget):
                     elif teacher_name not in valid_teachers:
                         invalid_teacher_count -= 1
                         continue
+                # print(teacher_list)
+                # print(template_list)
+                # progress_bar.setValue(100)
                 if invalid_teacher_count == 0:
                     progress_bar.close()
                     progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
@@ -628,7 +668,6 @@ class WorkerThreadAlreadyLogin(QRunnable):
 
 class SpellTextEdit(QPlainTextEdit):
     """QPlainTextEdit subclass which does spell-checking using PyEnchant"""
-
     def __init__(self, *args):
         QPlainTextEdit.__init__(self, *args)
 
