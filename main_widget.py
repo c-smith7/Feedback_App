@@ -32,11 +32,6 @@ class Window(QWidget):
         self.feedback_temp = SpellTextEdit()
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
-        # add combo box to button
-        templates = ['temp1', 'temp2', 'temp3']  # add all returned available templates to this list
-        self.available_templates = QComboBox(self)
-        self.available_templates.addItems(templates)
-        # add combo box to button
         # HBox button group 1
         self.hbox_buttons1 = QWidget()
         self.hbox_buttonsLayout1 = QHBoxLayout(self.hbox_buttons1)
@@ -60,8 +55,7 @@ class Window(QWidget):
         self.hbox_buttonsLayout1.addWidget(self.login_success)
         self.hbox_buttonsLayout1.addWidget(self.logged_in_already)
         # HBox button group 2
-        self.hbox_buttons2 = QWidget()
-        self.hbox_buttonsLayout2 = QHBoxLayout(self.hbox_buttons2)
+        self.hbox_buttonsLayout2 = QHBoxLayout()
         self.copy_output_button = QPushButton('Copy Feedback')
         self.clear_form_button = QPushButton('Clear')
         self.copy_output_tip = QLabel()
@@ -69,7 +63,18 @@ class Window(QWidget):
         self.hbox_buttonsLayout2.addWidget(self.copy_output_tip, 1)
         self.hbox_buttonsLayout2.addWidget(self.copy_output_button, 50)
         self.hbox_buttonsLayout2.addSpacing(5)
-        self.hbox_buttonsLayout2.addWidget(self.clear_form_button, 49)
+        self.hbox_buttonsLayout2.addWidget(self.clear_form_button, 48)
+        # HBox group 3
+        self.hbox_Layout3 = QHBoxLayout()
+        self.template_label = QLabel('Feedback Template:')
+        self.available_templates = QComboBox(self)
+        self.available_templates.setVisible(True)
+        self.available_templates.addItems(['West1', 'Test2', 'Test3', 'Test4', 'Test5'])
+        # lists used to store teacher names and respective templates in combobox
+        self.teacher_list = []
+        self.template_list = []
+        self.hbox_Layout3.addWidget(self.template_label, 2)
+        self.hbox_Layout3.addWidget(self.available_templates, 1)
         # Add widgets to layout
         self.layout.addWidget(self.hbox_buttons1)
         self.layout.addWidget(QHline())
@@ -82,12 +87,11 @@ class Window(QWidget):
         self.layout.addWidget(self.yes_button)
         self.layout.addWidget(self.no_button)
         self.layout.addSpacing(7)
-        self.layout.addWidget(QLabel('Feedback Template:'))
+        self.layout.addLayout(self.hbox_Layout3)
         self.layout.addSpacing(2)
         self.layout.addWidget(self.feedback_temp, 6)
         self.layout.addSpacing(5)
         self.layout.addWidget(self.generate_output)
-        self.layout.addWidget(self.available_templates)
         self.layout.addSpacing(5)
         self.layout.addWidget(QHline())
         self.layout.addSpacing(5)
@@ -95,7 +99,7 @@ class Window(QWidget):
         self.layout.addSpacing(2)
         self.layout.addWidget(self.feedback_output, 5)
         self.layout.addSpacing(2)
-        self.layout.addWidget(self.hbox_buttons2)
+        self.layout.addLayout(self.hbox_buttonsLayout2)
         self.setLayout(self.layout)
         # Button configs
         self.no_button.setChecked(True)
@@ -108,11 +112,7 @@ class Window(QWidget):
         self.yes_button.setFocusPolicy(Qt.NoFocus)
         self.no_button.setFocusPolicy(Qt.NoFocus)
         self.feedback_output.setFocusPolicy(Qt.NoFocus)
-        # Dark mode
-        # palette = QPalette()
-        # palette.setColor(QPalette.Window, QColor(53, 53, 53))
-        # palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
-        # self.setPalette(palette)
+        # Style sheets
         self.generate_output.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                            'border-radius: 12px; padding: 5px; font: bold 12px;}'
                                            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
@@ -134,6 +134,14 @@ class Window(QWidget):
                                         'border-radius: 12px; padding: 5px; font: bold 12px;}'
                                         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                         'QPushButton:hover {border: 0.5px solid white}')
+        self.available_templates.setStyleSheet('QComboBox {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                               'border-radius: 9px; padding-left: 10px; padding-top: 2px; padding-bottom: 2px}'
+                                               'QComboBox::drop-down {background-color: rgb(115, 115, 115); border-radius: 8.3px;'
+                                               'padding-right: 12px;}'
+                                               'QComboBox::down-arrow {image: url(drop_down_arrow.png);}'
+                                               'QComboBox QAbstractItemView {background-color: rgb(53, 53, 53);'
+                                               'color: rgb(235, 235, 235); selection-background-color: rgb(115, 115, 115);'
+                                               'border: 1px solid rgb(53, 53, 53)}')
         self.feedback_temp.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px;'
                                          'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         self.feedback_output.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; '
@@ -158,7 +166,7 @@ class Window(QWidget):
         if os.path.exists('cookie'):
             options = Options()
             options.headless = True
-            self.browser = webdriver.Chrome(options=options)
+            self.browser = webdriver.Chrome()
             print('driver connected')
         # Signals and slots
         self.login_button_counter = 0
@@ -170,34 +178,7 @@ class Window(QWidget):
         self.generate_output.clicked.connect(self.feedback_script)
         self.copy_output_button.clicked.connect(self.copy)
         self.clear_form_button.clicked.connect(self.clear_form)
-        self.available_templates.activated[str].connect(self.testFunc)
-
-    # def contextMenuEvent(self, event):
-    #     menu = QMenu(self.feedback_temp)
-    #     menu.addAction('Test', self.testFunc)
-    #     menu.exec_(event.globalPos())
-    # def context_menu(self):
-    #     self.normal_menu = self.createStandardContextMenu()
-    #     self.custom_menu_items(self.normal_menu)
-    #     self.normal_menu.exec_(QtGui.QCursor.pos())
-    #
-    # def custom_menu_items(self, menu):
-    #     menu.addSeparator()
-    #     menu.addAction('Test', self.testFunc)
-    #
-    def testFunc(self):
-        """ Each item will return its respective template"""
-        # Instead of if/elif, you can use a for loop for the len of available list, where each loop
-        # is an item index. Ex:
-        # for index in len(templates):
-        #   if self.available_templates.currentIndex() == index:
-        #       print('respective template')
-        if self.available_templates.currentIndex() == 0:
-            print('1st Template selected')
-        elif self.available_templates.currentIndex() == 1:
-            print('2nd Template selected')
-        elif self.available_templates.currentIndex() == 2:
-            print('3rd Template selected')
+        self.available_templates.activated[str].connect(self.available_templates_combobox)
 
     def feedback_script(self):
         global new_student
@@ -395,10 +376,16 @@ class Window(QWidget):
     #     msgBox.exec()
 
     def feedback_automation(self):
+        """Automatically retrieves feedback templates for missing CFs."""
         # Clear any previous text from text boxes.
         self.student.clear()
         self.feedback_temp.clear()
-        ''' create own class for progress bar'''
+        # clear the lists used for combobox
+        self.teacher_list.clear()
+        self.template_list.clear()
+        # clear combobox
+        self.available_templates.clear()
+        self.available_templates.setVisible(False)
         progress_bar = QProgressDialog('', '', 0, 100, self)
         progress_bar.setWindowModality(Qt.WindowModal)
         progress_bar.setWindowFlag(Qt.FramelessWindowHint)
@@ -443,7 +430,7 @@ class Window(QWidget):
                 msgBox.exec()
             except TimeoutException:
                 progress_bar.setValue(15)
-                student_name = str(WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
+                student_name = str(WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
                 student_name = student_name.title()
                 if student_name.isupper():
                     student_name = ''.join(student_name.split()).title()
@@ -469,32 +456,31 @@ class Window(QWidget):
                 ul_list = self.browser.find_element_by_class_name('shared-notes-list-container')
                 li_tags = ul_list.find_elements_by_tag_name('li')
                 valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
-                                  'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
+                                  'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH',
+                                  'Holli Q', 'Courtney SOC', 'Heather BGW']
                 invalid_teacher_count = int(len(li_tags))
-                # teacher_list = []
-                # template_list = []
                 for li_tag in li_tags:
                     teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
                     if teacher_name in valid_teachers:
+                        self.teacher_list.append(teacher_name)
                         template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
-                        # teacher_list.append(teacher_name)
-                        # template_list.append(template)
-                        time.sleep(1)
-                        self.feedback_temp.insertPlainText(template)
-                        progress_bar.setValue(100)
-                        self.browser.close()
-                        self.browser.switch_to.window(self.browser.window_handles[0])
-                        if len(self.browser.window_handles) > 1:
-                            self.browser.switch_to.window(self.browser.window_handles[-1])
-                            self.browser.close()
-                            self.browser.switch_to.window(self.browser.window_handles[0])
-                        break
+                        self.template_list.append(template)
                     elif teacher_name not in valid_teachers:
                         invalid_teacher_count -= 1
                         continue
-                # print(teacher_list)
-                # print(template_list)
-                # progress_bar.setValue(100)
+                print(self.teacher_list)
+                print(self.template_list)
+                print(len(self.teacher_list))
+                self.available_templates.addItems(self.teacher_list)
+                self.available_templates.setVisible(True)
+                self.feedback_temp.insertPlainText(self.template_list[0])
+                progress_bar.setValue(100)
+                self.browser.close()
+                self.browser.switch_to.window(self.browser.window_handles[0])
+                if len(self.browser.window_handles) > 1:
+                    self.browser.switch_to.window(self.browser.window_handles[-1])
+                    self.browser.close()
+                    self.browser.switch_to.window(self.browser.window_handles[0])
                 if invalid_teacher_count == 0:
                     progress_bar.close()
                     progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
@@ -547,6 +533,27 @@ class Window(QWidget):
                 self.browser.refresh()
                 time.sleep(2)
                 self.get_template_button.click()
+
+    def available_templates_combobox(self):
+        """ Each item will return its respective template"""
+        # Instead of if/elif, you can use a for loop for the len of available list, where each loop
+        # is an item index. Ex:
+        index_activated = self.available_templates.currentIndex()
+        self.feedback_temp.clear()
+        self.feedback_temp.insertPlainText(self.template_list[index_activated])
+        # for i in len(self.teacher_list):
+        #     if i == index_activated:
+        #         self.feedback_temp.clear()
+        #         self.feedback_temp.insertPlainText(self.template_list[i])
+        # elif self.available_templates.currentIndex() == 1:
+        #     self.feedback_temp.clear()
+        #     self.feedback_temp.insertPlainText(self.template_list[1])
+        # elif self.available_templates.currentIndex() == 2:
+        #     self.feedback_temp.clear()
+        #     self.feedback_temp.insertPlainText(self.template_list[2])
+        # elif self.available_templates.currentIndex() == 3:
+        #     self.feedback_temp.clear()
+        #     self.feedback_temp.insertPlainText(self.template_list[3])
 
     def login_started(self):
         gif = QMovie('loading.gif')
