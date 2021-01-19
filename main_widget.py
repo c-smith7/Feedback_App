@@ -68,8 +68,8 @@ class Window(QWidget):
         self.hbox_Layout3 = QHBoxLayout()
         self.template_label = QLabel('Feedback Template:')
         self.available_templates = QComboBox(self)
-        self.available_templates.setVisible(True)
-        self.available_templates.addItems(['West1', 'Test2', 'Test3', 'Test4', 'Test5'])
+        self.available_templates.setVisible(False)
+        # self.available_templates.addItems(['West1', 'Test2', 'Test3', 'Test4', 'Test5'])
         # lists used to store teacher names and respective templates in combobox
         self.teacher_list = []
         self.template_list = []
@@ -166,7 +166,7 @@ class Window(QWidget):
         if os.path.exists('cookie'):
             options = Options()
             options.headless = True
-            self.browser = webdriver.Chrome()
+            self.browser = webdriver.Chrome(options=options)
             print('driver connected')
         # Signals and slots
         self.login_button_counter = 0
@@ -468,20 +468,17 @@ class Window(QWidget):
                     elif teacher_name not in valid_teachers:
                         invalid_teacher_count -= 1
                         continue
-                print(self.teacher_list)
-                print(self.template_list)
-                print(len(self.teacher_list))
-                self.available_templates.addItems(self.teacher_list)
-                self.available_templates.setVisible(True)
-                self.feedback_temp.insertPlainText(self.template_list[0])
                 progress_bar.setValue(100)
                 self.browser.close()
                 self.browser.switch_to.window(self.browser.window_handles[0])
-                if len(self.browser.window_handles) > 1:
-                    self.browser.switch_to.window(self.browser.window_handles[-1])
-                    self.browser.close()
-                    self.browser.switch_to.window(self.browser.window_handles[0])
-                if invalid_teacher_count == 0:
+                if invalid_teacher_count != 0:
+                    print(self.teacher_list)
+                    print(self.template_list)
+                    print(len(self.teacher_list))
+                    self.available_templates.addItems(self.teacher_list)
+                    self.available_templates.setVisible(True)
+                    self.feedback_temp.insertPlainText(self.template_list[0])
+                elif invalid_teacher_count == 0:
                     progress_bar.close()
                     progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
                     msgBox = QMessageBox(self)
@@ -499,12 +496,10 @@ class Window(QWidget):
                                          'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                          'QPushButton:hover {border: 0.5px solid white}')
                     msgBox.exec()
+                elif len(self.browser.window_handles) > 1:
+                    self.browser.switch_to.window(self.browser.window_handles[-1])
                     self.browser.close()
                     self.browser.switch_to.window(self.browser.window_handles[0])
-                    if len(self.browser.window_handles) > 1:
-                        self.browser.switch_to.window(self.browser.window_handles[-1])
-                        self.browser.close()
-                        self.browser.switch_to.window(self.browser.window_handles[0])
         except Exception as e:
             print(e)
             progress_bar.close()
