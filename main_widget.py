@@ -405,11 +405,12 @@ class Window(QWidget):
         progress_bar.forceShow()
         progress_bar.setValue(0)
         self.browser.refresh()
+        time.sleep(1)
         progress_bar.setValue(10)
         try:
             try:
-                WebDriverWait(self.browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')))
-                progress_bar.setValue(99)
+                WebDriverWait(self.browser, 1).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')))
+                progress_bar.setValue(50)
                 time.sleep(1)
                 progress_bar.setValue(100)
                 self.feedback_output.clear()
@@ -438,14 +439,15 @@ class Window(QWidget):
                 progress_bar.setValue(25)
                 materials_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__layout']/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]")))
                 self.browser.execute_script("arguments[0].click();", materials_button)
-                progress_bar.setValue(40)
+                progress_bar.setValue(35)
                 self.browser.switch_to.window(self.browser.window_handles[1])
                 progress_bar.setValue(50)
                 template_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.ID, 'tab-5')))
                 self.browser.execute_script("arguments[0].click();", template_button)
-                progress_bar.setValue(75)
+                progress_bar.setValue(65)
                 # Click show 'more' button until all templates are shown.
                 show_more_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button')))
+                progress_bar.setValue(75)
                 try:
                     while show_more_button.is_displayed():
                         self.browser.execute_script("arguments[0].click()", show_more_button)
@@ -455,6 +457,7 @@ class Window(QWidget):
                 # Iterate through every <li> tag until we find a teacher name in csv file.
                 ul_list = self.browser.find_element_by_class_name('shared-notes-list-container')
                 li_tags = ul_list.find_elements_by_tag_name('li')
+                progress_bar.setValue(95)
                 valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
                                   'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH',
                                   'Holli Q', 'Courtney SOC', 'Heather BGW']
