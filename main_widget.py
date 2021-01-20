@@ -225,24 +225,26 @@ class Window(QWidget):
             pass
 
     def login(self):
-        print('Logging in...')
-        self.login_button.setEnabled(False)
-        self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-        # try:
-        with open('cookie', 'rb') as cookiesfile:
-            cookies = pickle.load(cookiesfile)
-            for cookie in cookies:
-                self.browser.add_cookie(cookie)
-            self.browser.refresh()
-            missing_cf_button = WebDriverWait(self.browser, 3).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
-            self.browser.execute_script("arguments[0].click();", missing_cf_button)
-            self.login_button_counter = 1
-            print('Logged In!')
-            self.get_template_button.setEnabled(True)
-            self.login_button.setEnabled(True)
-        os.remove('cookie')
-        with open('cookie', 'wb') as file:
-            pickle.dump(self.browser.get_cookies(), file)
+        if os.path.exists('cookie'):
+            print('Logging in...')
+            self.login_button.setEnabled(False)
+            self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
+            with open('cookie', 'rb') as cookiesfile:
+                cookies = pickle.load(cookiesfile)
+                for cookie in cookies:
+                    self.browser.add_cookie(cookie)
+                self.browser.refresh()
+                missing_cf_button = WebDriverWait(self.browser, 3).until(EC.element_to_be_clickable((By.CLASS_NAME, 'to-do-type')))
+                self.browser.execute_script("arguments[0].click();", missing_cf_button)
+                self.login_button_counter = 1
+                print('Logged In!')
+                self.get_template_button.setEnabled(True)
+                self.login_button.setEnabled(True)
+            os.remove('cookie')
+            with open('cookie', 'wb') as file:
+                pickle.dump(self.browser.get_cookies(), file)
+        else:
+            self.login_nocookies()
 
     def login_error_msg(self):
         print("Couldn't log in")
@@ -274,7 +276,6 @@ class Window(QWidget):
                 time.sleep(2)
                 self.login_nocookies()
             except Exception as e:
-                print('got here')
                 msgBox = QMessageBox(self)
                 msgBox.setIcon(QMessageBox.Critical)
                 msgBox.setText('Error')
@@ -292,7 +293,7 @@ class Window(QWidget):
     def login_nocookies(self):
         if self.login_button_counter == 0:
             msgBox = QMessageBox(self)
-            # msgBox.setWindowModality(Qt.WindowModal)
+            msgBox.setWindowModality(Qt.WindowModal)
             msgBox.setWindowFlag(Qt.ToolTip)
             msgBox.setIcon(QMessageBox.Information)
             msgBox.setText('Click the "Login" button below.\nLog in to VIPKid in the window that opens.')
@@ -310,7 +311,6 @@ class Window(QWidget):
                                  'QPushButton:hover {border: 0.5px solid white}')
             result = msgBox.exec()
             if result == QMessageBox.Ok:
-                print('Nice!')
                 self.login_nocookies_slots()
         elif self.login_button_counter == 1:
             self.login_slots()
@@ -452,15 +452,15 @@ class Window(QWidget):
                     while show_more_button.is_displayed():
                         self.browser.execute_script("arguments[0].click()", show_more_button)
                 except StaleElementReferenceException:
-                    time.sleep(1)
+                    pass
+                time.sleep(1)
                 progress_bar.setValue(90)
                 # Iterate through every <li> tag until we find a teacher name in csv file.
                 ul_list = self.browser.find_element_by_class_name('shared-notes-list-container')
                 li_tags = ul_list.find_elements_by_tag_name('li')
                 progress_bar.setValue(95)
                 valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
-                                  'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH',
-                                  'Holli Q', 'Courtney SOC', 'Heather BGW']
+                                  'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
                 invalid_teacher_count = int(len(li_tags))
                 for li_tag in li_tags:
                     teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
@@ -504,7 +504,7 @@ class Window(QWidget):
                     self.browser.close()
                     self.browser.switch_to.window(self.browser.window_handles[0])
         except Exception as e:
-            print(e)
+            print(e)  # put this message in details button of message box.
             progress_bar.close()
             progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
             msgBox = QMessageBox(self)

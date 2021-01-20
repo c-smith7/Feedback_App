@@ -1,3 +1,4 @@
+import os
 import sys
 
 from PyQt5 import QtGui, QtCore, Qt
@@ -13,6 +14,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.app_widget)
         self._createActions()
         self._createMenuBar()
+        self._connectActions()
         # config
         self.setWindowTitle('VIPKid Feedback App')
         self.resize(525, 725)
@@ -43,11 +45,55 @@ class MainWindow(QMainWindow):
         self.sign_out = QAction('&Log Out', self)
         self.edit_signature = QAction('Edit Feedback Signature', self)
 
+    def _connectActions(self):
+        self.sign_out.triggered.connect(self.logout)
+
     def closeEvent(self, event):
         try:
             self.app_widget.browser.quit()
         except:
             pass
+
+    def logout(self):
+        """slot of logout option in menubar"""
+        if os.path.exists('cookie'):
+            os.remove('cookie')
+            self.app_widget.login_button_counter = 0
+            msgBox = QMessageBox(self)
+            msgBox.setWindowModality(QtCore.Qt.WindowModal)
+            msgBox.setWindowFlag(QtCore.Qt.ToolTip)
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText('Successfully Logged Out!')
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            msgBox.setDefaultButton(QMessageBox.Ok)
+            msgBox.setStyleSheet(
+                'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                'border-bottom: 1px solid rgb(115, 115, 115)}'
+                'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
+                'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                'border-radius: 11px; padding: 5px; min-width: 5em}'
+                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                'QPushButton:hover {border: 0.5px solid white}')
+            msgBox.exec()
+        else:
+            msgBox = QMessageBox(self)
+            msgBox.setWindowModality(QtCore.Qt.WindowModal)
+            msgBox.setWindowFlag(QtCore.Qt.ToolTip)
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText('Already Logged Out!')
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            msgBox.setDefaultButton(QMessageBox.Ok)
+            msgBox.setStyleSheet(
+                'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                'border-bottom: 1px solid rgb(115, 115, 115)}'
+                'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
+                'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                'border-radius: 11px; padding: 5px; min-width: 5em}'
+                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                'QPushButton:hover {border: 0.5px solid white}')
+            msgBox.exec()
 
 
 if __name__ == "__main__":
