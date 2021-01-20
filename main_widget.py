@@ -530,25 +530,10 @@ class Window(QWidget):
                 self.get_template_button.click()
 
     def available_templates_combobox(self):
-        """ Each item will return its respective template"""
-        # Instead of if/elif, you can use a for loop for the len of available list, where each loop
-        # is an item index. Ex:
+        """ Each item in combobox will return its respective template"""
         index_activated = self.available_templates.currentIndex()
         self.feedback_temp.clear()
         self.feedback_temp.insertPlainText(self.template_list[index_activated])
-        # for i in len(self.teacher_list):
-        #     if i == index_activated:
-        #         self.feedback_temp.clear()
-        #         self.feedback_temp.insertPlainText(self.template_list[i])
-        # elif self.available_templates.currentIndex() == 1:
-        #     self.feedback_temp.clear()
-        #     self.feedback_temp.insertPlainText(self.template_list[1])
-        # elif self.available_templates.currentIndex() == 2:
-        #     self.feedback_temp.clear()
-        #     self.feedback_temp.insertPlainText(self.template_list[2])
-        # elif self.available_templates.currentIndex() == 3:
-        #     self.feedback_temp.clear()
-        #     self.feedback_temp.insertPlainText(self.template_list[3])
 
     def login_started(self):
         gif = QMovie('loading.gif')
