@@ -166,7 +166,7 @@ class Window(QWidget):
         if os.path.exists('cookie'):
             options = Options()
             options.headless = True
-            self.browser = webdriver.Chrome(options=options)
+            self.browser = webdriver.Chrome()
             print('driver connected')
         # Signals and slots
         self.login_button_counter = 0
@@ -459,8 +459,7 @@ class Window(QWidget):
                 ul_list = self.browser.find_element_by_class_name('shared-notes-list-container')
                 li_tags = ul_list.find_elements_by_tag_name('li')
                 progress_bar.setValue(95)
-                valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
-                                  'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
+                valid_teachers = ['Katie EAVV']
                 invalid_teacher_count = int(len(li_tags))
                 for li_tag in li_tags:
                     teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
@@ -472,8 +471,6 @@ class Window(QWidget):
                         invalid_teacher_count -= 1
                         continue
                 progress_bar.setValue(100)
-                self.browser.close()
-                self.browser.switch_to.window(self.browser.window_handles[0])
                 if invalid_teacher_count != 0:
                     print(self.teacher_list)
                     print(self.template_list)
@@ -487,9 +484,11 @@ class Window(QWidget):
                     msgBox = QMessageBox(self)
                     msgBox.setIcon(QMessageBox.Information)
                     msgBox.setWindowFlag(Qt.ToolTip)
-                    msgBox.setText('No valid teacher templates :(')
-                    msgBox.setStandardButtons(QMessageBox.Ok)
-                    msgBox.setDefaultButton(QMessageBox.Ok)
+                    msgBox.setText('No valid teacher templates :(\n'
+                                   '\n'
+                                   'Would you like to see the Top 5 templates?')
+                    msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                    msgBox.setDefaultButton(QMessageBox.Yes)
                     msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
                                          'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
                                          'border-bottom: 1px solid rgb(115, 115, 115)}'
@@ -498,8 +497,19 @@ class Window(QWidget):
                                          'border-radius: 11px; padding: 5px; min-width: 5em}'
                                          'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                          'QPushButton:hover {border: 0.5px solid white}')
-                    msgBox.exec()
-                elif len(self.browser.window_handles) > 1:
+                    result = msgBox.exec()
+                    if result == QMessageBox.Yes:
+                        print('Show top 3 templates')
+                        for li_tag in li_tags[:5]:
+                            teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
+                            template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
+                            self.teacher_list.append(teacher_name)
+                            self.template_list.append(template)
+                        self.available_templates.addItems(self.teacher_list)
+                        self.available_templates.setVisible(True)
+                self.browser.close()
+                self.browser.switch_to.window(self.browser.window_handles[0])
+                if len(self.browser.window_handles) > 1:
                     self.browser.switch_to.window(self.browser.window_handles[-1])
                     self.browser.close()
                     self.browser.switch_to.window(self.browser.window_handles[0])
