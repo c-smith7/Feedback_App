@@ -69,12 +69,14 @@ class Window(QWidget):
         self.template_label = QLabel('Feedback Template:')
         self.available_templates = QComboBox(self)
         self.available_templates.setVisible(False)
-        # self.available_templates.addItems(['West1', 'Test2', 'Test3', 'Test4', 'Test5'])
         # lists used to store teacher names and respective templates in combobox
         self.teacher_list = []
         self.template_list = []
         self.hbox_Layout3.addWidget(self.template_label, 2)
         self.hbox_Layout3.addWidget(self.available_templates, 1)
+        # list to store teachers who have valid templates
+        self.valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
+                          'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
         # Add widgets to layout
         self.layout.addWidget(self.hbox_buttons1)
         self.layout.addWidget(QHline())
@@ -166,7 +168,7 @@ class Window(QWidget):
         if os.path.exists('cookie'):
             options = Options()
             options.headless = True
-            self.browser = webdriver.Chrome()
+            self.browser = webdriver.Chrome(options=options)
             print('driver connected')
         # Signals and slots
         self.login_button_counter = 0
@@ -459,15 +461,14 @@ class Window(QWidget):
                 ul_list = self.browser.find_element_by_class_name('shared-notes-list-container')
                 li_tags = ul_list.find_elements_by_tag_name('li')
                 progress_bar.setValue(95)
-                valid_teachers = ['Katie EAVV']
                 invalid_teacher_count = int(len(li_tags))
                 for li_tag in li_tags:
                     teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-                    if teacher_name in valid_teachers:
+                    if teacher_name in self.valid_teachers:
                         self.teacher_list.append(teacher_name)
                         template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
                         self.template_list.append(template)
-                    elif teacher_name not in valid_teachers:
+                    elif teacher_name not in self.valid_teachers:
                         invalid_teacher_count -= 1
                         continue
                 progress_bar.setValue(100)
@@ -499,7 +500,6 @@ class Window(QWidget):
                                          'QPushButton:hover {border: 0.5px solid white}')
                     result = msgBox.exec()
                     if result == QMessageBox.Yes:
-                        print('Show top 3 templates')
                         for li_tag in li_tags[:5]:
                             teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
                             template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)

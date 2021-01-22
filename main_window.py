@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 from PyQt5 import QtGui, QtCore, Qt
 from PyQt5.QtGui import QPalette, QColor
@@ -7,6 +8,7 @@ from PyQt5.QtWidgets import *
 from main_widget import Window, Splashscreen
 
 
+# noinspection PyArgumentList
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -35,18 +37,17 @@ class MainWindow(QMainWindow):
         file_menu.addAction(self.sign_out)
         edit_menu = menuBar.addMenu('&Edit')
         edit_menu.addAction(self.edit_signature)
-        # submenu
-        teacher_menu = edit_menu.addMenu('Teacher Templates')
-        teacher_menu.addAction('Add Teachers...')
-        teacher_menu.addAction('Remove Teachers...')
+        edit_menu.addAction(self.edit_teachers)
         help_menu = menuBar.addMenu('&Help')
 
     def _createActions(self):
         self.sign_out = QAction('&Log Out', self)
         self.edit_signature = QAction('Edit Feedback Signature', self)
+        self.edit_teachers = QAction('&Edit Liked Teachers', self)
 
     def _connectActions(self):
         self.sign_out.triggered.connect(self.logout)
+        self.edit_teachers.triggered.connect(self.teacher_list_widget)
 
     def closeEvent(self, event):
         try:
@@ -94,6 +95,49 @@ class MainWindow(QMainWindow):
                 'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                 'QPushButton:hover {border: 0.5px solid white}')
             msgBox.exec()
+
+    def teacher_list_widget(self):
+        dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        dialog.setWindowTitle('VIPKid Feedback App')
+        dialog.setMinimumWidth(450)
+        # widget layout
+        layout = QVBoxLayout()
+        # Instructions
+        instructions = QLabel()
+        instructions.setWordWrap(True)
+        instructions.setText('<h3>Liked Teachers List</h3>'
+                             '<ul style="margin-left: 10px; -qt-list-indent: 0;">'
+                             '<li>Add teachers by using the <b>Add Teacher</b> button below.</li>'
+                             '<li>Remove teachers by right clicking on a teacher name and selecting <b>Remove</b>.</li></ul>')
+        layout.addWidget(instructions)
+        layout.addSpacing(9)
+        # List Widget
+        list_widget = QListWidget(dialog)
+        list_widget.addItems(self.app_widget.valid_teachers)
+        layout.addWidget(list_widget)
+        # Add button
+        add_teacher_button = QPushButton('Add Teacher', dialog)
+        add_teacher_button.setMaximumWidth(150)
+        layout.addWidget(add_teacher_button)
+        layout.addSpacing(7)
+        # Reminder to user
+        reminder = QLabel()
+        reminder.setWordWrap(True)
+        reminder.setStyleSheet('Font: 9px')
+        reminder.setText('<i>Remember, it is best to add teachers who have '
+                         'feedback templates that are compatible with VIPKid Feedback App. '
+                         'Head to the <b>Help Menu</b> for more details on what templates are compatible.</i>')
+        layout.addWidget(reminder)
+        dialog.setLayout(layout)
+        # slots
+        list_widget.itemClicked.connect(self.TestClicked)
+        # add_teacher_button.clicked.connect()
+        dialog.exec()
+
+    def TestClicked(self, item):
+        print(item.text() + ' selected')
+
+    # def add_teacher(self):
 
 
 if __name__ == "__main__":
