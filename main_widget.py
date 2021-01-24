@@ -76,7 +76,7 @@ class Window(QWidget):
         self.hbox_Layout3.addWidget(self.available_templates, 1)
         # list to store teachers who have valid templates
         self.valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
-                          'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
+                               'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
         # Add widgets to layout
         self.layout.addWidget(self.hbox_buttons1)
         self.layout.addWidget(QHline())
