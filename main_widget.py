@@ -1,3 +1,4 @@
+import json
 import os
 import pickle
 import re
@@ -45,8 +46,8 @@ class Window(QWidget):
         self.logged_in_already = QLabel('Already logged in!')
         self.logged_in_already.setVisible(False)
         self.get_template_tip = QLabel()
-        pixmap = QPixmap('tooltip.svg')
-        self.get_template_tip.setPixmap(pixmap)
+        self.pixmap = QPixmap('tooltip.svg')
+        self.get_template_tip.setPixmap(self.pixmap)
         self.hbox_buttonsLayout1.addWidget(self.get_template_button, 3)
         self.hbox_buttonsLayout1.addWidget(self.get_template_tip)
         self.hbox_buttonsLayout1.addSpacing(15)
@@ -59,7 +60,7 @@ class Window(QWidget):
         self.copy_output_button = QPushButton('Copy Feedback')
         self.clear_form_button = QPushButton('Clear')
         self.copy_output_tip = QLabel()
-        self.copy_output_tip.setPixmap(pixmap)
+        self.copy_output_tip.setPixmap(self.pixmap)
         self.hbox_buttonsLayout2.addWidget(self.copy_output_tip, 1)
         self.hbox_buttonsLayout2.addWidget(self.copy_output_button, 50)
         self.hbox_buttonsLayout2.addSpacing(5)
@@ -74,9 +75,10 @@ class Window(QWidget):
         self.template_list = []
         self.hbox_Layout3.addWidget(self.template_label, 2)
         self.hbox_Layout3.addWidget(self.available_templates, 1)
-        # list to store teachers who have valid templates
-        self.valid_teachers = ['Katie EAV', 'Tammy PHT', 'Amber MZC', 'Andrew BAR', 'Kimberly BDP', 'Miranda CR',
-                               'Richard ZZ', 'Tomas B', 'Stefanie BD', 'Kristina EB', 'Jessica XH', 'Thomas CH']
+        # list of liked teachers from json file
+        if os.path.exists('liked_teachers.json'):
+            with open('liked_teachers.json', 'r') as file:
+                self.liked_teachers = json.load(file)
         # Add widgets to layout
         self.layout.addWidget(self.hbox_buttons1)
         self.layout.addWidget(QHline())
@@ -464,11 +466,11 @@ class Window(QWidget):
                 invalid_teacher_count = int(len(li_tags))
                 for li_tag in li_tags:
                     teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-                    if teacher_name in self.valid_teachers:
+                    if teacher_name in self.liked_teachers:
                         self.teacher_list.append(teacher_name)
                         template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
                         self.template_list.append(template)
-                    elif teacher_name not in self.valid_teachers:
+                    elif teacher_name not in self.liked_teachers:
                         invalid_teacher_count -= 1
                         continue
                 progress_bar.setValue(100)

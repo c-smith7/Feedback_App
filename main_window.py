@@ -1,7 +1,6 @@
+import json
 import os
 import sys
-import time
-import pandas as pd
 from PyQt5 import QtGui, QtCore, Qt
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import *
@@ -17,10 +16,6 @@ class TeachersModel(QtCore.QAbstractListModel):
         if role == QtCore.Qt.DisplayRole:
             text = self.teachers_list[index.row()]
             return text
-        # if role == QtCore.Qt.DecorationRole:
-        #     status, _ = self.teachers[index.row()]
-        #     if status:
-        #         return tick
 
     def rowCount(self, index):
         return len(self.teachers_list)
@@ -37,6 +32,7 @@ class MainWindow(QMainWindow):
         self._connectActions()
         # Liked Teachers list
         self.model = TeachersModel()
+        self.load_data()
         # window config
         self.setWindowTitle('VIPKid Feedback App')
         self.resize(525, 725)
@@ -122,15 +118,21 @@ class MainWindow(QMainWindow):
         dialog.setMinimumWidth(450)
         # widget layout
         layout = QVBoxLayout()
-        # Instructions
-        instructions = QLabel()
-        instructions.setWordWrap(True)
-        instructions.setText('<h3>Liked Teachers List</h3>'
-                             '<ul style="margin-left: 10px; -qt-list-indent: 0;">'
-                             '<li>Add teachers by using the <b>Add Teacher</b> button below.</li>'
-                             '<li>Remove teachers by right-clicking on a teacher name and selecting <b>Remove Teacher</b>.</li></ul>')
-        layout.addWidget(instructions)
-        layout.addSpacing(7)
+        # Instructions Tool Tip
+        hbox_tooltip = QHBoxLayout()
+        title = QLabel('<h3>Liked Teachers List</h3>')
+        title_tip = QLabel()
+        title_tip.setPixmap(self.app_widget.pixmap)
+        title_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
+                             '<li><b>Add</b> a teacher by typing their name and pressing '
+                             'the <br>"Add Teacher" button.</li>'
+                             '<li><b>Remove</b> a teacher by selecting their name and '
+                             'pressing the "Remove Teacher" button.</li>'
+                             '</ul>')
+        hbox_tooltip.addWidget(title, 1)
+        hbox_tooltip.addWidget(title_tip, 5)
+        layout.addLayout(hbox_tooltip)
+        layout.addSpacing(9)
         # Add teacher button and textedit
         hbox_buttons_layout = QHBoxLayout()
         self.new_teacher_name = QLineEdit()
@@ -145,9 +147,8 @@ class MainWindow(QMainWindow):
         # List Widget
         self.list_widget = QListView(dialog)
         self.list_widget.setModel(self.model)
-        # self.load_data('vip_teacher_names.csv')
-        # self.list_widget.addItems(self.liked_teachers.Teachers.to_list())
         layout.addWidget(self.list_widget)
+        layout.addSpacing(3)
         # Remove teacher button
         self.remove_teacher_button = QPushButton('Remove Teacher', dialog)
         self.remove_teacher_button.setMaximumWidth(150)
@@ -169,7 +170,7 @@ class MainWindow(QMainWindow):
         self.list_widget.setStyleSheet('QListView {background-color: rgb(36, 36, 36); border-radius: 4px;'
                                        'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5);}'
                                        'QListView::item:hover {background-color: rgb(115, 115, 115)}'
-                                       'QListView::item:selected:active {background-color: transparent}')
+                                       'QListView::item:selected:active {background-color: rgb(115, 115, 115)}')
         self.new_teacher_name.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; '
                                             'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         self.add_teacher_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
@@ -183,14 +184,9 @@ class MainWindow(QMainWindow):
                                                  'QPushButton:disabled {color: rgb(53, 53, 53)}')
         reminder.setStyleSheet('Font: 9px; color: rgb(235, 235, 235)')
         # slots
-        # self.list_widget.itemClicked.connect(self.TestClicked)
         self.add_teacher_button.clicked.connect(self.add_teacher)
         self.remove_teacher_button.clicked.connect(self.remove_teacher)
         dialog.exec()
-
-    # def TestClicked(self, item):
-    #     test = self.liked_teachers
-    #     print(test)
 
     def add_teacher(self):
         added_teacher = self.new_teacher_name.text()
@@ -198,28 +194,18 @@ class MainWindow(QMainWindow):
             self.model.teachers_list.append(added_teacher)
             self.model.layoutChanged.emit()
             self.new_teacher_name.clear()
+            self.save_data()
 
     def remove_teacher(self):
-        # if self.liked_teachers.size == 0:
-        #     self.remove_teacher_button.setDisabled(True)
-        # print('Teacher Removed0')
-        # teacher_name_index = self.list_widget.currentRow()
-        # print('Teacher Removed1')
-        # teacher_name_text = self.list_widget.currentItem().text()
-        # print('Teacher Removed2')
-
         # Delete? MsgBox
         indexes = self.list_widget.selectedIndexes()
         index_text = self.model.teachers_list[indexes[0].row()]
         msgBox = QMessageBox(self)
         msgBox.setIcon(QMessageBox.Information)
         msgBox.setWindowFlag(QtCore.Qt.ToolTip)
-        teacher_tobe_removed = QLabel()
-        teacher_tobe_removed.setText(index_text)
-        teacher_tobe_removed = teacher_tobe_removed.text()
-        teacher_tobe_removed.setStyleSheet('font-weight: bold')
-        msgBox.setText(teacher_tobe_removed)
-        msgBox.setInformativeText('Remove this teacher?')
+        msgBox.setTextFormat(QtCore.Qt.RichText)
+        msgBox.setText(f'Are you sure you want to remove:<br>'
+                       f'<b>{index_text}</b>?')
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.Yes)
         msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
@@ -237,25 +223,18 @@ class MainWindow(QMainWindow):
                 del self.model.teachers_list[index.row()]
                 self.model.layoutChanged.emit()
                 self.list_widget.clearSelection()
+                self.save_data()
 
-    def rebuild_list(self):
-        print('Here5')
-        self.list_widget.clear()
-        print('Here6')
-        teachers = self.app_widget.valid_teachers
-        print('Here7')
-        for teacher in teachers:
-            item = QListWidgetItem(teacher, self.list_widget)
-            self.app_widget.valid_teachers.append(item)
-
-    def load_data(self, data):
+    def load_data(self):
         try:
-            self.liked_teachers = pd.read_csv(data)
+            with open('liked_teachers.json', 'r') as file:
+                self.model.teachers_list = json.load(file)
         except Exception:
             pass
 
-    def save_data(self, df):
-        df.to_csv('vip_teacher_names.csv', index=False)
+    def save_data(self):
+        with open('liked_teachers.json', 'w') as file:
+            json.dump(self.model.teachers_list, file)
 
 
 if __name__ == "__main__":
