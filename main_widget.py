@@ -33,7 +33,7 @@ class Window(QWidget):
         self.generate_output = QPushButton('Generate Feedback')
         # New student hbox
         self.new_student_hbox = QHBoxLayout()
-        self.new_student = QLabel('New Student ?:')
+        self.new_student = QLabel('New Student?:')
         self.yes_button = QRadioButton('&Yes')
         self.no_button = QRadioButton('&No')
         self.new_student_hbox.addWidget(self.new_student, 1)
@@ -491,9 +491,9 @@ class Window(QWidget):
                         continue
                 progress_bar.setValue(100)
                 if invalid_teacher_count != 0:
-                    print(self.teacher_list)
-                    print(self.template_list)
-                    print(len(self.teacher_list))
+                    # print(self.teacher_list)
+                    # print(self.template_list)
+                    # print(len(self.teacher_list))
                     self.available_templates.addItems(self.teacher_list)
                     self.available_templates.setVisible(True)
                     self.feedback_temp.insertPlainText(self.template_list[0])
@@ -525,6 +525,7 @@ class Window(QWidget):
                             self.template_list.append(template)
                         self.available_templates.addItems(self.teacher_list)
                         self.available_templates.setVisible(True)
+                        self.feedback_temp.insertPlainText(self.template_list[0])
                 self.browser.close()
                 self.browser.switch_to.window(self.browser.window_handles[0])
                 if len(self.browser.window_handles) > 1:
