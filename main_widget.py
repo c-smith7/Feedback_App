@@ -27,12 +27,26 @@ class Window(QWidget):
         self.threadpool = QThreadPool()
         self.layout = QVBoxLayout()
         # Widgets
-        self.student = QLineEdit(self)
-        self.yes_button = QRadioButton('&Yes')
-        self.no_button = QRadioButton('&No')
         self.feedback_temp = SpellTextEdit()
+        self.feedback_label = QLabel('Feedback:')
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
+        # New student hbox
+        self.new_student_hbox = QHBoxLayout()
+        self.new_student = QLabel('New Student ?:')
+        self.yes_button = QRadioButton('&Yes')
+        self.no_button = QRadioButton('&No')
+        self.new_student_hbox.addWidget(self.new_student, 1)
+        self.new_student_hbox.addSpacing(4)
+        self.new_student_hbox.addWidget(self.yes_button, 5)
+        self.new_student_hbox.addWidget(self.no_button, 45)
+        # Student name hbox
+        self.student_hbox = QHBoxLayout()
+        self.student_label = QLabel('Student Name:')
+        self.student = QLineEdit()
+        self.student.setFixedHeight(21)
+        self.student_hbox.addWidget(self.student_label)
+        self.student_hbox.addWidget(self.student)
         # HBox button group 1
         self.hbox_buttons1 = QWidget()
         self.hbox_buttonsLayout1 = QHBoxLayout(self.hbox_buttons1)
@@ -83,13 +97,9 @@ class Window(QWidget):
         self.layout.addWidget(self.hbox_buttons1)
         self.layout.addWidget(QHline())
         self.layout.addSpacing(5)
-        self.layout.addWidget(QLabel('Student Name:'))
-        self.layout.addSpacing(2)
-        self.layout.addWidget(self.student)
+        self.layout.addLayout(self.student_hbox)
         self.layout.addSpacing(7)
-        self.layout.addWidget(QLabel('New Student?'))
-        self.layout.addWidget(self.yes_button)
-        self.layout.addWidget(self.no_button)
+        self.layout.addLayout(self.new_student_hbox)
         self.layout.addSpacing(7)
         self.layout.addLayout(self.hbox_Layout3)
         self.layout.addSpacing(2)
@@ -99,7 +109,7 @@ class Window(QWidget):
         self.layout.addSpacing(5)
         self.layout.addWidget(QHline())
         self.layout.addSpacing(5)
-        self.layout.addWidget(QLabel('Feedback:'))
+        self.layout.addWidget(self.feedback_label)
         self.layout.addSpacing(2)
         self.layout.addWidget(self.feedback_output, 5)
         self.layout.addSpacing(2)
@@ -152,6 +162,10 @@ class Window(QWidget):
                                            'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         self.student.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; '
                                    'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
+        self.student_label.setStyleSheet('font-size: 12px; color: rgb(235, 235, 235)')
+        self.new_student.setStyleSheet('font-size: 12px; color: rgb(235, 235, 235)')
+        self.template_label.setStyleSheet('font-size: 12px; color: rgb(235, 235, 235)')
+        self.feedback_label.setStyleSheet('font-size: 12px; color: rgb(235, 235, 235)')
         # Tool Tips
         self.get_template_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
                                          '<li>Automatically get lesson feedback template.</li>'
@@ -381,6 +395,8 @@ class Window(QWidget):
 
     def feedback_automation(self):
         """Automatically retrieves feedback templates for missing CFs."""
+        # Reset radio button to default
+        self.no_button.setChecked(True)
         # Clear any previous text from text boxes.
         self.student.clear()
         self.feedback_temp.clear()

@@ -46,8 +46,8 @@ class MainWindow(QMainWindow):
 
     def _createMenuBar(self):
         menuBar = self.menuBar()
-        menuBar.setStyleSheet('QMenuBar {background: rgb(53, 53, 53); color: rgb(235, 235, 235);'
-                              'border-bottom: 1px solid rgba(36, 36, 36, .5)}'
+        menuBar.setStyleSheet('QMenuBar {background: rgb(53, 53, 53); border-bottom: 1px solid rgba(36, 36, 36, .5);}'
+                              'QMenuBar::item {color: rgb(235, 235, 235); font: 11px}'
                               'QMenuBar::item:selected {background: rgb(115, 115, 115);}')
         file_menu = menuBar.addMenu('&File')
         file_menu.addAction(self.sign_out)
@@ -60,6 +60,7 @@ class MainWindow(QMainWindow):
         self.sign_out = QAction('&Log Out', self)
         self.edit_signature = QAction('Edit Feedback Signature', self)
         self.edit_teachers = QAction('&Edit Liked Teachers', self)
+
 
     def _connectActions(self):
         self.sign_out.triggered.connect(self.logout)
