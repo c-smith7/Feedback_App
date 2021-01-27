@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
     def _createMenuBar(self):
         menuBar = self.menuBar()
         menuBar.setStyleSheet('QMenuBar {background: rgb(53, 53, 53); border-bottom: 1px solid rgba(36, 36, 36, .5);}'
-                              'QMenuBar::item {color: rgb(235, 235, 235); font: 11px}'
+                              'QMenuBar::item {color: rgb(235, 235, 235); font-size: 11px; font-family: "Segoe UI";}'
                               'QMenuBar::item:selected {background: rgb(115, 115, 115);}')
         file_menu = menuBar.addMenu('&File')
         file_menu.addAction(self.sign_out)
@@ -84,15 +84,14 @@ class MainWindow(QMainWindow):
             msgBox.setText('Successfully Logged Out!')
             msgBox.setStandardButtons(QMessageBox.Ok)
             msgBox.setDefaultButton(QMessageBox.Ok)
-            msgBox.setStyleSheet(
-                'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                'border-bottom: 1px solid rgb(115, 115, 115)}'
-                'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
-                'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                'border-radius: 11px; padding: 5px; min-width: 5em}'
-                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                'QPushButton:hover {border: 0.5px solid white}')
+            msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                                 'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                                 'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                                 'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                 'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                                 'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                 'QPushButton:hover {border: 0.5px solid white}')
             msgBox.exec()
         else:
             msgBox = QMessageBox(self)
@@ -105,10 +104,10 @@ class MainWindow(QMainWindow):
             msgBox.setStyleSheet(
                 'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
                 'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                'border-bottom: 1px solid rgb(115, 115, 115)}'
-                'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
+                'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
                 'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                'border-radius: 11px; padding: 5px; min-width: 5em}'
+                'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
                 'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                 'QPushButton:hover {border: 0.5px solid white}')
             msgBox.exec()
@@ -169,21 +168,22 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
         dialog.setPalette(palette)
         self.list_widget.setStyleSheet('QListView {background-color: rgb(36, 36, 36); border-radius: 4px;'
-                                       'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5);}'
+                                       'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5);'
+                                       'font-family: "Segoe UI";}'
                                        'QListView::item:hover {background-color: rgb(115, 115, 115)}'
                                        'QListView::item:selected:active {background-color: rgb(115, 115, 115)}')
         self.new_teacher_name.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; '
                                             'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         self.add_teacher_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                              'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                              'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
                                               'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                               'QPushButton:hover {border: 0.5px solid white}')
         self.remove_teacher_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                                 'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                                 'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
                                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                                  'QPushButton:hover {border: 0.5px solid white}'
                                                  'QPushButton:disabled {color: rgb(53, 53, 53)}')
-        reminder.setStyleSheet('Font: 9px; color: rgb(235, 235, 235)')
+        reminder.setStyleSheet('font-size: 9px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         # slots
         self.add_teacher_button.clicked.connect(self.add_teacher)
         self.remove_teacher_button.clicked.connect(self.remove_teacher)
@@ -211,10 +211,10 @@ class MainWindow(QMainWindow):
         msgBox.setDefaultButton(QMessageBox.Yes)
         msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
                              'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                             'border-bottom: 1px solid rgb(115, 115, 115)}'
-                             'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
+                             'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                             'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
                              'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                             'border-radius: 11px; padding: 5px; min-width: 5em}'
+                             'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                              'QPushButton:hover {border: 0.5px solid white}')
         result = msgBox.exec()

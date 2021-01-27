@@ -33,7 +33,7 @@ class Window(QWidget):
         self.generate_output = QPushButton('Generate Feedback')
         # New student hbox
         self.new_student_hbox = QHBoxLayout()
-        self.new_student = QLabel('New Student?:')
+        self.new_student = QLabel('New Student? :')
         self.yes_button = QRadioButton('&Yes')
         self.no_button = QRadioButton('&No')
         self.new_student_hbox.addWidget(self.new_student, 1)
@@ -128,44 +128,45 @@ class Window(QWidget):
         self.feedback_output.setFocusPolicy(Qt.NoFocus)
         # Style sheets
         self.generate_output.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                           'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                           'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
                                            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                            'QPushButton:hover {border: 0.5px solid white}')
         self.copy_output_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                              'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                              'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
                                               'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                               'QPushButton:hover {border: 0.5px solid white}')
         self.clear_form_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                             'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                             'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
                                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                              'QPushButton:hover {border: 0.5px solid white}')
         self.get_template_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                               'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                               'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
                                                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                                'QPushButton:hover {border: 0.5px solid white}'
                                                'QPushButton:disabled {color: rgb(53, 53, 53)}')
         self.login_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                        'border-radius: 12px; padding: 5px; font: bold 12px;}'
+                                        'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
                                         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                         'QPushButton:hover {border: 0.5px solid white}')
         self.available_templates.setStyleSheet('QComboBox {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                               'border-radius: 9px; padding-left: 10px; padding-top: 2px; padding-bottom: 2px}'
+                                               'border-radius: 9px; padding-left: 10px; padding-top: 2px; padding-bottom: 2px;'
+                                               'font-family: "Segoe UI";}'
                                                'QComboBox::drop-down {background-color: rgb(115, 115, 115); border-radius: 8.3px;'
                                                'padding-right: 12px;}'
                                                'QComboBox::down-arrow {image: url(drop_down_arrow.png);}'
                                                'QComboBox QAbstractItemView {background-color: rgb(53, 53, 53);'
                                                'color: rgb(235, 235, 235); selection-background-color: rgb(115, 115, 115);'
-                                               'border: 1px solid rgb(53, 53, 53)}')
+                                               'border: 1px solid rgb(53, 53, 53); font-family: "Segoe UI";}')
         self.feedback_temp.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px;'
                                          'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         self.feedback_output.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; '
                                            'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         self.student.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; '
                                    'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
-        self.student_label.setStyleSheet('font-size: 12px; color: rgb(235, 235, 235)')
-        self.new_student.setStyleSheet('font-size: 12px; color: rgb(235, 235, 235)')
-        self.template_label.setStyleSheet('font-size: 12px; color: rgb(235, 235, 235)')
-        self.feedback_label.setStyleSheet('font-size: 12px; color: rgb(235, 235, 235)')
+        self.student_label.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.new_student.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.template_label.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.feedback_label.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         # Tool Tips
         self.get_template_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
                                          '<li>Automatically get lesson feedback template.</li>'
@@ -278,10 +279,10 @@ class Window(QWidget):
         msgBox.setDefaultButton(QMessageBox.Ok)
         msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
                              'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                             'border-bottom: 1px solid rgb(115, 115, 115)}'
-                             'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
+                             'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                             'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
                              'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                             'border-radius: 11px; padding: 5px; min-width: 5em}'
+                             'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                              'QPushButton:hover {border: 0.5px solid white}')
         result = msgBox.exec()
@@ -300,10 +301,10 @@ class Window(QWidget):
                 msgBox.setDetailedText(e)
                 msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
                                      'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                     'border-bottom: 1px solid rgb(115, 115, 115)}'
-                                     'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
+                                     'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                     'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
                                      'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                     'border-radius: 11px; padding: 5px; min-width: 5em}'
+                                     'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
                                      'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                      'QPushButton:hover {border: 0.5px solid white}')
                 msgBox.exec()
@@ -321,10 +322,10 @@ class Window(QWidget):
             msgBox.setDefaultButton(QMessageBox.Ok)
             msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
                                  'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                 'border-bottom: 1px solid rgb(115, 115, 115)}'
-                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
+                                 'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
                                  'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                 'border-radius: 11px; padding: 5px; min-width: 5em}'
+                                 'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                  'QPushButton:hover {border: 0.5px solid white}')
             result = msgBox.exec()
@@ -368,10 +369,10 @@ class Window(QWidget):
             msgBox.setDetailedText(e)
             msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
                                  'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                 'border-bottom: 1px solid rgb(115, 115, 115)}'
-                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
+                                 'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
                                  'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                 'border-radius: 11px; padding: 5px; min-width: 5em}'
+                                 'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                  'QPushButton:hover {border: 0.5px solid white}')
             msgBox.exec()
@@ -416,7 +417,7 @@ class Window(QWidget):
         progress_bar.setBar(bar)
         progress_bar.setWindowTitle('VIPKid Feedback App')
         label = QLabel('  Getting feedback template...')
-        label.setStyleSheet('color: rgb(235, 235, 235); font: 12px')
+        label.setStyleSheet('color: rgb(235, 235, 235); font: 12px; font-family: "Segoe UI";')
         progress_bar.setLabel(label)
         progress_bar.setStyleSheet('QProgressBar {border: 1px solid rgb(115, 115, 115); border-radius: 7px;'
                                    'background-color: rgb(36, 36, 36);}'
@@ -442,10 +443,10 @@ class Window(QWidget):
                 msgBox.setDefaultButton(QMessageBox.Ok)
                 msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
                                      'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                     'border-bottom: 1px solid rgb(115, 115, 115)}'
-                                     'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
+                                     'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                     'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
                                      'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                     'border-radius: 11px; padding: 5px; min-width: 5em}'
+                                     'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
                                      'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                      'QPushButton:hover {border: 0.5px solid white}')
                 msgBox.exec()
@@ -464,6 +465,7 @@ class Window(QWidget):
                 progress_bar.setValue(50)
                 template_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.ID, 'tab-5')))
                 self.browser.execute_script("arguments[0].click();", template_button)
+                time.sleep(0.5)
                 progress_bar.setValue(65)
                 # Click show 'more' button until all templates are shown.
                 show_more_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button')))
@@ -498,34 +500,63 @@ class Window(QWidget):
                     self.available_templates.setVisible(True)
                     self.feedback_temp.insertPlainText(self.template_list[0])
                 elif invalid_teacher_count == 0:
-                    progress_bar.close()
-                    progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
-                    msgBox = QMessageBox(self)
-                    msgBox.setIcon(QMessageBox.Information)
-                    msgBox.setWindowFlag(Qt.ToolTip)
-                    msgBox.setText('No valid teacher templates :(\n'
-                                   '\n'
-                                   'Would you like to see the Top 5 templates?')
-                    msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-                    msgBox.setDefaultButton(QMessageBox.Yes)
-                    msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                                         'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                         'border-bottom: 1px solid rgb(115, 115, 115)}'
-                                         'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
-                                         'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                         'border-radius: 11px; padding: 5px; min-width: 5em}'
-                                         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                                         'QPushButton:hover {border: 0.5px solid white}')
-                    result = msgBox.exec()
-                    if result == QMessageBox.Yes:
-                        for li_tag in li_tags[:5]:
-                            teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-                            template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
-                            self.teacher_list.append(teacher_name)
-                            self.template_list.append(template)
-                        self.available_templates.addItems(self.teacher_list)
-                        self.available_templates.setVisible(True)
-                        self.feedback_temp.insertPlainText(self.template_list[0])
+                    if len(li_tags) != 0:
+                        progress_bar.close()
+                        progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
+                        msgBox = QMessageBox(self)
+                        msgBox.setIcon(QMessageBox.Information)
+                        msgBox.setWindowFlag(Qt.ToolTip)
+                        msgBox.setText('No available templates from liked teachers :(\n'
+                                       '\n'
+                                       'Would you like to see the Top 5 templates?')
+                        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                        msgBox.setDefaultButton(QMessageBox.Yes)
+                        msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                                             'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                                             'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                             'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                                             'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                             'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                                             'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                             'QPushButton:hover {border: 0.5px solid white}')
+                        result = msgBox.exec()
+                        if result == QMessageBox.Yes:
+                            try:
+                                for li_tag in li_tags[:5]:
+                                    teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
+                                    template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
+                                    self.teacher_list.append(teacher_name)
+                                    self.template_list.append(template)
+                                self.available_templates.addItems(self.teacher_list)
+                                self.available_templates.setVisible(True)
+                                self.feedback_temp.insertPlainText(self.template_list[0])
+                            except Exception:
+                                for li_tag in li_tags:
+                                    teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
+                                    template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
+                                    self.teacher_list.append(teacher_name)
+                                    self.template_list.append(template)
+                                self.available_templates.addItems(self.teacher_list)
+                                self.available_templates.setVisible(True)
+                                self.feedback_temp.insertPlainText(self.template_list[0])
+                    elif len(li_tags) == 0:
+                        progress_bar.close()
+                        progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
+                        msgBox = QMessageBox(self)
+                        msgBox.setIcon(QMessageBox.Information)
+                        msgBox.setWindowFlag(Qt.ToolTip)
+                        msgBox.setText('No available templates from liked teachers :(')
+                        msgBox.setStandardButtons(QMessageBox.Ok)
+                        msgBox.setDefaultButton(QMessageBox.Ok)
+                        msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                                             'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                                             'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                             'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                                             'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                             'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                                             'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                             'QPushButton:hover {border: 0.5px solid white}')
+                        msgBox.exec()
                 self.browser.close()
                 self.browser.switch_to.window(self.browser.window_handles[0])
                 if len(self.browser.window_handles) > 1:
@@ -547,10 +578,10 @@ class Window(QWidget):
             msgBox.setDefaultButton(QMessageBox.Ok)
             msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
                                  'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                 'border-bottom: 1px solid rgb(115, 115, 115)}'
-                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
+                                 'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
                                  'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                 'border-radius: 11px; padding: 5px; min-width: 5em}'
+                                 'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                  'QPushButton:hover {border: 0.5px solid white}')
             msgBox.exec()
