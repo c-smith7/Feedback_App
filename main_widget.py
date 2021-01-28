@@ -28,7 +28,7 @@ class Window(QWidget):
         self.layout = QVBoxLayout()
         # Widgets
         self.feedback_temp = SpellTextEdit()
-        self.feedback_label = QLabel('Feedback:')
+        self.feedback_label = QLabel('Feedback :')
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
         # New student hbox
@@ -42,9 +42,9 @@ class Window(QWidget):
         self.new_student_hbox.addWidget(self.no_button, 45)
         # Student name hbox
         self.student_hbox = QHBoxLayout()
-        self.student_label = QLabel('Student Name:')
+        self.student_label = QLabel('Student Name :')
         self.student = QLineEdit()
-        self.student.setFixedHeight(21)
+        self.student.setFixedHeight(19)
         self.student_hbox.addWidget(self.student_label)
         self.student_hbox.addWidget(self.student)
         # HBox button group 1
@@ -81,7 +81,7 @@ class Window(QWidget):
         self.hbox_buttonsLayout2.addWidget(self.clear_form_button, 48)
         # HBox group 3
         self.hbox_Layout3 = QHBoxLayout()
-        self.template_label = QLabel('Feedback Template:')
+        self.template_label = QLabel('Feedback Template :')
         self.available_templates = QComboBox(self)
         self.available_templates.setVisible(False)
         # lists used to store teacher names and respective templates in combobox
@@ -150,23 +150,25 @@ class Window(QWidget):
                                         'QPushButton:hover {border: 0.5px solid white}')
         self.available_templates.setStyleSheet('QComboBox {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                                'border-radius: 9px; padding-left: 10px; padding-top: 2px; padding-bottom: 2px;'
-                                               'font-family: "Segoe UI";}'
+                                               'font-family: "Segoe UI"; font-size: 12px;}'
                                                'QComboBox::drop-down {background-color: rgb(115, 115, 115); border-radius: 8.3px;'
                                                'padding-right: 12px;}'
                                                'QComboBox::down-arrow {image: url(drop_down_arrow.png);}'
                                                'QComboBox QAbstractItemView {background-color: rgb(53, 53, 53);'
                                                'color: rgb(235, 235, 235); selection-background-color: rgb(115, 115, 115);'
-                                               'border: 1px solid rgb(53, 53, 53); font-family: "Segoe UI";}')
-        self.feedback_temp.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px;'
+                                               'border: 1px solid rgb(53, 53, 53); font-family: "Segoe UI"; font-size: 12px;}')
+        self.feedback_temp.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 12px; font-family: "Segoe UI";'
                                          'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
-        self.feedback_output.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; '
+        self.feedback_output.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 12px; font-family: "Segoe UI";'
                                            'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
-        self.student.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; '
+        self.student.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; font-size: 12px; font-family: "Segoe UI";'
                                    'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         self.student_label.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         self.new_student.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         self.template_label.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         self.feedback_label.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.yes_button.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.no_button.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         # Tool Tips
         self.get_template_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
                                          '<li>Automatically get lesson feedback template.</li>'
@@ -203,6 +205,8 @@ class Window(QWidget):
         global new_student
         global output
         student_name = self.student.text()
+        # student name for signature
+        # student_name_signature = # input from dialog box.
         feedback_input = self.feedback_temp.toPlainText()
         feedback_output = re.sub(' we |We', f' {student_name} and I ', feedback_input, 1)
         feedback_output = ' '.join(feedback_output.split())
@@ -216,6 +220,10 @@ class Window(QWidget):
                      f'improving every class! See you next time {student_name}. ' \
                      f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
                      f'From, Teacher Carlos ZDG.'
+            # signature will come from the edit signature dialog. Have user input, (student), everytime they want to use
+            # the students name in their signature. After pressing the generate feedback button, the logic here will
+            # get signature text from dialog, replace all (student) instances with the variable student_name, and output
+            # the generated feedback.
             if feedback_input.split(' ', 1)[0] in ['We', 'we']:
                 output = f'In this lesson, {output}'
         elif new_student == 'yes':

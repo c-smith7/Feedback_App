@@ -1,7 +1,10 @@
 import json
 import os
 import sys
+import time
+
 from PyQt5 import QtGui, QtCore, Qt
+from PyQt5.QtCore import QObject, pyqtSignal, QRunnable, pyqtSlot, QThreadPool
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import *
 from main_widget import Window, Splashscreen
@@ -32,7 +35,7 @@ class MainWindow(QMainWindow):
         self._connectActions()
         # Liked Teachers list
         self.model = TeachersModel()
-        self.load_data()
+        self.load_liked_teachers()
         # window config
         self.setWindowTitle('VIPKid Feedback App')
         self.resize(525, 725)
@@ -43,6 +46,8 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Window, QColor(53, 53, 53))
         palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
         self.setPalette(palette)
+        # main window threadpool
+        self.main_window_threadpool = QThreadPool()
 
     def _createMenuBar(self):
         menuBar = self.menuBar()
@@ -61,10 +66,10 @@ class MainWindow(QMainWindow):
         self.edit_signature = QAction('Edit Feedback Signature', self)
         self.edit_teachers = QAction('&Edit Liked Teachers', self)
 
-
     def _connectActions(self):
         self.sign_out.triggered.connect(self.logout)
         self.edit_teachers.triggered.connect(self.teacher_list_widget)
+        self.edit_signature.triggered.connect(self.teacher_signature_widget)
 
     def closeEvent(self, event):
         try:
@@ -72,6 +77,7 @@ class MainWindow(QMainWindow):
         except:
             pass
 
+# LOGOUT menubar function
     def logout(self):
         """slot of logout option in menubar"""
         if os.path.exists('cookie'):
@@ -112,6 +118,7 @@ class MainWindow(QMainWindow):
                 'QPushButton:hover {border: 0.5px solid white}')
             msgBox.exec()
 
+# Liked Teachers menubar function
     def teacher_list_widget(self):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         dialog.setWindowTitle('VIPKid Feedback App')
@@ -169,11 +176,12 @@ class MainWindow(QMainWindow):
         dialog.setPalette(palette)
         self.list_widget.setStyleSheet('QListView {background-color: rgb(36, 36, 36); border-radius: 4px;'
                                        'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5);'
-                                       'font-family: "Segoe UI";}'
+                                       'font-family: "Segoe UI"; font-size: 12px;}'
                                        'QListView::item:hover {background-color: rgb(115, 115, 115)}'
                                        'QListView::item:selected:active {background-color: rgb(115, 115, 115)}')
-        self.new_teacher_name.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; '
-                                            'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
+        self.new_teacher_name.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; font-size: 12px;'
+                                            'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5);'
+                                            'font-family: "Segoe UI";')
         self.add_teacher_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                               'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
                                               'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
@@ -183,6 +191,7 @@ class MainWindow(QMainWindow):
                                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                                  'QPushButton:hover {border: 0.5px solid white}'
                                                  'QPushButton:disabled {color: rgb(53, 53, 53)}')
+        title.setStyleSheet('font-family: "Segoe UI";color: rgb(235, 235, 235)')
         reminder.setStyleSheet('font-size: 9px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         # slots
         self.add_teacher_button.clicked.connect(self.add_teacher)
@@ -195,7 +204,7 @@ class MainWindow(QMainWindow):
             self.model.teachers_list.append(added_teacher)
             self.model.layoutChanged.emit()
             self.new_teacher_name.clear()
-            self.save_data()
+            self.save_liked_teachers()
 
     def remove_teacher(self):
         # Delete? MsgBox
@@ -224,18 +233,146 @@ class MainWindow(QMainWindow):
                 del self.model.teachers_list[index.row()]
                 self.model.layoutChanged.emit()
                 self.list_widget.clearSelection()
-                self.save_data()
+                self.save_liked_teachers()
 
-    def load_data(self):
+    def load_liked_teachers(self):
         try:
             with open('liked_teachers.json', 'r') as file:
                 self.model.teachers_list = json.load(file)
         except Exception:
             pass
 
-    def save_data(self):
+    def save_liked_teachers(self):
         with open('liked_teachers.json', 'w') as file:
             json.dump(self.model.teachers_list, file)
+
+    # Signature menubar function
+    def teacher_signature_widget(self):
+        dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        dialog.setWindowTitle('VIPKid Feedback App')
+        dialog.setMinimumWidth(450)
+        # widget layout
+        layout = QVBoxLayout()
+        title = QLabel('<h3>Edit Feedback Signature</h3>')
+        layout.addWidget(title)
+        self.signature_textbox = QPlainTextEdit(dialog)
+        # load current feedback signature
+        self.load_signature()
+        layout.addWidget(self.signature_textbox)
+        # save_button hbox
+        save_hbox_layout = QHBoxLayout()
+        self.save_signature_button = QPushButton('Save', dialog)
+        self.save_signature_button.setMinimumWidth(150)
+        self.save_confirmed = QLabel('Saved Successfully!')
+        self.save_confirmed.setVisible(False)
+        save_hbox_layout.addWidget(self.save_signature_button, 1, alignment=QtCore.Qt.AlignLeft)
+        save_hbox_layout.addWidget(self.save_confirmed, 5)
+        layout.addLayout(save_hbox_layout)
+        dialog.setLayout(layout)
+        # style
+        palette = QPalette()
+        palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
+        dialog.setPalette(palette)
+        self.signature_textbox.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 12px;'
+                                             'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
+        self.save_signature_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                                 'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                                 'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                                 'QPushButton:hover {border: 0.5px solid white}')
+        title.setStyleSheet('font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.save_confirmed.setStyleSheet('font-family: "Segoe UI"; font-size: 12px; color: rgb(235, 235, 235)')
+        # slots
+        self.save_signature_button.clicked.connect(self.save_signature_slots)
+        dialog.exec()
+
+    def load_signature(self):
+        try:
+            with open('signature.txt', 'r') as file:
+                signature = file.read()
+                self.signature_textbox.setPlainText(signature)
+        except Exception:
+            msgBox = QMessageBox(self)
+            msgBox.setWindowModality(QtCore.Qt.WindowModal)
+            msgBox.setWindowFlag(QtCore.Qt.ToolTip)
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText('There was an error loading your feedback signature.')
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            msgBox.setDefaultButton(QMessageBox.Ok)
+            msgBox.setStyleSheet(
+                'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                'QPushButton:hover {border: 0.5px solid white}')
+            msgBox.exec()
+
+    def save_signature(self):
+        with open('signature.txt', 'w') as file:
+            new_signature = self.signature_textbox.toPlainText()
+            file.write(new_signature)
+
+    def saved_error_msg(self):
+        msgBox = QMessageBox(self)
+        msgBox.setWindowModality(QtCore.Qt.WindowModal)
+        msgBox.setWindowFlag(QtCore.Qt.ToolTip)
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setText('There was an error saving your feedback signature.\n'
+                       'Please try saving again.')
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        msgBox.setDefaultButton(QMessageBox.Ok)
+        msgBox.setStyleSheet(
+            'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+            'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+            'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+            'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+            'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+            'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+            'QPushButton:hover {border: 0.5px solid white}')
+        msgBox.exec()
+
+    def saved_msg(self):
+        self.save_confirmed.setVisible(True)
+
+    def saved_msg_close(self):
+        self.save_confirmed.setVisible(False)
+
+    def save_signature_slots(self):
+        worker = SaveSignatureWorkerThread(self.save_signature)
+        worker.signal.saved_msg_signal.connect(self.saved_msg)
+        worker.signal.saved_msg_close_signal.connect(self.saved_msg_close)
+        worker.signal.saved_error.connect(self.saved_error_msg)
+        self.main_window_threadpool.start(worker)
+
+
+class WorkerSignals(QObject):
+    saved_msg_signal = pyqtSignal()
+    saved_msg_close_signal = pyqtSignal()
+    saved_error = pyqtSignal()
+
+
+class SaveSignatureWorkerThread(QRunnable):
+    def __init__(self, fn, *args, **kwargs):
+        super(SaveSignatureWorkerThread, self).__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signal = WorkerSignals()
+
+    @pyqtSlot()
+    def run(self):
+        try:
+            self.fn(*self.args, **self.kwargs)
+            time.sleep(0.25)
+            self.signal.saved_msg_signal.emit()
+            time.sleep(3)
+            self.signal.saved_msg_close_signal.emit()
+        except Exception:
+            self.signal.saved_error.emit()
 
 
 if __name__ == "__main__":
