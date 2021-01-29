@@ -57,19 +57,23 @@ class MainWindow(QMainWindow):
         file_menu = menuBar.addMenu('&File')
         file_menu.addAction(self.sign_out)
         edit_menu = menuBar.addMenu('&Edit')
-        edit_menu.addAction(self.edit_signature)
+        signature_menu = edit_menu.addMenu('Edit Feedback Signatures')
+        signature_menu.addAction(self.default_signature)
+        signature_menu.addAction(self.new_student_signature)
         edit_menu.addAction(self.edit_teachers)
         help_menu = menuBar.addMenu('&Help')
 
     def _createActions(self):
         self.sign_out = QAction('&Log Out', self)
-        self.edit_signature = QAction('Edit Feedback Signature', self)
+        self.default_signature = QAction('Default Signature', self)
+        self.new_student_signature = QAction('New Student Signature', self)
         self.edit_teachers = QAction('&Edit Liked Teachers', self)
 
     def _connectActions(self):
         self.sign_out.triggered.connect(self.logout)
         self.edit_teachers.triggered.connect(self.teacher_list_widget)
-        self.edit_signature.triggered.connect(self.teacher_signature_widget)
+        self.default_signature.triggered.connect(self.feedback_signature_default)
+        self.new_student_signature.triggered.connect(self.feedback_signature_new)
 
     def closeEvent(self, event):
         try:
@@ -246,26 +250,26 @@ class MainWindow(QMainWindow):
         with open('liked_teachers.json', 'w') as file:
             json.dump(self.model.teachers_list, file)
 
-    # Signature menubar function
-    def teacher_signature_widget(self):
+    # Edit default feedback signature dialog.
+    def feedback_signature_default(self):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         dialog.setWindowTitle('VIPKid Feedback App')
         dialog.setMinimumWidth(450)
         # widget layout
         layout = QVBoxLayout()
-        title = QLabel('<h3>Edit Feedback Signature</h3>')
+        title = QLabel('<h3>Edit Default Signature</h3>')
         layout.addWidget(title)
-        self.signature_textbox = QPlainTextEdit(dialog)
-        # load current feedback signature
-        self.load_signature()
-        layout.addWidget(self.signature_textbox)
+        self.signature_textbox_default = QPlainTextEdit(dialog)
+        # load current default feedback signature
+        self.load_signature('default')
+        layout.addWidget(self.signature_textbox_default)
         # save_button hbox
         save_hbox_layout = QHBoxLayout()
-        self.save_signature_button = QPushButton('Save', dialog)
-        self.save_signature_button.setMinimumWidth(150)
+        save_default_signature_btn = QPushButton('Save', dialog)
+        save_default_signature_btn.setMinimumWidth(150)
         self.save_confirmed = QLabel('Saved Successfully!')
         self.save_confirmed.setVisible(False)
-        save_hbox_layout.addWidget(self.save_signature_button, 1, alignment=QtCore.Qt.AlignLeft)
+        save_hbox_layout.addWidget(save_default_signature_btn, 1, alignment=QtCore.Qt.AlignLeft)
         save_hbox_layout.addWidget(self.save_confirmed, 5)
         layout.addLayout(save_hbox_layout)
         dialog.setLayout(layout)
@@ -274,23 +278,66 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Window, QColor(53, 53, 53))
         palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
         dialog.setPalette(palette)
-        self.signature_textbox.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 12px;'
-                                             'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
-        self.save_signature_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+        self.signature_textbox_default.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 12px;'
+                                                     'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
+        save_default_signature_btn.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                                  'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
                                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                                  'QPushButton:hover {border: 0.5px solid white}')
         title.setStyleSheet('font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         self.save_confirmed.setStyleSheet('font-family: "Segoe UI"; font-size: 12px; color: rgb(235, 235, 235)')
         # slots
-        self.save_signature_button.clicked.connect(self.save_signature_slots)
+        save_default_signature_btn.clicked.connect(self.save_signature_slots_default)
         dialog.exec()
 
-    def load_signature(self):
+    # Edit new student feedback signature dialog.
+    def feedback_signature_new(self):
+        dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        dialog.setWindowTitle('VIPKid Feedback App')
+        dialog.setMinimumWidth(450)
+        # widget layout
+        layout = QVBoxLayout()
+        title = QLabel('<h3>Edit New Student Signature</h3>')
+        layout.addWidget(title)
+        self.signature_textbox_new = QPlainTextEdit(dialog)
+        # load current feedback signature
+        self.load_signature('new')
+        layout.addWidget(self.signature_textbox_new)
+        # save_button hbox
+        save_hbox_layout = QHBoxLayout()
+        save_new_signature_btn = QPushButton('Save', dialog)
+        save_new_signature_btn.setMinimumWidth(150)
+        self.save_confirmed = QLabel('Saved Successfully!')
+        self.save_confirmed.setVisible(False)
+        save_hbox_layout.addWidget(save_new_signature_btn, 1, alignment=QtCore.Qt.AlignLeft)
+        save_hbox_layout.addWidget(self.save_confirmed, 5)
+        layout.addLayout(save_hbox_layout)
+        dialog.setLayout(layout)
+        # style
+        palette = QPalette()
+        palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
+        dialog.setPalette(palette)
+        self.signature_textbox_new.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 12px;'
+                                                 'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
+        save_new_signature_btn.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                             'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                             'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                             'QPushButton:hover {border: 0.5px solid white}')
+        title.setStyleSheet('font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.save_confirmed.setStyleSheet('font-family: "Segoe UI"; font-size: 12px; color: rgb(235, 235, 235)')
+        # slots
+        save_new_signature_btn.clicked.connect(self.save_signature_slots_new)
+        dialog.exec()
+
+    def load_signature(self, sig_type: str):
         try:
-            with open('signature.txt', 'r') as file:
-                signature = file.read()
-                self.signature_textbox.setPlainText(signature)
+            with open('signature.json', 'r') as openfile:
+                self.signature = json.load(openfile)
+                if sig_type == 'default':
+                    self.signature_textbox_default.setPlainText(self.signature['default'])
+                elif sig_type == 'new':
+                    self.signature_textbox_new.setPlainText(self.signature['new_student'])
         except Exception:
             msgBox = QMessageBox(self)
             msgBox.setWindowModality(QtCore.Qt.WindowModal)
@@ -310,10 +357,19 @@ class MainWindow(QMainWindow):
                 'QPushButton:hover {border: 0.5px solid white}')
             msgBox.exec()
 
-    def save_signature(self):
-        with open('signature.txt', 'w') as file:
-            new_signature = self.signature_textbox.toPlainText()
-            file.write(new_signature)
+    def save_signature_default(self):
+        # update dictionary data.
+        edited_signature = self.signature_textbox_default.toPlainText()
+        self.signature['default'] = edited_signature
+        # write updated data to json.
+        with open('signature.json', 'w') as outfile:
+            json.dump(self.signature, outfile)
+
+    def save_signature_new(self):
+        edited_signature = self.signature_textbox_new.toPlainText()
+        self.signature['new_student'] = edited_signature
+        with open('signature.json', 'w') as outfile:
+            json.dump(self.signature, outfile)
 
     def saved_error_msg(self):
         msgBox = QMessageBox(self)
@@ -341,8 +397,15 @@ class MainWindow(QMainWindow):
     def saved_msg_close(self):
         self.save_confirmed.setVisible(False)
 
-    def save_signature_slots(self):
-        worker = SaveSignatureWorkerThread(self.save_signature)
+    def save_signature_slots_default(self):
+        worker = SaveSignatureWorkerThreadDefault(self.save_signature_default)
+        worker.signal.saved_msg_signal.connect(self.saved_msg)
+        worker.signal.saved_msg_close_signal.connect(self.saved_msg_close)
+        worker.signal.saved_error.connect(self.saved_error_msg)
+        self.main_window_threadpool.start(worker)
+
+    def save_signature_slots_new(self):
+        worker = SaveSignatureWorkerThreadNew(self.save_signature_new)
         worker.signal.saved_msg_signal.connect(self.saved_msg)
         worker.signal.saved_msg_close_signal.connect(self.saved_msg_close)
         worker.signal.saved_error.connect(self.saved_error_msg)
@@ -355,9 +418,29 @@ class WorkerSignals(QObject):
     saved_error = pyqtSignal()
 
 
-class SaveSignatureWorkerThread(QRunnable):
+class SaveSignatureWorkerThreadDefault(QRunnable):
     def __init__(self, fn, *args, **kwargs):
-        super(SaveSignatureWorkerThread, self).__init__()
+        super(SaveSignatureWorkerThreadDefault, self).__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signal = WorkerSignals()
+
+    @pyqtSlot()
+    def run(self):
+        try:
+            self.fn(*self.args, **self.kwargs)
+            time.sleep(0.25)
+            self.signal.saved_msg_signal.emit()
+            time.sleep(3)
+            self.signal.saved_msg_close_signal.emit()
+        except Exception:
+            self.signal.saved_error.emit()
+
+
+class SaveSignatureWorkerThreadNew(QRunnable):
+    def __init__(self, fn, *args, **kwargs):
+        super(SaveSignatureWorkerThreadNew, self).__init__()
         self.fn = fn
         self.args = args
         self.kwargs = kwargs

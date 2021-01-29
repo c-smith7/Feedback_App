@@ -201,7 +201,47 @@ class Window(QWidget):
         self.clear_form_button.clicked.connect(self.clear_form)
         self.available_templates.activated[str].connect(self.available_templates_combobox)
 
+    def load_feedback_signature(self):
+        try:
+            with open('signature.txt', 'r') as file:
+                self.signature = file.read()
+        except Exception as e:
+            msgBox = QMessageBox(self)
+            msgBox.setWindowModality(QtCore.Qt.WindowModal)
+            msgBox.setWindowFlag(QtCore.Qt.ToolTip)
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText('There was an error loading your feedback signature.')
+            msgBox.setDetailedText(e)
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            msgBox.setDefaultButton(QMessageBox.Ok)
+            msgBox.setStyleSheet(
+                'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                'QPushButton:hover {border: 0.5px solid white}')
+            msgBox.exec()
+
     def feedback_script(self):
+    #     # load currently saved signature
+    #     self.load_feedback_signature()
+    #     student_name = self.student.text()
+    #     feedback_input = self.feedback_temp.toPlainText()
+    #     feedback_output = re.sub(' we |We', f' {student_name} and I ', feedback_input, 1)
+    #     feedback_output = ' '.join(feedback_output.split())
+    #     # new student or recurring?
+    #     if self.yes_button.isChecked():
+    #         self.new_student = 'yes'
+    #     elif self.no_button.isChecked():
+    #         self.new_student = 'no'
+    #
+    #     if self.new_student == 'no':
+
+        # now we need to replace all student keywords with student_name, keyword = (student)
+
         global new_student
         global output
         student_name = self.student.text()
@@ -438,7 +478,7 @@ class Window(QWidget):
         progress_bar.setValue(10)
         try:
             try:
-                WebDriverWait(self.browser, 1).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')))
+                WebDriverWait(self.browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/div/span/div/div/div/p')))
                 progress_bar.setValue(50)
                 time.sleep(1)
                 progress_bar.setValue(100)
@@ -610,7 +650,7 @@ class Window(QWidget):
 
     def login_started(self):
         gif = QMovie('loading.gif')
-        tip = QLabel('ToolTip')
+        # tip = QLabel('ToolTip')
         self.loading.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.loading.setAttribute(Qt.WA_TranslucentBackground)
         self.loading.setMovie(gif)
