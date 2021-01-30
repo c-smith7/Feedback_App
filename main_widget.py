@@ -187,7 +187,7 @@ class Window(QWidget):
         if os.path.exists('cookie'):
             options = Options()
             options.headless = True
-            self.browser = webdriver.Chrome()
+            self.browser = webdriver.Chrome(options=options)
             print('driver connected')
         # Signals and slots
         self.login_button_counter = 0
@@ -226,59 +226,69 @@ class Window(QWidget):
             msgBox.exec()
 
     def feedback_script(self):
-    #     # load currently saved signature
-    #     self.load_feedback_signature()
-    #     student_name = self.student.text()
-    #     feedback_input = self.feedback_temp.toPlainText()
-    #     feedback_output = re.sub(' we |We', f' {student_name} and I ', feedback_input, 1)
-    #     feedback_output = ' '.join(feedback_output.split())
-    #     # new student or recurring?
-    #     if self.yes_button.isChecked():
-    #         self.new_student = 'yes'
-    #     elif self.no_button.isChecked():
-    #         self.new_student = 'no'
-    #
-    #     if self.new_student == 'no':
-
-        # now we need to replace all student keywords with student_name, keyword = (student)
-
-        global new_student
-        global output
         student_name = self.student.text()
-        # student name for signature
-        # student_name_signature = # input from dialog box.
+        # load currently saved signatures and replace student keywords with student_name.
+        with open('signature.json', 'r') as openfile:
+            signatures = json.load(openfile)
+            signature_default = signatures['default'].replace('(student)', student_name)
+            signature_new = signatures['new_student'].replace('(student)', student_name)
+        # get feedback template input
         feedback_input = self.feedback_temp.toPlainText()
-        feedback_output = re.sub(' we |We', f' {student_name} and I ', feedback_input, 1)
+        # produce feedback output
+        feedback_output = re.sub(' we |We ', f' {student_name} and I ', feedback_input, 1)
         feedback_output = ' '.join(feedback_output.split())
-        if self.yes_button.isChecked():
-            new_student = 'yes'
-        elif self.no_button.isChecked():
-            new_student = 'no'
-        if new_student == 'no':
-            output = f'{feedback_output} Fantastic job today {student_name}! ' \
-                     f'Keep practicing your English and working hard, you are ' \
-                     f'improving every class! See you next time {student_name}. ' \
-                     f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
-                     f'From, Teacher Carlos ZDG.'
-            # signature will come from the edit signature dialog. Have user input, (student), everytime they want to use
-            # the students name in their signature. After pressing the generate feedback button, the logic here will
-            # get signature text from dialog, replace all (student) instances with the variable student_name, and output
-            # the generated feedback.
+        if self.no_button.isChecked():
+            self.final_output = f'{feedback_output} {signature_default}'
             if feedback_input.split(' ', 1)[0] in ['We', 'we']:
-                output = f'In this lesson, {output}'
-        elif new_student == 'yes':
-            output = f'{feedback_output} Fantastic job today {student_name}! ' \
-                     f'It was great meeting you. Keep up the great work, and I hope ' \
-                     f'to see you in my class again soon. ' \
-                     f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
-                     f'From, Teacher Carlos ZDG.'
+                self.final_output = f'In this lesson, {self.final_output}'
+        elif self.yes_button.isChecked():
+            self.final_output = f'{feedback_output} {signature_new}'
             if feedback_input.split(' ', 1)[0] in ['We', 'we']:
-                output = f'In this lesson, {output}'
+                self.final_output = f'In this lesson, {self.final_output}'
         if student_name == '':
             self.feedback_output.clear()
         else:
             self.feedback_output.clear()
-            self.feedback_output.insertPlainText(output)
+            self.feedback_output.insertPlainText(self.final_output)
+
+        # now we need to replace all student keywords with student_name, keyword = (student)
+        # # global new_student
+        # # global output
+        # # student_name = self.student.text()
+        # # # student name for signature
+        # # # student_name_signature = # input from dialog box.
+        # # feedback_input = self.feedback_temp.toPlainText()
+        # # feedback_output = re.sub(' we |We', f' {student_name} and I ', feedback_input, 1)
+        # # feedback_output = ' '.join(feedback_output.split())
+        # if self.yes_button.isChecked():
+        #     new_student = 'yes'
+        # elif self.no_button.isChecked():
+        #     new_student = 'no'
+        # if new_student == 'no':
+        #     output = f'{feedback_output} Fantastic job today {student_name}! ' \
+        #              f'Keep practicing your English and working hard, you are ' \
+        #              f'improving every class! See you next time {student_name}. ' \
+        #              f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
+        #              f'From, Teacher Carlos ZDG.'
+        #     # signature will come from the edit signature dialog. Have user input, (student), everytime they want to use
+        #     # the students name in their signature. After pressing the generate feedback button, the logic here will
+        #     # get signature text from dialog, replace all (student) instances with the variable student_name, and output
+        #     # the generated feedback.
+        #     if feedback_input.split(' ', 1)[0] in ['We', 'we']:
+        #         output = f'In this lesson, {output}'
+        # elif new_student == 'yes':
+        #     output = f'{feedback_output} Fantastic job today {student_name}! ' \
+        #              f'It was great meeting you. Keep up the great work, and I hope ' \
+        #              f'to see you in my class again soon. ' \
+        #              f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
+        #              f'From, Teacher Carlos ZDG.'
+        #     if feedback_input.split(' ', 1)[0] in ['We', 'we']:
+        #         output = f'In this lesson, {output}'
+        # if student_name == '':
+        #     self.feedback_output.clear()
+        # else:
+        #     self.feedback_output.clear()
+        #     self.feedback_output.insertPlainText(output)
 
     def clear_form(self):
         self.student.clear()
@@ -287,7 +297,7 @@ class Window(QWidget):
     def copy(self):
         try:
             clipboard = QtGui.QGuiApplication.clipboard()
-            clipboard.setText(output)
+            clipboard.setText(self.final_output)
         except Exception:
             pass
 

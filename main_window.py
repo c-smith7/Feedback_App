@@ -430,9 +430,8 @@ class SaveSignatureWorkerThreadDefault(QRunnable):
     def run(self):
         try:
             self.fn(*self.args, **self.kwargs)
-            time.sleep(0.25)
             self.signal.saved_msg_signal.emit()
-            time.sleep(3)
+            time.sleep(1)
             self.signal.saved_msg_close_signal.emit()
         except Exception:
             self.signal.saved_error.emit()
@@ -450,9 +449,8 @@ class SaveSignatureWorkerThreadNew(QRunnable):
     def run(self):
         try:
             self.fn(*self.args, **self.kwargs)
-            time.sleep(0.25)
             self.signal.saved_msg_signal.emit()
-            time.sleep(3)
+            time.sleep(1)
             self.signal.saved_msg_close_signal.emit()
         except Exception:
             self.signal.saved_error.emit()
