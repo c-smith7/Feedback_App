@@ -62,18 +62,27 @@ class MainWindow(QMainWindow):
         signature_menu.addAction(self.new_student_signature)
         edit_menu.addAction(self.edit_teachers)
         help_menu = menuBar.addMenu('&Help')
+        help_menu.addAction(self.help)
+        help_menu.addAction(self.support)
+        help_menu.addAction(self.submit_feedback)
+        help_menu.addAction(self.about)
 
     def _createActions(self):
         self.sign_out = QAction('&Log Out', self)
         self.default_signature = QAction('Default Signature', self)
         self.new_student_signature = QAction('New Student Signature', self)
         self.edit_teachers = QAction('&Edit Liked Teachers', self)
+        self.help = QAction('&Help', self)
+        self.support = QAction('Contact &Support', self)
+        self.submit_feedback = QAction('Submit Feedback', self)
+        self.about = QAction('About', self)
 
     def _connectActions(self):
         self.sign_out.triggered.connect(self.logout)
         self.edit_teachers.triggered.connect(self.teacher_list_widget)
         self.default_signature.triggered.connect(self.feedback_signature_default)
         self.new_student_signature.triggered.connect(self.feedback_signature_new)
+        self.help.triggered.connect(self.help_widget)
 
     def closeEvent(self, event):
         try:
@@ -410,6 +419,26 @@ class MainWindow(QMainWindow):
         worker.signal.saved_msg_close_signal.connect(self.saved_msg_close)
         worker.signal.saved_error.connect(self.saved_error_msg)
         self.main_window_threadpool.start(worker)
+
+    def help_widget(self):
+        dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        dialog.setWindowTitle('VIPKid Feedback App')
+        help_widget = QTextBrowser(dialog)
+        help_widget.setHtml('<b>This is a test input for help widget</b>'
+                            '<ul>'
+                            '<li>TEST</li>'
+                            '<li>TEST</li>'
+                            '<li>TEST</li>'
+                            '<li>TEST</li>'
+                            '<li>TEST</li>'
+                            '</ul>'
+                            '<br></br>'
+                            'More tesing, yes I just want to see if this widget auto wraps text. Let us see..')
+        help_widget.setStyleSheet('background-color: rgb(36, 36, 36); font-size: 14px; color: rgb(235, 235, 235);'
+                                  'border: transparent; font-family: "Segoe UI";')
+        dialog.setStyleSheet('background-color: rgb(36, 36, 36);')
+        dialog.setFixedSize(350, 300)
+        dialog.exec()
 
 
 class WorkerSignals(QObject):
