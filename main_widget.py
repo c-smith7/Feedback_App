@@ -2,12 +2,11 @@ import json
 import os
 import pickle
 import re
-import sys
 import time
 import enchant
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import *
-from PyQt5.QtGui import QPalette, QColor, QSyntaxHighlighter, QTextCharFormat, QPixmap, QMovie
+from PyQt5.QtGui import QSyntaxHighlighter, QTextCharFormat, QPixmap, QMovie
 from PyQt5.QtWidgets import *
 from enchant import tokenize
 from enchant.errors import TokenizerNotFoundError
@@ -19,7 +18,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 
-# noinspection PyArgumentList,PyTypeChecker,PyBroadException
+# noinspection PyArgumentList,PyTypeChecker,PyBroadException,PyUnresolvedReferences
 class Window(QWidget):
     def __init__(self, *args, **kwargs):
         super(Window, self).__init__(*args, **kwargs)
@@ -128,47 +127,47 @@ class Window(QWidget):
         self.feedback_output.setFocusPolicy(Qt.NoFocus)
         # Style sheets
         self.generate_output.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                           'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                           'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                            'QPushButton:hover {border: 0.5px solid white}')
         self.copy_output_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                              'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                              'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                               'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                               'QPushButton:hover {border: 0.5px solid white}')
         self.clear_form_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                             'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                             'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                              'QPushButton:hover {border: 0.5px solid white}')
         self.get_template_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                               'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                               'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                                'QPushButton:hover {border: 0.5px solid white}'
                                                'QPushButton:disabled {color: rgb(53, 53, 53)}')
         self.login_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                        'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                        'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                         'QPushButton:hover {border: 0.5px solid white}')
         self.available_templates.setStyleSheet('QComboBox {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
                                                'border-radius: 9px; padding-left: 10px; padding-top: 2px; padding-bottom: 2px;'
-                                               'font-family: "Segoe UI"; font-size: 12px;}'
+                                               'font-family: "Segoe UI"; font-size: 14px;}'
                                                'QComboBox::drop-down {background-color: rgb(115, 115, 115); border-radius: 8.3px;'
                                                'padding-right: 12px;}'
                                                'QComboBox::down-arrow {image: url(drop_down_arrow.png);}'
                                                'QComboBox QAbstractItemView {background-color: rgb(53, 53, 53);'
                                                'color: rgb(235, 235, 235); selection-background-color: rgb(115, 115, 115);'
-                                               'border: 1px solid rgb(53, 53, 53); font-family: "Segoe UI"; font-size: 12px;}')
-        self.feedback_temp.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 12px; font-family: "Segoe UI";'
+                                               'border: 1px solid rgb(53, 53, 53); font-family: "Segoe UI"; font-size: 14px;}')
+        self.feedback_temp.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 14px; font-family: "Segoe UI";'
                                          'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
-        self.feedback_output.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 12px; font-family: "Segoe UI";'
+        self.feedback_output.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 14px; font-family: "Segoe UI";'
                                            'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
-        self.student.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; font-size: 12px; font-family: "Segoe UI";'
+        self.student.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; font-size: 14px; font-family: "Segoe UI";'
                                    'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
-        self.student_label.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
-        self.new_student.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
-        self.template_label.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
-        self.feedback_label.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
-        self.yes_button.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
-        self.no_button.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.student_label.setStyleSheet('font-size: 14px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.new_student.setStyleSheet('font-size: 14px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.template_label.setStyleSheet('font-size: 14px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.feedback_label.setStyleSheet('font-size: 14px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.yes_button.setStyleSheet('font-size: 14px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.no_button.setStyleSheet('font-size: 14px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         # Tool Tips
         self.get_template_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
                                          '<li>Automatically get lesson feedback template.</li>'
@@ -250,8 +249,6 @@ class Window(QWidget):
         else:
             self.feedback_output.clear()
             self.feedback_output.insertPlainText(self.final_output)
-
-        # now we need to replace all student keywords with student_name, keyword = (student)
         # # global new_student
         # # global output
         # # student_name = self.student.text()
@@ -475,7 +472,7 @@ class Window(QWidget):
         progress_bar.setBar(bar)
         progress_bar.setWindowTitle('VIPKid Feedback App')
         label = QLabel('  Getting feedback template...')
-        label.setStyleSheet('color: rgb(235, 235, 235); font: 12px; font-family: "Segoe UI";')
+        label.setStyleSheet('color: rgb(235, 235, 235); font: 14px; font-family: "Segoe UI";')
         progress_bar.setLabel(label)
         progress_bar.setStyleSheet('QProgressBar {border: 1px solid rgb(115, 115, 115); border-radius: 7px;'
                                    'background-color: rgb(36, 36, 36);}'

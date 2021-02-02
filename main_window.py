@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         # Instructions Tool Tip
         hbox_tooltip = QHBoxLayout()
-        title = QLabel('<h3>Liked Teachers List</h3>')
+        title = QLabel('<h2>Liked Teachers List</h2>')
         title_tip = QLabel()
         title_tip.setPixmap(self.app_widget.pixmap)
         title_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
@@ -180,23 +180,23 @@ class MainWindow(QMainWindow):
         dialog.setPalette(palette)
         self.list_widget.setStyleSheet('QListView {background-color: rgb(36, 36, 36); border-radius: 4px;'
                                        'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5);'
-                                       'font-family: "Segoe UI"; font-size: 12px;}'
+                                       'font-family: "Segoe UI"; font-size: 14px;}'
                                        'QListView::item:hover {background-color: rgb(115, 115, 115)}'
                                        'QListView::item:selected:active {background-color: rgb(115, 115, 115)}')
-        self.new_teacher_name.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; font-size: 12px;'
+        self.new_teacher_name.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 2px; font-size: 14px;'
                                             'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5);'
                                             'font-family: "Segoe UI";')
         self.add_teacher_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                              'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                              'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                               'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                               'QPushButton:hover {border: 0.5px solid white}')
         self.remove_teacher_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                                 'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                                 'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                                  'QPushButton:hover {border: 0.5px solid white}'
                                                  'QPushButton:disabled {color: rgb(53, 53, 53)}')
         title.setStyleSheet('font-family: "Segoe UI";color: rgb(235, 235, 235)')
-        reminder.setStyleSheet('font-size: 9px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        reminder.setStyleSheet('font-size: 10px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         # slots
         self.add_teacher_button.clicked.connect(self.add_teacher)
         self.remove_teacher_button.clicked.connect(self.remove_teacher)
@@ -257,7 +257,7 @@ class MainWindow(QMainWindow):
         dialog.setMinimumWidth(450)
         # widget layout
         layout = QVBoxLayout()
-        title = QLabel('<h3>Edit Default Signature</h3>')
+        title = QLabel('<h2>Edit Default Signature</h2>')
         layout.addWidget(title)
         self.signature_textbox_default = QPlainTextEdit(dialog)
         # load current default feedback signature
@@ -278,14 +278,14 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Window, QColor(53, 53, 53))
         palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
         dialog.setPalette(palette)
-        self.signature_textbox_default.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 12px;'
+        self.signature_textbox_default.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 14px;'
                                                      'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         save_default_signature_btn.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                                 'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                                 'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                                  'QPushButton:hover {border: 0.5px solid white}')
         title.setStyleSheet('font-family: "Segoe UI"; color: rgb(235, 235, 235)')
-        self.save_confirmed.setStyleSheet('font-family: "Segoe UI"; font-size: 12px; color: rgb(235, 235, 235)')
+        self.save_confirmed.setStyleSheet('font-family: "Segoe UI"; font-size: 14px; color: rgb(235, 235, 235)')
         # slots
         save_default_signature_btn.clicked.connect(self.save_signature_slots_default)
         dialog.exec()
@@ -297,7 +297,7 @@ class MainWindow(QMainWindow):
         dialog.setMinimumWidth(450)
         # widget layout
         layout = QVBoxLayout()
-        title = QLabel('<h3>Edit New Student Signature</h3>')
+        title = QLabel('<h2>Edit New Student Signature</h2>')
         layout.addWidget(title)
         self.signature_textbox_new = QPlainTextEdit(dialog)
         # load current feedback signature
@@ -318,14 +318,14 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Window, QColor(53, 53, 53))
         palette.setColor(QPalette.WindowText, QColor(235, 235, 235))
         dialog.setPalette(palette)
-        self.signature_textbox_new.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 12px;'
+        self.signature_textbox_new.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 14px;'
                                                  'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         save_new_signature_btn.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                             'border-radius: 12px; padding: 5px; font: bold 12px; font-family: "Segoe UI";}'
+                                             'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                              'QPushButton:hover {border: 0.5px solid white}')
         title.setStyleSheet('font-family: "Segoe UI"; color: rgb(235, 235, 235)')
-        self.save_confirmed.setStyleSheet('font-family: "Segoe UI"; font-size: 12px; color: rgb(235, 235, 235)')
+        self.save_confirmed.setStyleSheet('font-family: "Segoe UI"; font-size: 14px; color: rgb(235, 235, 235)')
         # slots
         save_new_signature_btn.clicked.connect(self.save_signature_slots_new)
         dialog.exec()
