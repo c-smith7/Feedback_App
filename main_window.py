@@ -83,6 +83,8 @@ class MainWindow(QMainWindow):
         self.default_signature.triggered.connect(self.feedback_signature_default)
         self.new_student_signature.triggered.connect(self.feedback_signature_new)
         self.help.triggered.connect(self.help_widget)
+        self.support.triggered.connect(self.contact_support_widget)
+        self.submit_feedback.triggered.connect(self.feedback_url)
 
     def closeEvent(self, event):
         try:
@@ -424,6 +426,7 @@ class MainWindow(QMainWindow):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         dialog.setWindowTitle('VIPKid Feedback App')
         help_widget = QTextBrowser(dialog)
+        help_widget.setMinimumSize(350, 300)
         help_widget.setHtml('<b>This is a test input for help widget</b>'
                             '<ul>'
                             '<li>TEST</li>'
@@ -438,6 +441,30 @@ class MainWindow(QMainWindow):
                                   'border: transparent; font-family: "Segoe UI";')
         dialog.setStyleSheet('background-color: rgb(36, 36, 36);')
         dialog.setFixedSize(350, 300)
+        dialog.exec()
+
+    def feedback_url(self):
+        url = QtCore.QUrl('https://carlossmith.typeform.com/to/BwQMNq0g')
+        if not QtGui.QDesktopServices.openUrl(url):
+            QMessageBox.warning(self, 'Submit Feedback', 'Unable to open url :(')
+
+    def contact_support_widget(self):
+        dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        dialog.setWindowTitle('VIPKid Feedback App')
+        help_widget = QTextBrowser(dialog)
+        help_widget.setMinimumSize(375, 175)
+        help_widget.setHtml('<h3>Contact Support</h3>'
+                            'Shoot us an email at: <a href="mailto: mcmco421@gmail.com" style="color: #4d94ff;">mcmco421@gmail.com</a>'
+                            'Please include:'
+                            '<ul>'
+                            '<li>A detailed explanation of the issue you are facing.</li>'
+                            '<li>Any screenshots or videos of your issue.</li>'
+                            '</ul>')
+        help_widget.setOpenExternalLinks(True)
+        help_widget.setStyleSheet('background-color: rgb(36, 36, 36); font-size: 14px; color: rgb(235, 235, 235);'
+                                  'border: transparent; font-family: "Segoe UI";')
+        dialog.setStyleSheet('background-color: rgb(36, 36, 36);')
+        dialog.setFixedSize(375, 175)
         dialog.exec()
 
 
