@@ -43,7 +43,7 @@ class Window(QWidget):
         self.student_hbox = QHBoxLayout()
         self.student_label = QLabel('Student Name :')
         self.student = QLineEdit()
-        self.student.setFixedHeight(19)
+        self.student.setFixedHeight(24)
         self.student_hbox.addWidget(self.student_label)
         self.student_hbox.addWidget(self.student)
         # HBox button group 1

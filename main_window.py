@@ -85,6 +85,7 @@ class MainWindow(QMainWindow):
         self.help.triggered.connect(self.help_widget)
         self.support.triggered.connect(self.contact_support_widget)
         self.submit_feedback.triggered.connect(self.feedback_url)
+        self.about.triggered.connect(self.about_widget)
 
     def closeEvent(self, event):
         try:
@@ -158,7 +159,7 @@ class MainWindow(QMainWindow):
         # Add teacher button and textedit
         hbox_buttons_layout = QHBoxLayout()
         self.new_teacher_name = QLineEdit()
-        self.new_teacher_name.setFixedHeight(21)
+        self.new_teacher_name.setFixedHeight(24)
         self.add_teacher_button = QPushButton('Add Teacher', dialog)
         hbox_buttons_layout.addWidget(self.new_teacher_name)
         hbox_buttons_layout.addSpacing(3)
@@ -465,6 +466,18 @@ class MainWindow(QMainWindow):
                                   'border: transparent; font-family: "Segoe UI";')
         dialog.setStyleSheet('background-color: rgb(36, 36, 36);')
         dialog.setFixedSize(375, 175)
+        dialog.exec()
+
+    def about_widget(self):
+        dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        dialog.setWindowTitle('VIPKid Feedback App')
+        help_widget = QTextBrowser(dialog)
+        help_widget.setMinimumSize(350, 300)
+        help_widget.setHtml('<h3>About</h3>')
+        help_widget.setStyleSheet('background-color: rgb(36, 36, 36); font-size: 14px; color: rgb(235, 235, 235);'
+                                  'border: transparent; font-family: "Segoe UI";')
+        dialog.setStyleSheet('background-color: rgb(36, 36, 36);')
+        dialog.setFixedSize(350, 300)
         dialog.exec()
 
 
