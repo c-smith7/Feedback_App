@@ -88,10 +88,6 @@ class Window(QWidget):
         self.template_list = []
         self.hbox_Layout3.addWidget(self.template_label, 2)
         self.hbox_Layout3.addWidget(self.available_templates, 1)
-        # list of liked teachers from json file
-        if os.path.exists('liked_teachers.json'):
-            with open('liked_teachers.json', 'r') as file:
-                self.liked_teachers = json.load(file)
         # Add widgets to layout
         self.layout.addWidget(self.hbox_buttons1)
         self.layout.addWidget(QHline())
@@ -168,6 +164,8 @@ class Window(QWidget):
         self.feedback_label.setStyleSheet('font-size: 14px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         self.yes_button.setStyleSheet('font-size: 14px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         self.no_button.setStyleSheet('font-size: 14px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.login_success.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
+        self.logged_in_already.setStyleSheet('font-size: 12px; font-family: "Segoe UI"; color: rgb(235, 235, 235)')
         # Tool Tips
         self.get_template_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
                                          '<li>Automatically get lesson feedback template.</li>'
@@ -538,14 +536,37 @@ class Window(QWidget):
                 ul_list = self.browser.find_element_by_class_name('shared-notes-list-container')
                 li_tags = ul_list.find_elements_by_tag_name('li')
                 progress_bar.setValue(95)
+                # load current liked teachers list
+                try:
+                    if os.path.exists('liked_teachers.json'):
+                        with open('liked_teachers.json', 'r') as file:
+                            liked_teachers = json.load(file)
+                except Exception:
+                    msgBox = QMessageBox(self)
+                    msgBox.setIcon(QMessageBox.Information)
+                    msgBox.setWindowFlag(Qt.ToolTip)
+                    msgBox.setText('Could not find your Liked Teachers. Please try again.')
+                    msgBox.setStandardButtons(QMessageBox.Ok)
+                    msgBox.setDefaultButton(QMessageBox.Ok)
+                    msgBox.setStyleSheet(
+                        'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                        'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                        'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                        'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                        'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                        'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                        'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                        'QPushButton:hover {border: 0.5px solid white}')
+                    msgBox.exec()
+                # iterate through each teacher name
                 invalid_teacher_count = int(len(li_tags))
                 for li_tag in li_tags:
                     teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-                    if teacher_name in self.liked_teachers:
+                    if teacher_name in liked_teachers:
                         self.teacher_list.append(teacher_name)
                         template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
                         self.template_list.append(template)
-                    elif teacher_name not in self.liked_teachers:
+                    elif teacher_name not in liked_teachers:
                         invalid_teacher_count -= 1
                         continue
                 progress_bar.setValue(100)
