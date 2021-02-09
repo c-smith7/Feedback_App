@@ -184,7 +184,7 @@ class Window(QWidget):
         if os.path.exists('cookie'):
             options = Options()
             options.headless = True
-            self.browser = webdriver.Chrome(options=options)
+            self.browser = webdriver.Chrome()
             print('driver connected')
         # Signals and slots
         self.login_button_counter = 0
@@ -523,7 +523,7 @@ class Window(QWidget):
                 # Click show 'more' button until all templates are shown.
                 try:
                     progress_bar.setValue(70)
-                    show_more_button = WebDriverWait(self.browser, 3).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div/div[3]/div/div[1]/div[1]/div[2]/section/div[2]/div[4]/div/button')))
+                    show_more_button = WebDriverWait(self.browser, 3).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div/div[3]/div/div[1]/div[1]/div[3]/section/div[2]/div[4]/div/button')))
                     progress_bar.setValue(75)
                     while show_more_button.is_displayed():
                         self.browser.execute_script("arguments[0].click()", show_more_button)
