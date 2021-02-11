@@ -123,24 +123,24 @@ class Window(QWidget):
         self.feedback_output.setFocusPolicy(Qt.NoFocus)
         # Style sheets
         self.generate_output.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                           'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
+                                           'border-radius: 14px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                            'QPushButton:hover {border: 0.5px solid white}')
         self.copy_output_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                              'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
+                                              'border-radius: 14px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                               'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                               'QPushButton:hover {border: 0.5px solid white}')
         self.clear_form_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                             'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
+                                             'border-radius: 14px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                              'QPushButton:hover {border: 0.5px solid white}')
         self.get_template_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                               'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
+                                               'border-radius: 14px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                                'QPushButton:hover {border: 0.5px solid white}'
                                                'QPushButton:disabled {color: rgb(53, 53, 53)}')
         self.login_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                        'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
+                                        'border-radius: 14px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                         'QPushButton:hover {border: 0.5px solid white}')
         self.available_templates.setStyleSheet('QComboBox {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
@@ -184,7 +184,7 @@ class Window(QWidget):
         if os.path.exists('cookie'):
             options = Options()
             options.headless = True
-            self.browser = webdriver.Chrome()
+            self.browser = webdriver.Chrome(options=options)
             print('driver connected')
         # Signals and slots
         self.login_button_counter = 0
@@ -363,7 +363,31 @@ class Window(QWidget):
                 msgBox.exec()
 
     def login_nocookies(self):
-        if self.login_button_counter == 0:
+        try:
+            if self.login_button_counter == 0:
+                msgBox = QMessageBox(self)
+                msgBox.setWindowModality(Qt.WindowModal)
+                msgBox.setWindowFlag(Qt.ToolTip)
+                msgBox.setIcon(QMessageBox.Information)
+                msgBox.setText('Click the "Login" button below.\nLog in to VIPKid in the window that opens.')
+                msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                ok_button = msgBox.button(QMessageBox.Ok)
+                ok_button.setText('Login')
+                msgBox.setDefaultButton(QMessageBox.Ok)
+                msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                                     'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                                     'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                     'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                                     'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                     'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                                     'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                     'QPushButton:hover {border: 0.5px solid white}')
+                result = msgBox.exec()
+                if result == QMessageBox.Ok:
+                    self.login_nocookies_slots()
+            elif self.login_button_counter == 1:
+                self.login_slots()
+        except Exception:
             msgBox = QMessageBox(self)
             msgBox.setWindowModality(Qt.WindowModal)
             msgBox.setWindowFlag(Qt.ToolTip)
@@ -373,19 +397,17 @@ class Window(QWidget):
             ok_button = msgBox.button(QMessageBox.Ok)
             ok_button.setText('Login')
             msgBox.setDefaultButton(QMessageBox.Ok)
-            msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                                 'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                 'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-                                 'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                 'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-                                 'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                                 'QPushButton:hover {border: 0.5px solid white}')
-            result = msgBox.exec()
-            if result == QMessageBox.Ok:
-                self.login_nocookies_slots()
-        elif self.login_button_counter == 1:
-            self.login_slots()
+            msgBox.setStyleSheet(
+                'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                'QPushButton:hover {border: 0.5px solid white}')
+            msgBox.exec()
+
 
     def login_nocookies_prompt(self):
         self.login_button.setEnabled(False)

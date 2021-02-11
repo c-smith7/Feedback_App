@@ -65,6 +65,7 @@ class MainWindow(QMainWindow):
         help_menu.addAction(self.help)
         help_menu.addAction(self.support)
         help_menu.addAction(self.submit_feedback)
+        help_menu.addAction(self.suggest_feature)
         help_menu.addAction(self.about)
 
     def _createActions(self):
@@ -73,8 +74,9 @@ class MainWindow(QMainWindow):
         self.new_student_signature = QAction('New Student Signature', self)
         self.edit_teachers = QAction('&Edit Liked Teachers', self)
         self.help = QAction('&Help', self)
-        self.support = QAction('Contact &Support', self)
-        self.submit_feedback = QAction('Submit Feedback', self)
+        self.support = QAction('Contact &Support...', self)
+        self.submit_feedback = QAction('Submit Feedback...', self)
+        self.suggest_feature = QAction('Suggest Feature...', self)
         self.about = QAction('About', self)
 
     def _connectActions(self):
@@ -85,6 +87,7 @@ class MainWindow(QMainWindow):
         self.help.triggered.connect(self.help_widget)
         self.support.triggered.connect(self.contact_support_widget)
         self.submit_feedback.triggered.connect(self.feedback_url)
+        self.suggest_feature.triggered.connect(self.feature_url)
         self.about.triggered.connect(self.about_widget)
 
     def closeEvent(self, event):
@@ -95,44 +98,65 @@ class MainWindow(QMainWindow):
 
 # LOGOUT menubar function
     def logout(self):
-        """slot of logout option in menubar"""
-        if os.path.exists('cookie'):
-            os.remove('cookie')
-            self.app_widget.login_button_counter = 0
-            msgBox = QMessageBox(self)
-            msgBox.setWindowModality(QtCore.Qt.WindowModal)
-            msgBox.setWindowFlag(QtCore.Qt.ToolTip)
-            msgBox.setIcon(QMessageBox.Information)
-            msgBox.setText('Successfully Logged Out!')
-            msgBox.setStandardButtons(QMessageBox.Ok)
-            msgBox.setDefaultButton(QMessageBox.Ok)
-            msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                                 'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                 'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-                                 'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                 'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-                                 'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                                 'QPushButton:hover {border: 0.5px solid white}')
-            msgBox.exec()
-        else:
-            msgBox = QMessageBox(self)
-            msgBox.setWindowModality(QtCore.Qt.WindowModal)
-            msgBox.setWindowFlag(QtCore.Qt.ToolTip)
-            msgBox.setIcon(QMessageBox.Information)
-            msgBox.setText('Already Logged Out!')
-            msgBox.setStandardButtons(QMessageBox.Ok)
-            msgBox.setDefaultButton(QMessageBox.Ok)
-            msgBox.setStyleSheet(
-                'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-                'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-                'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                'QPushButton:hover {border: 0.5px solid white}')
-            msgBox.exec()
+        """slot for logout option in menubar"""
+        msgBox = QMessageBox(self)
+        msgBox.setWindowModality(QtCore.Qt.WindowModal)
+        msgBox.setWindowFlag(QtCore.Qt.ToolTip)
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setText('<p><b>Are you sure you would like to logout?</b></p>'
+                       'If you logout, you will need to re-login<br>'
+                       'with your VIPKid login info the next time <br>'
+                       'you use the Feedback App.')
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        msgBox.setDefaultButton(QMessageBox.Cancel)
+        msgBox.setStyleSheet(
+            'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+            'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+            'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+            'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+            'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+            'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+            'QPushButton:hover {border: 0.5px solid white}')
+        result = msgBox.exec()
+        if result == QMessageBox.Yes:
+            if os.path.exists('cookie'):
+                os.remove('cookie')
+                self.app_widget.login_button_counter = 0
+                msgBox = QMessageBox(self)
+                msgBox.setWindowModality(QtCore.Qt.WindowModal)
+                msgBox.setWindowFlag(QtCore.Qt.ToolTip)
+                msgBox.setIcon(QMessageBox.Information)
+                msgBox.setText('Successfully Logged Out!')
+                msgBox.setStandardButtons(QMessageBox.Ok)
+                msgBox.setDefaultButton(QMessageBox.Ok)
+                msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                                     'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                                     'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                     'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                                     'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                     'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                                     'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                     'QPushButton:hover {border: 0.5px solid white}')
+                msgBox.exec()
+            else:
+                msgBox = QMessageBox(self)
+                msgBox.setWindowModality(QtCore.Qt.WindowModal)
+                msgBox.setWindowFlag(QtCore.Qt.ToolTip)
+                msgBox.setIcon(QMessageBox.Information)
+                msgBox.setText('Already Logged Out!')
+                msgBox.setStandardButtons(QMessageBox.Ok)
+                msgBox.setDefaultButton(QMessageBox.Ok)
+                msgBox.setStyleSheet(
+                    'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                    'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                    'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                    'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                    'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                    'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                    'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                    'QPushButton:hover {border: 0.5px solid white}')
+                msgBox.exec()
 
 # Liked Teachers menubar function
     def teacher_list_widget(self):
@@ -447,7 +471,12 @@ class MainWindow(QMainWindow):
     def feedback_url(self):
         url = QtCore.QUrl('https://carlossmith.typeform.com/to/BwQMNq0g')
         if not QtGui.QDesktopServices.openUrl(url):
-            QMessageBox.warning(self, 'Submit Feedback', 'Unable to open url :(')
+            QMessageBox.warning(self, 'Submit Feedback...', 'Unable to submit feedback at this time, please try again.')
+
+    def feature_url(self):
+        url = QtCore.QUrl('https://carlossmith.typeform.com/to/mbrd6nKD')
+        if not QtGui.QDesktopServices.openUrl(url):
+            QMessageBox.warning(self, 'Suggest Feature...', 'Unable to suggest feature at this time, please try again.')
 
     def contact_support_widget(self):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
@@ -455,12 +484,13 @@ class MainWindow(QMainWindow):
         help_widget = QTextBrowser(dialog)
         help_widget.setMinimumSize(375, 175)
         help_widget.setHtml('<h3>Contact Support</h3>'
-                            'Shoot us an email at: <a href="mailto: mcmco421@gmail.com" style="color: #4d94ff;">mcmco421@gmail.com</a>'
-                            'Please include:'
+                            'Shoot us an email at: <a href="mailto: mcmco421@gmail.com" style="color: #4d94ff;">mcmco421@gmail.com</a><br>'
+                            'In your email, please include:'
                             '<ul>'
                             '<li>A detailed explanation of the issue you are facing.</li>'
                             '<li>Any screenshots or videos of your issue.</li>'
-                            '</ul>')
+                            '</ul>'
+                            "Thanks! We'll get back to you as soon as possible.")
         help_widget.setOpenExternalLinks(True)
         help_widget.setStyleSheet('background-color: rgb(36, 36, 36); font-size: 14px; color: rgb(235, 235, 235);'
                                   'border: transparent; font-family: "Segoe UI";')
