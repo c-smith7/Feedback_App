@@ -66,7 +66,6 @@ class MainWindow(QMainWindow):
         help_menu.addAction(self.support)
         help_menu.addAction(self.submit_feedback)
         help_menu.addAction(self.suggest_feature)
-        help_menu.addAction(self.about)
 
     def _createActions(self):
         self.sign_out = QAction('&Log Out', self)
@@ -76,8 +75,7 @@ class MainWindow(QMainWindow):
         self.help = QAction('&Help', self)
         self.support = QAction('Contact &Support...', self)
         self.submit_feedback = QAction('Submit Feedback...', self)
-        self.suggest_feature = QAction('Suggest Feature...', self)
-        self.about = QAction('About', self)
+        self.suggest_feature = QAction('Suggest a Feature...', self)
 
     def _connectActions(self):
         self.sign_out.triggered.connect(self.logout)
@@ -88,7 +86,6 @@ class MainWindow(QMainWindow):
         self.support.triggered.connect(self.contact_support_widget)
         self.submit_feedback.triggered.connect(self.feedback_url)
         self.suggest_feature.triggered.connect(self.feature_url)
-        self.about.triggered.connect(self.about_widget)
 
     def closeEvent(self, event):
         try:
@@ -452,16 +449,17 @@ class MainWindow(QMainWindow):
         dialog.setWindowTitle('VIPKid Feedback App')
         help_widget = QTextBrowser(dialog)
         help_widget.setMinimumSize(350, 300)
-        help_widget.setHtml('<b>This is a test input for help widget</b>'
-                            '<ul>'
-                            '<li>TEST</li>'
-                            '<li>TEST</li>'
-                            '<li>TEST</li>'
-                            '<li>TEST</li>'
-                            '<li>TEST</li>'
-                            '</ul>'
-                            '<br></br>'
-                            'More tesing, yes I just want to see if this widget auto wraps text. Let us see..')
+        help_widget.setHtml('<h3>Help Menu</h3>'
+                            'Last updated: 2 February 2021'
+                            '<h4>How to use the app:</h4>'
+                            '<ol>'
+                            '<li>Login</li>'
+                            '<li>Click <i>Get Feedback Template</i> button.</li>'
+                            '<li>Select your desired template from the list of teachers generated.</li>'
+                            '<li>Select whether or not your current feedback is for a new student.</li>'
+                            '<li>Click <i>Generate Feedback</i> button.</li>'
+                            '<li>Copy the generated feedback using the <i>Copy Feedback</i> button.</li>'
+                            '</ol>')
         help_widget.setStyleSheet('background-color: rgb(36, 36, 36); font-size: 14px; color: rgb(235, 235, 235);'
                                   'border: transparent; font-family: "Segoe UI";')
         dialog.setStyleSheet('background-color: rgb(36, 36, 36);')
@@ -484,7 +482,7 @@ class MainWindow(QMainWindow):
         help_widget = QTextBrowser(dialog)
         help_widget.setMinimumSize(375, 175)
         help_widget.setHtml('<h3>Contact Support</h3>'
-                            'Shoot us an email at: <a href="mailto: mcmco421@gmail.com" style="color: #4d94ff;">mcmco421@gmail.com</a><br>'
+                            'Shoot us an email at: <a href="mailto: feedbackapp.contact@gmail.com" style="color: #4d94ff;">feedbackapp.contact@gmail.com</a><br>'
                             'In your email, please include:'
                             '<ul>'
                             '<li>A detailed explanation of the issue you are facing.</li>'
@@ -496,18 +494,6 @@ class MainWindow(QMainWindow):
                                   'border: transparent; font-family: "Segoe UI";')
         dialog.setStyleSheet('background-color: rgb(36, 36, 36);')
         dialog.setFixedSize(375, 175)
-        dialog.exec()
-
-    def about_widget(self):
-        dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
-        dialog.setWindowTitle('VIPKid Feedback App')
-        help_widget = QTextBrowser(dialog)
-        help_widget.setMinimumSize(350, 300)
-        help_widget.setHtml('<h3>About</h3>')
-        help_widget.setStyleSheet('background-color: rgb(36, 36, 36); font-size: 14px; color: rgb(235, 235, 235);'
-                                  'border: transparent; font-family: "Segoe UI";')
-        dialog.setStyleSheet('background-color: rgb(36, 36, 36);')
-        dialog.setFixedSize(350, 300)
         dialog.exec()
 
 
