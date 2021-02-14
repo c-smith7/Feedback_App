@@ -448,22 +448,51 @@ class MainWindow(QMainWindow):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         dialog.setWindowTitle('VIPKid Feedback App')
         help_widget = QTextBrowser(dialog)
-        help_widget.setMinimumSize(350, 300)
-        help_widget.setHtml('<h3>Help Menu</h3>'
+        help_widget.setMinimumSize(475, 425)
+        help_widget.setHtml('<h3 style="margin-bottom: 2px";>Help Menu</h3>'
+                            '<hr>'
                             'Last updated: 2 February 2021'
-                            '<h4>How to use the app:</h4>'
+                            '<h3>How to use the app:</h3>'
                             '<ol>'
-                            '<li>Login</li>'
-                            '<li>Click <i>Get Feedback Template</i> button.</li>'
-                            '<li>Select your desired template from the list of teachers generated.</li>'
+                            '<li>Click the <b>Login</b> button, and wait for the "Logged In!" message to appear.</li>'
+                            '<ul>'
+                            '<li>When using the app for the first time, a window will open for you to login into the '
+                            'VIPKid website.</li>'
+                            '<li>After logging into VIPKid, the window will close automatically and you will be returned to '
+                            'the feedback app.</li>'
+                            '<li>After logging in for the first time, the app will remember your login info. So that '
+                            'the next time you use the app, you will be logged in automatically after clicking the '
+                            '<b>Login</b> button.</li>'
+                            '</ul>'
+                            '<li>Click <b>Get Feedback Template</b> button.</li>'
+                            '<ul>'
+                            '<li>Clicking this button will automatically get the student name and feedback template for each '
+                            'of your current missing class feedback submissions, in chronological order.</li>'
+                            '<li>The feedback templates that the app gets are based on the teachers in the '
+                            '<b>Liked Teachers List</b> in the Edit Menu.</li>'
+                            '<li>If any of the teachers in your <b>Liked Teachers List</b>, also have templates in the '
+                            'materials section of the lesson you are giving feedback for, their names will be shown in a '
+                            'drop down menu for you to choose from.</li>'
+                            "<li>Selecting a teacher's name will automatically put their respective feedback template "
+                            "in the <i>Feedback Template</i> text box.</li>"
+                            '</ul>'
+                            "<li>Next, you'll want to go ahead and make any revisions to the template, if needed.</li>"
                             '<li>Select whether or not your current feedback is for a new student.</li>'
-                            '<li>Click <i>Generate Feedback</i> button.</li>'
-                            '<li>Copy the generated feedback using the <i>Copy Feedback</i> button.</li>'
+                            '<li>Click <b>Generate Feedback</b> button.</li>'
+                            '<ul>'
+                            "<li>This will customize your feedback by using your student's name and adding your personal "
+                            "<b>Feedback Signature</b>, which you can find in the Edit Menu.</li>"
+                            '<li>It will also take into account if you have selected whether the current feedback is a '
+                            'new student or not. Based on your selection, either the <i>Default Signature</i> or the '
+                            '<i>New Student Signature</i> will be used.</li>'
+                            '</ul>'
+                            '<li>Once you are happy with the customized feedback, copy it by clicking the <b>Copy Feedback</b> button.</li>'
+                            "<li>Lastly, you can use your custom feedback when submitting your student's class feedback"
                             '</ol>')
-        help_widget.setStyleSheet('background-color: rgb(36, 36, 36); font-size: 14px; color: rgb(235, 235, 235);'
+        help_widget.setStyleSheet('background-color: rgb(53, 53, 53); font-size: 14px; color: rgb(235, 235, 235);'
                                   'border: transparent; font-family: "Segoe UI";')
-        dialog.setStyleSheet('background-color: rgb(36, 36, 36);')
-        dialog.setFixedSize(350, 300)
+        dialog.setStyleSheet('background-color: rgb(53, 53, 53);')
+        dialog.setFixedSize(475, 425)
         dialog.exec()
 
     def feedback_url(self):
