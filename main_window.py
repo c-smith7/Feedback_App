@@ -509,20 +509,21 @@ class MainWindow(QMainWindow):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         dialog.setWindowTitle('VIPKid Feedback App')
         help_widget = QTextBrowser(dialog)
-        help_widget.setMinimumSize(375, 175)
+        help_widget.setMinimumSize(375, 215)
         help_widget.setHtml('<h3>Contact Support</h3>'
-                            'Shoot us an email at: <a href="mailto: feedbackapp.contact@gmail.com" style="color: #4d94ff;">feedbackapp.contact@gmail.com</a><br>'
+                            'Shoot us an email at: <a href="mailto: feedbackapp.contact@gmail.com" style="color: #4d94ff; text-decoration: none;">feedbackapp.contact@gmail.com</a><br>'
                             'In your email, please include:'
                             '<ul>'
                             '<li>A detailed explanation of the issue you are facing.</li>'
                             '<li>Any screenshots or videos of your issue.</li>'
                             '</ul>'
-                            "Thanks! We'll get back to you as soon as possible.")
+                            '<p>-Or-</p>'
+                            'Tweet us <a href="https://twitter.com/The_FeedbackApp" style="color: #4d94ff; text-decoration: none;">@The_FeedbackApp</a>')
         help_widget.setOpenExternalLinks(True)
-        help_widget.setStyleSheet('background-color: rgb(36, 36, 36); font-size: 14px; color: rgb(235, 235, 235);'
+        help_widget.setStyleSheet('background-color: rgb(53, 53, 53); font-size: 14px; color: rgb(235, 235, 235);'
                                   'border: transparent; font-family: "Segoe UI";')
-        dialog.setStyleSheet('background-color: rgb(36, 36, 36);')
-        dialog.setFixedSize(375, 175)
+        dialog.setStyleSheet('background-color: rgb(53, 53, 53);')
+        dialog.setFixedSize(375, 215)
         dialog.exec()
 
 
