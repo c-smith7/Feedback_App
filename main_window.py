@@ -449,10 +449,15 @@ class MainWindow(QMainWindow):
         dialog.setWindowTitle('VIPKid Feedback App')
         help_widget = QTextBrowser(dialog)
         help_widget.setMinimumSize(475, 425)
-        help_widget.setHtml('<h3 style="margin-bottom: 2px";>Help Menu</h3>'
-                            '<hr>'
+        help_widget.setHtml('<h2 style="margin-bottom: 2px";>Help Menu</h2>'
                             'Last updated: 2 February 2021'
-                            '<h3>How to use the app:</h3>'
+                            '<hr>'
+                            '<h3>Video Tutorials</h3>'
+                            '<ul>'
+                            '<li><a href="https://www.youtube.com/watch?v=qo_2mlkbs9g" style="color: #4d94ff; text-decoration: none;"> Full-length Tutorial (19:54)</a></li>'
+                            '<li> Link to "Quick Tutorial Video"</li>'
+                            '</ul>'
+                            '<h3>How to use the app:</h3>'                          
                             '<ol>'
                             '<li>Click the <b>Login</b> button, and wait for the "Logged In!" message to appear.</li>'
                             '<ul>'
@@ -487,8 +492,9 @@ class MainWindow(QMainWindow):
                             '<i>New Student Signature</i> will be used.</li>'
                             '</ul>'
                             '<li>Once you are happy with the customized feedback, copy it by clicking the <b>Copy Feedback</b> button.</li>'
-                            "<li>Lastly, you can use your custom feedback when submitting your student's class feedback"
+                            "<li>Lastly, you can now use your custom feedback when submitting your student's class feedback.</li>"
                             '</ol>')
+        help_widget.setOpenExternalLinks(True)
         help_widget.setStyleSheet('background-color: rgb(53, 53, 53); font-size: 14px; color: rgb(235, 235, 235);'
                                   'border: transparent; font-family: "Segoe UI";')
         dialog.setStyleSheet('background-color: rgb(53, 53, 53);')
