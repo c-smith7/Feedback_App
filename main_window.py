@@ -220,11 +220,11 @@ class MainWindow(QMainWindow):
                                             'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5);'
                                             'font-family: "Segoe UI";')
         self.add_teacher_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                              'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
+                                              'border-radius: 14px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                               'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                               'QPushButton:hover {border: 0.5px solid white}')
         self.remove_teacher_button.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                                 'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
+                                                 'border-radius: 14px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                                  'QPushButton:hover {border: 0.5px solid white}'
                                                  'QPushButton:disabled {color: rgb(53, 53, 53)}')
@@ -314,7 +314,7 @@ class MainWindow(QMainWindow):
         self.signature_textbox_default.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 14px;'
                                                      'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         save_default_signature_btn.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                                 'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
+                                                 'border-radius: 14px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                                  'QPushButton:hover {border: 0.5px solid white}')
         title.setStyleSheet('font-family: "Segoe UI"; color: rgb(235, 235, 235)')
@@ -354,7 +354,7 @@ class MainWindow(QMainWindow):
         self.signature_textbox_new.setStyleSheet('background-color: rgb(36, 36, 36); border-radius: 4px; font-size: 14px;'
                                                  'color: rgb(235, 235, 235); border: 0.5px solid rgba(115, 115, 115, 0.5)')
         save_new_signature_btn.setStyleSheet('QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                             'border-radius: 12px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
+                                             'border-radius: 14px; padding: 5px; font: bold 14px; font-family: "Segoe UI";}'
                                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                              'QPushButton:hover {border: 0.5px solid white}')
         title.setStyleSheet('font-family: "Segoe UI"; color: rgb(235, 235, 235)')
@@ -550,10 +550,10 @@ class SaveSignatureWorkerThreadDefault(QRunnable):
     @pyqtSlot()
     def run(self):
         try:
+            self.signal.saved_msg_close_signal.emit()
+            time.sleep(0.5)
             self.fn(*self.args, **self.kwargs)
             self.signal.saved_msg_signal.emit()
-            time.sleep(1)
-            self.signal.saved_msg_close_signal.emit()
         except Exception:
             self.signal.saved_error.emit()
 
@@ -569,10 +569,10 @@ class SaveSignatureWorkerThreadNew(QRunnable):
     @pyqtSlot()
     def run(self):
         try:
+            self.signal.saved_msg_close_signal.emit()
+            time.sleep(0.5)
             self.fn(*self.args, **self.kwargs)
             self.signal.saved_msg_signal.emit()
-            time.sleep(1)
-            self.signal.saved_msg_close_signal.emit()
         except Exception:
             self.signal.saved_error.emit()
 
