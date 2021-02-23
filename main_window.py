@@ -455,7 +455,7 @@ class MainWindow(QMainWindow):
                             '<h3>Video Tutorials</h3>'
                             '<ul>'
                             '<li><a href="https://www.youtube.com/watch?v=qo_2mlkbs9g" style="color: #4d94ff; text-decoration: none;"> Full-length Tutorial (19:54)</a></li>'
-                            '<li> Link to "Quick Tutorial Video"</li>'
+                            '<li><a href="https://youtu.be/nsJ5m8Drx-g" style="color: #4d94ff; text-decoration: none;"> Day-to-Day Use Tutorial (4:09)</a></li></li>'
                             '</ul>'
                             '<h3>How to use the app:</h3>'                          
                             '<ol>'
