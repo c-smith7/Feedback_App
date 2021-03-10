@@ -288,6 +288,7 @@ class Window(QWidget):
     def clear_form(self):
         self.student.clear()
         self.feedback_temp.clear()
+        self.feedback_output.clear()
 
     def copy(self):
         try:
@@ -408,7 +409,6 @@ class Window(QWidget):
                 'QPushButton:hover {border: 0.5px solid white}')
             msgBox.exec()
 
-
     def login_nocookies_prompt(self):
         self.login_button.setEnabled(False)
         self.browser = webdriver.Chrome()
@@ -476,6 +476,7 @@ class Window(QWidget):
         # Clear any previous text from text boxes.
         self.student.clear()
         self.feedback_temp.clear()
+        self.feedback_output.clear()
         # clear the lists used for combobox
         self.teacher_list.clear()
         self.template_list.clear()
