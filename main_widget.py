@@ -299,7 +299,6 @@ class Window(QWidget):
 
     def login(self):
         if os.path.exists('cookie'):
-            print('Logging in...')
             self.login_button.setEnabled(False)
             self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
             with open('cookie', 'rb') as cookiesfile:
@@ -320,7 +319,6 @@ class Window(QWidget):
             self.login_nocookies()
 
     def login_error_msg(self):
-        print("Couldn't log in")
         msgBox = QMessageBox(self)
         msgBox.setIcon(QMessageBox.Information)
         msgBox.setWindowModality(Qt.WindowModal)
@@ -723,6 +721,9 @@ class Window(QWidget):
     def login_already_msg_close(self):
         self.logged_in_already.setVisible(False)
 
+    def login_button_status(self):
+        self.login_button.setEnabled(True)
+
     def login_slots(self):
         if self.login_button_counter == 0:
             worker = WorkerThread(self.login)
@@ -731,6 +732,7 @@ class Window(QWidget):
             worker.signal.login_open.connect(self.login_msg)
             worker.signal.login_close.connect(self.login_msg_close)
             worker.signal.login_error.connect(self.login_error_msg)
+            worker.signal.login_button.connect(self.login_button_status)
             self.threadpool.start(worker)
 
         else:
@@ -746,6 +748,7 @@ class Window(QWidget):
         worker.signal.finished.connect(self.login_finished)
         worker.signal.login_open.connect(self.login_msg)
         worker.signal.login_close.connect(self.login_msg_close)
+        worker.signal.login_button.connect(self.login_button_status)
         self.threadpool.start(worker)
 
 
@@ -757,6 +760,7 @@ class WorkerSignals(QObject):
     nocookies_msg = pyqtSignal()
     login_prompt = pyqtSignal()
     login_error = pyqtSignal()
+    login_button = pyqtSignal()
 
 
 class WorkerThread(QRunnable):
@@ -778,7 +782,9 @@ class WorkerThread(QRunnable):
             self.signal.login_close.emit()
         except Exception:
             self.signal.finished.emit()
+            self.signal.login_button.emit()
             self.signal.login_error.emit()
+
 
 
 class WorkerThreadNoCookies(QRunnable):
@@ -800,6 +806,7 @@ class WorkerThreadNoCookies(QRunnable):
             self.signal.login_close.emit()
         except Exception:
             self.signal.finished.emit()
+            self.signal.login_button.emit()
 
 
 class WorkerThreadAlreadyLogin(QRunnable):

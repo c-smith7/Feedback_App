@@ -586,9 +586,10 @@ if __name__ == "__main__":
         splash.stop(window)
         app.exec()
     except SessionNotCreatedException as e:
+        # splash.stop()
         msgBox = QMessageBox()
         msgBox.setWindowModality(QtCore.Qt.WindowModal)
-        msgBox.setWindowFlag(QtCore.Qt.ToolTip)
+        msgBox.setWindowFlags(QtCore.Qt.ToolTip | QtCore.Qt.WindowStaysOnTopHint)
         msgBox.setIcon(QMessageBox.Information)
         msgBox.setText('Update required!')
         msgBox.setDetailedText(str(e))
@@ -609,7 +610,7 @@ if __name__ == "__main__":
     except Exception as e:
         msgBox = QMessageBox()
         msgBox.setWindowModality(QtCore.Qt.WindowModal)
-        msgBox.setWindowFlag(QtCore.Qt.ToolTip)
+        msgBox.setWindowFlags(QtCore.Qt.ToolTip | QtCore.Qt.WindowStaysOnTopHint)
         msgBox.setIcon(QMessageBox.Information)
         msgBox.setText('Unknown error..')
         msgBox.setDetailedText(str(e))
