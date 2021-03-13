@@ -189,7 +189,7 @@ class Window(QWidget):
         # Signals and slots
         self.login_button_counter = 0
         if os.path.exists('cookie'):
-            self.login_button.clicked.connect(self.login_slots)
+            self.login_button.clicked.connect(self.login_check_cookie)
         else:
             self.login_button.clicked.connect(self.login_nocookies)
         self.get_template_button.clicked.connect(self.feedback_automation)
@@ -297,7 +297,14 @@ class Window(QWidget):
         except Exception:
             pass
 
+    def login_check_cookie(self):
+        if os.path.exists('cookie'):
+            self.login_slots()
+        else:
+            self.login_nocookies()
+
     def login(self):
+        print('LoginHERE')
         if os.path.exists('cookie'):
             self.login_button.setEnabled(False)
             self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
@@ -316,6 +323,7 @@ class Window(QWidget):
             with open('cookie', 'wb') as file:
                 pickle.dump(self.browser.get_cookies(), file)
         else:
+            print('Went to else statement.')
             self.login_nocookies()
 
     def login_error_msg(self):
@@ -323,11 +331,8 @@ class Window(QWidget):
         msgBox.setIcon(QMessageBox.Information)
         msgBox.setWindowModality(Qt.WindowModal)
         msgBox.setWindowFlag(Qt.ToolTip)
-        msgBox.setText('There was a problem logging into VIPKid.')
-        msgBox.setInformativeText('Please try again by clicking the "Retry" button below.')
-        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        retry_button = msgBox.button(QMessageBox.Ok)
-        retry_button.setText('Retry')
+        msgBox.setText('There was a problem logging into VIPKid.\nPlease try again.')
+        msgBox.setStandardButtons(QMessageBox.Ok)
         msgBox.setDefaultButton(QMessageBox.Ok)
         msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
                              'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
@@ -337,56 +342,34 @@ class Window(QWidget):
                              'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                              'QPushButton:hover {border: 0.5px solid white}')
-        result = msgBox.exec()
-        if result == QMessageBox.Ok:
-            try:
-                print('Trying to login again..')
-                os.remove('cookie')
-                print('cookies removed.')
-                self.browser.quit()
-                time.sleep(2)
-                self.login_nocookies()
-            except Exception as e:
-                msgBox = QMessageBox(self)
-                msgBox.setIcon(QMessageBox.Critical)
-                msgBox.setText('Error')
-                msgBox.setDetailedText(e)
-                msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                                     'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                     'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-                                     'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-                                     'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                     'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-                                     'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                                     'QPushButton:hover {border: 0.5px solid white}')
-                msgBox.exec()
+        msgBox.exec()
+        # if result == QMessageBox.Ok:
+        #     try:
+        #         # print('Trying to login again..')
+        #         # os.remove('cookie')
+        #         # print('cookies removed.')
+        #         self.browser.quit()
+        #         # time.sleep(2)
+        #         # self.login_nocookies()
+        #     except Exception as e:
+        #         msgBox = QMessageBox(self)
+        #         msgBox.setIcon(QMessageBox.Critical)
+        #         msgBox.setText('Error')
+        #         msgBox.setDetailedText(e)
+        #         msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+        #                              'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+        #                              'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+        #                              'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+        #                              'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+        #                              'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+        #                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+        #                              'QPushButton:hover {border: 0.5px solid white}')
+        #         msgBox.exec()
 
     def login_nocookies(self):
-        try:
-            if self.login_button_counter == 0:
-                msgBox = QMessageBox(self)
-                msgBox.setWindowModality(Qt.WindowModal)
-                msgBox.setWindowFlag(Qt.ToolTip)
-                msgBox.setIcon(QMessageBox.Information)
-                msgBox.setText('Click the "Login" button below.\nLog in to VIPKid in the window that opens.')
-                msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-                ok_button = msgBox.button(QMessageBox.Ok)
-                ok_button.setText('Login')
-                msgBox.setDefaultButton(QMessageBox.Ok)
-                msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                                     'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                     'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-                                     'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-                                     'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                     'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-                                     'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                                     'QPushButton:hover {border: 0.5px solid white}')
-                result = msgBox.exec()
-                if result == QMessageBox.Ok:
-                    self.login_nocookies_slots()
-            elif self.login_button_counter == 1:
-                self.login_slots()
-        except Exception:
+        # try:
+        print('NOCookiesHERE')
+        if self.login_button_counter == 0:
             msgBox = QMessageBox(self)
             msgBox.setWindowModality(Qt.WindowModal)
             msgBox.setWindowFlag(Qt.ToolTip)
@@ -396,16 +379,41 @@ class Window(QWidget):
             ok_button = msgBox.button(QMessageBox.Ok)
             ok_button.setText('Login')
             msgBox.setDefaultButton(QMessageBox.Ok)
-            msgBox.setStyleSheet(
-                'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-                'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-                'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                'QPushButton:hover {border: 0.5px solid white}')
-            msgBox.exec()
+            msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                                 'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                                 'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                                 'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                 'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                                 'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                 'QPushButton:hover {border: 0.5px solid white}')
+            result = msgBox.exec()
+            if result == QMessageBox.Ok:
+                self.login_nocookies_slots()
+        else:
+            print('Went to else nocookies')
+            # elif self.login_button_counter == 1:
+            #     self.login_slots()
+        # except Exception:
+        #     msgBox = QMessageBox(self)
+        #     msgBox.setWindowModality(Qt.WindowModal)
+        #     msgBox.setWindowFlag(Qt.ToolTip)
+        #     msgBox.setIcon(QMessageBox.Information)
+        #     msgBox.setText('Click the "Login" button below.\nLog in to VIPKid in the window that opens.')
+        #     msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        #     ok_button = msgBox.button(QMessageBox.Ok)
+        #     ok_button.setText('Login')
+        #     msgBox.setDefaultButton(QMessageBox.Ok)
+        #     msgBox.setStyleSheet(
+        #         'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+        #         'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+        #         'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+        #         'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+        #         'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+        #         'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+        #         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+        #         'QPushButton:hover {border: 0.5px solid white}')
+        #     msgBox.exec()
 
     def login_nocookies_prompt(self):
         self.login_button.setEnabled(False)
@@ -782,9 +790,8 @@ class WorkerThread(QRunnable):
             self.signal.login_close.emit()
         except Exception:
             self.signal.finished.emit()
-            self.signal.login_button.emit()
             self.signal.login_error.emit()
-
+            self.signal.login_button.emit()
 
 
 class WorkerThreadNoCookies(QRunnable):
@@ -806,6 +813,7 @@ class WorkerThreadNoCookies(QRunnable):
             self.signal.login_close.emit()
         except Exception:
             self.signal.finished.emit()
+            self.signal.login_error.emit()
             self.signal.login_button.emit()
 
 

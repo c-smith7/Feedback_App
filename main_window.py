@@ -120,6 +120,7 @@ class MainWindow(QMainWindow):
             if os.path.exists('cookie'):
                 os.remove('cookie')
                 self.app_widget.login_button_counter = 0
+                print(self.app_widget.login_button_counter)
                 msgBox = QMessageBox(self)
                 msgBox.setWindowModality(QtCore.Qt.WindowModal)
                 msgBox.setWindowFlag(QtCore.Qt.ToolTip)
