@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import *
 from enchant import tokenize
 from enchant.errors import TokenizerNotFoundError
 from selenium import webdriver
-from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -535,10 +535,16 @@ class Window(QWidget):
             except TimeoutException:
                 progress_bar.setValue(15)
                 student_name = str(WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span'))).get_attribute('innerHTML').splitlines()[0])
-                student_name = student_name.title()
-                if student_name.isupper():
-                    student_name = ''.join(student_name.split()).title()
-                self.student.setText(student_name)
+                try:
+                    nickname = str(self.browser.find_element_by_xpath('//*[@id="__layout"]/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[4]/div/div/div/span/span').get_attribute('innerHTML').strip())
+                    if nickname.startswith('(') and nickname.endswith(')'):
+                        nickname = nickname[1:-1]
+                    self.student.setText(nickname)
+                except NoSuchElementException:
+                    student_name = student_name.title()
+                    if student_name.isupper():
+                        student_name = ''.join(student_name.split()).title()
+                    self.student.setText(student_name)
                 progress_bar.setValue(25)
                 materials_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__layout']/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]")))
                 self.browser.execute_script("arguments[0].click();", materials_button)
