@@ -567,20 +567,117 @@ class Window(QWidget):
                     pass
                 time.sleep(1)
                 progress_bar.setValue(90)
-                # Iterate through every <li> tag until we find a teacher name in csv file.
-                ul_list = self.browser.find_element_by_class_name('shared-notes-list-container')
-                li_tags = ul_list.find_elements_by_tag_name('li')
-                progress_bar.setValue(95)
-                # load current liked teachers list
+                # Iterate through every <li> tag, if there are any, until we find a teacher name in csv file.
                 try:
-                    if os.path.exists('liked_teachers.json'):
-                        with open('liked_teachers.json', 'r') as file:
-                            liked_teachers = json.load(file)
-                except Exception:
+                    ul_list = self.browser.find_element_by_class_name('shared-notes-list-container')
+                    li_tags = ul_list.find_elements_by_tag_name('li')
+                    progress_bar.setValue(95)
+                    # load current liked teachers list
+                    try:
+                        if os.path.exists('liked_teachers.json'):
+                            with open('liked_teachers.json', 'r') as file:
+                                liked_teachers = json.load(file)
+                    except Exception:
+                        msgBox = QMessageBox(self)
+                        msgBox.setIcon(QMessageBox.Information)
+                        msgBox.setWindowFlag(Qt.ToolTip)
+                        msgBox.setText('Could not find your Liked Teachers. Please try again.')
+                        msgBox.setStandardButtons(QMessageBox.Ok)
+                        msgBox.setDefaultButton(QMessageBox.Ok)
+                        msgBox.setStyleSheet(
+                            'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                            'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                            'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                            'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                            'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                            'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                            'QPushButton:hover {border: 0.5px solid white}')
+                        msgBox.exec()
+                    # iterate through each teacher name
+                    invalid_teacher_count = int(len(li_tags))
+                    for li_tag in li_tags:
+                        teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
+                        if teacher_name in liked_teachers:
+                            self.teacher_list.append(teacher_name)
+                            template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
+                            self.template_list.append(template)
+                        elif teacher_name not in liked_teachers:
+                            invalid_teacher_count -= 1
+                            continue
+                    progress_bar.setValue(100)
+                    if invalid_teacher_count != 0:
+                        # print(self.teacher_list)
+                        # print(self.template_list)
+                        # print(len(self.teacher_list))
+                        self.available_templates.addItems(self.teacher_list)
+                        self.available_templates.setVisible(True)
+                        self.feedback_temp.insertPlainText(self.template_list[0])
+                    elif invalid_teacher_count == 0:
+                        if len(li_tags) != 0:
+                            progress_bar.close()
+                            progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
+                            msgBox = QMessageBox(self)
+                            msgBox.setIcon(QMessageBox.Information)
+                            msgBox.setWindowFlag(Qt.ToolTip)
+                            msgBox.setText('No available templates from liked teachers :(\n'
+                                           '\n'
+                                           'Would you like to see the Top 5 templates?')
+                            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                            msgBox.setDefaultButton(QMessageBox.Yes)
+                            msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                                                 'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                                                 'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                                                 'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                                 'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                                                 'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                                 'QPushButton:hover {border: 0.5px solid white}')
+                            result = msgBox.exec()
+                            if result == QMessageBox.Yes:
+                                try:
+                                    for li_tag in li_tags[:5]:
+                                        teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
+                                        template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
+                                        self.teacher_list.append(teacher_name)
+                                        self.template_list.append(template)
+                                    self.available_templates.addItems(self.teacher_list)
+                                    self.available_templates.setVisible(True)
+                                    self.feedback_temp.insertPlainText(self.template_list[0])
+                                except Exception:
+                                    for li_tag in li_tags:
+                                        teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
+                                        template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
+                                        self.teacher_list.append(teacher_name)
+                                        self.template_list.append(template)
+                                    self.available_templates.addItems(self.teacher_list)
+                                    self.available_templates.setVisible(True)
+                                    self.feedback_temp.insertPlainText(self.template_list[0])
+                        elif len(li_tags) == 0:
+                            progress_bar.close()
+                            progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
+                            msgBox = QMessageBox(self)
+                            msgBox.setIcon(QMessageBox.Information)
+                            msgBox.setWindowFlag(Qt.ToolTip)
+                            msgBox.setText('No available templates from liked teachers :(')
+                            msgBox.setStandardButtons(QMessageBox.Ok)
+                            msgBox.setDefaultButton(QMessageBox.Ok)
+                            msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                                                 'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                                                 'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                                                 'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                                 'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                                                 'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                                 'QPushButton:hover {border: 0.5px solid white}')
+                            msgBox.exec()
+                except NoSuchElementException:
+                    progress_bar.close()
+                    progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
                     msgBox = QMessageBox(self)
                     msgBox.setIcon(QMessageBox.Information)
                     msgBox.setWindowFlag(Qt.ToolTip)
-                    msgBox.setText('Could not find your Liked Teachers. Please try again.')
+                    msgBox.setText('No available templates from liked teachers :(')
                     msgBox.setStandardButtons(QMessageBox.Ok)
                     msgBox.setDefaultButton(QMessageBox.Ok)
                     msgBox.setStyleSheet(
@@ -593,83 +690,6 @@ class Window(QWidget):
                         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                         'QPushButton:hover {border: 0.5px solid white}')
                     msgBox.exec()
-                # iterate through each teacher name
-                invalid_teacher_count = int(len(li_tags))
-                for li_tag in li_tags:
-                    teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-                    if teacher_name in liked_teachers:
-                        self.teacher_list.append(teacher_name)
-                        template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
-                        self.template_list.append(template)
-                    elif teacher_name not in liked_teachers:
-                        invalid_teacher_count -= 1
-                        continue
-                progress_bar.setValue(100)
-                if invalid_teacher_count != 0:
-                    # print(self.teacher_list)
-                    # print(self.template_list)
-                    # print(len(self.teacher_list))
-                    self.available_templates.addItems(self.teacher_list)
-                    self.available_templates.setVisible(True)
-                    self.feedback_temp.insertPlainText(self.template_list[0])
-                elif invalid_teacher_count == 0:
-                    if len(li_tags) != 0:
-                        progress_bar.close()
-                        progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
-                        msgBox = QMessageBox(self)
-                        msgBox.setIcon(QMessageBox.Information)
-                        msgBox.setWindowFlag(Qt.ToolTip)
-                        msgBox.setText('No available templates from liked teachers :(\n'
-                                       '\n'
-                                       'Would you like to see the Top 5 templates?')
-                        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-                        msgBox.setDefaultButton(QMessageBox.Yes)
-                        msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                                             'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                             'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-                                             'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-                                             'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                             'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-                                             'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                                             'QPushButton:hover {border: 0.5px solid white}')
-                        result = msgBox.exec()
-                        if result == QMessageBox.Yes:
-                            try:
-                                for li_tag in li_tags[:5]:
-                                    teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-                                    template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
-                                    self.teacher_list.append(teacher_name)
-                                    self.template_list.append(template)
-                                self.available_templates.addItems(self.teacher_list)
-                                self.available_templates.setVisible(True)
-                                self.feedback_temp.insertPlainText(self.template_list[0])
-                            except Exception:
-                                for li_tag in li_tags:
-                                    teacher_name = li_tag.find_element_by_xpath(".//div[2]/div[1]").get_attribute('innerHTML').splitlines()[0]
-                                    template = str(li_tag.find_element_by_xpath(".//div[2]/div[2]").text)
-                                    self.teacher_list.append(teacher_name)
-                                    self.template_list.append(template)
-                                self.available_templates.addItems(self.teacher_list)
-                                self.available_templates.setVisible(True)
-                                self.feedback_temp.insertPlainText(self.template_list[0])
-                    elif len(li_tags) == 0:
-                        progress_bar.close()
-                        progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
-                        msgBox = QMessageBox(self)
-                        msgBox.setIcon(QMessageBox.Information)
-                        msgBox.setWindowFlag(Qt.ToolTip)
-                        msgBox.setText('No available templates from liked teachers :(')
-                        msgBox.setStandardButtons(QMessageBox.Ok)
-                        msgBox.setDefaultButton(QMessageBox.Ok)
-                        msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                                             'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                             'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-                                             'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-                                             'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                             'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-                                             'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                                             'QPushButton:hover {border: 0.5px solid white}')
-                        msgBox.exec()
                 self.browser.close()
                 self.browser.switch_to.window(self.browser.window_handles[0])
                 if len(self.browser.window_handles) > 1:
