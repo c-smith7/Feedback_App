@@ -3,19 +3,19 @@ import os
 import pickle
 import re
 import time
-import enchant
+
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import *
-from PyQt5.QtGui import QSyntaxHighlighter, QTextCharFormat, QPixmap, QMovie
+from PyQt5.QtGui import QPixmap, QMovie
 from PyQt5.QtWidgets import *
-from enchant import tokenize
-from enchant.errors import TokenizerNotFoundError
 from selenium import webdriver
 from selenium.common.exceptions import StaleElementReferenceException, TimeoutException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+
+from util.spell_checker import SpellTextEdit, SpellChecker
 
 
 # noinspection PyArgumentList,PyTypeChecker,PyBroadException,PyUnresolvedReferences
@@ -59,7 +59,7 @@ class Window(QWidget):
         self.logged_in_already = QLabel('Already logged in!')
         self.logged_in_already.setVisible(False)
         self.get_template_tip = QLabel()
-        self.pixmap = QPixmap('../icons/tooltip.svg')
+        self.pixmap = QPixmap(':/icons/tooltip')
         self.get_template_tip.setPixmap(self.pixmap)
         self.hbox_buttonsLayout1.addWidget(self.get_template_button, 3)
         self.hbox_buttonsLayout1.addWidget(self.get_template_tip)
@@ -858,66 +858,66 @@ class WorkerThreadAlreadyLogin(QRunnable):
         self.signal.finished.emit()
 
 
-class SpellTextEdit(QPlainTextEdit):
-    """QPlainTextEdit subclass which does spell-checking using PyEnchant"""
-    def __init__(self, *args):
-        QPlainTextEdit.__init__(self, *args)
-
-        # Start with a default dictionary based on the current locale.
-        self.highlighter = SpellChecker(self.document())
-        self.highlighter.setDict(enchant.Dict())
-
-
-class SpellChecker(QSyntaxHighlighter):
-    """QSyntaxHighlighter subclass which consults a PyEnchant dictionary"""
-    tokenizer = None
-    token_filters = (tokenize.EmailFilter, tokenize.URLFilter)
-    err_format = QTextCharFormat()
-    err_format.setUnderlineColor(Qt.red)
-    err_format.setUnderlineStyle(QTextCharFormat.SpellCheckUnderline)
-
-    def __init__(self, *args):
-        QSyntaxHighlighter.__init__(self, *args)
-
-        # Initialize private members
-        self._sp_dict = None
-        self._chunkers = []
-
-    def chunkers(self):
-        """Gets the chunkers in use"""
-        return self._chunkers
-
-    def dict(self):
-        """Gets the spelling dictionary in use"""
-        return self._sp_dict
-
-    def setChunkers(self, chunkers):
-        """Sets the list of chunkers to be used"""
-        self._chunkers = chunkers
-        self.setDict(self.dict())
-
-    def setDict(self, sp_dict):
-        """Sets the spelling dictionary to be used"""
-        try:
-            self.tokenizer = tokenize.get_tokenizer(sp_dict.tag, chunkers=self._chunkers, filters=self.token_filters)
-        except TokenizerNotFoundError:
-            # Fall back to English tokenizer
-            self.tokenizer = tokenize.get_tokenizer(chunkers=self._chunkers, filters=self.token_filters)
-        self._sp_dict = sp_dict
-
-        self.rehighlight()
-
-    def highlightBlock(self, text):
-        """Overridden QSyntaxHighlighter method to apply the highlight"""
-        if not self._sp_dict:
-            return
-
-        # Build a list of all misspelled words and highlight them
-        misspellings = []
-        for (word, pos) in self.tokenizer(text):
-            if not self._sp_dict.check(word):
-                self.setFormat(pos, len(word), self.err_format)
-                misspellings.append((pos, pos + len(word)))
+# class SpellTextEdit(QPlainTextEdit):
+#     """QPlainTextEdit subclass which does spell-checking using PyEnchant"""
+#     def __init__(self, *args):
+#         QPlainTextEdit.__init__(self, *args)
+#
+#         # Start with a default dictionary based on the current locale.
+#         self.highlighter = SpellChecker(self.document())
+#         self.highlighter.setDict(enchant.Dict())
+#
+#
+# class SpellChecker(QSyntaxHighlighter):
+#     """QSyntaxHighlighter subclass which consults a PyEnchant dictionary"""
+#     tokenizer = None
+#     token_filters = (tokenize.EmailFilter, tokenize.URLFilter)
+#     err_format = QTextCharFormat()
+#     err_format.setUnderlineColor(Qt.red)
+#     err_format.setUnderlineStyle(QTextCharFormat.SpellCheckUnderline)
+#
+#     def __init__(self, *args):
+#         QSyntaxHighlighter.__init__(self, *args)
+#
+#         # Initialize private members
+#         self._sp_dict = None
+#         self._chunkers = []
+#
+#     def chunkers(self):
+#         """Gets the chunkers in use"""
+#         return self._chunkers
+#
+#     def dict(self):
+#         """Gets the spelling dictionary in use"""
+#         return self._sp_dict
+#
+#     def setChunkers(self, chunkers):
+#         """Sets the list of chunkers to be used"""
+#         self._chunkers = chunkers
+#         self.setDict(self.dict())
+#
+#     def setDict(self, sp_dict):
+#         """Sets the spelling dictionary to be used"""
+#         try:
+#             self.tokenizer = tokenize.get_tokenizer(sp_dict.tag, chunkers=self._chunkers, filters=self.token_filters)
+#         except TokenizerNotFoundError:
+#             # Fall back to English tokenizer
+#             self.tokenizer = tokenize.get_tokenizer(chunkers=self._chunkers, filters=self.token_filters)
+#         self._sp_dict = sp_dict
+#
+#         self.rehighlight()
+#
+#     def highlightBlock(self, text):
+#         """Overridden QSyntaxHighlighter method to apply the highlight"""
+#         if not self._sp_dict:
+#             return
+#
+#         # Build a list of all misspelled words and highlight them
+#         misspellings = []
+#         for (word, pos) in self.tokenizer(text):
+#             if not self._sp_dict.check(word):
+#                 self.setFormat(pos, len(word), self.err_format)
+#                 misspellings.append((pos, pos + len(word)))
 
 
 # noinspection PyArgumentList
@@ -929,18 +929,18 @@ class QHline(QFrame):
         self.setStyleSheet('color: rgb(115, 115, 115)')
 
 
-class Splashscreen:
-    def __init__(self):
-        start = time.time()
-        splash_pix = QPixmap('../icons/pencil_432x432.png')
-        self.splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
-        self.splash.show()
-        while time.time() - start < 2:
-            time.sleep(0.001)
-            qApp.processEvents()
-
-    def stop(self, widget):
-        self.splash.finish(widget)
+# class Splashscreen:
+#     def __init__(self):
+#         start = time.time()
+#         splash_pix = QPixmap('../icons/pencil_432x432.png')
+#         self.splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+#         self.splash.show()
+#         while time.time() - start < 2:
+#             time.sleep(0.001)
+#             qApp.processEvents()
+#
+#     def stop(self, widget):
+#         self.splash.finish(widget)
 
 
 # if __name__ == "__main__":

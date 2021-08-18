@@ -2,12 +2,16 @@ import json
 import os
 import sys
 import time
-from PyQt5 import QtGui, QtCore, Qt
+
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QObject, pyqtSignal, QRunnable, pyqtSlot, QThreadPool
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import *
 from selenium.common.exceptions import SessionNotCreatedException
-from main_widget import Window, Splashscreen
+
+from main_widget import Window
+from util.splashscreen import Splashscreen
+import resources
 
 
 class TeachersModel(QtCore.QAbstractListModel):
@@ -40,7 +44,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('VIPKid Feedback App')
         self.resize(525, 725)
         self.app_icon = QtGui.QIcon()
-        self.app_icon.addFile('pencil.png', QtCore.QSize(16, 16))
+        self.app_icon.addFile(':/icons/app_icon', QtCore.QSize(16, 16))
         self.setWindowIcon(self.app_icon)
         palette = QPalette()
         palette.setColor(QPalette.Window, QColor(53, 53, 53))

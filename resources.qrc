@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="icons">
+        <file alias="tooltip">icons/tooltip.svg</file>
+        <file alias="app_icon">icons/app_icon.ico</file>
+    </qresource>
+</RCC>
