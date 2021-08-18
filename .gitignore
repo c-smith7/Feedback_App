@@ -2,32 +2,26 @@ feature_roadmap.txt
 <<<<<<< HEAD
 bug_notes.txt
 chromedriver.exe
-config.json
 debug.log
 ||||||| 7b387b8
 bug_notes.txt
 =======
 bug_notes.txt
 chromedriver.exe
-config.json
 debug.log
 >>>>>>> Selenium_integration
-Feedback_automation.py
 <<<<<<< HEAD
 cookie
-loading.gif
-pencil_432x432.png
-pencil_load.gif
-
+icons/loading.gif
+icons/pencil_432x432.png
 ||||||| 7217393
 cookie
 =======
 cookie
-pencil_load.gif
-pencil_432x432.png
-loading.gif
-tooltip.svg
-windows_logo.svg
-drop_down_arrow.png
+icons/pencil_432x432.png
+icons/loading.gif
+icons/tooltip.svg
+icons/windows_logo.svg
+icons/drop_down_arrow.png
 Feedback_App_Tutorial.mp4
 >>>>>>> External_driver_instance

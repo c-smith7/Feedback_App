@@ -59,7 +59,7 @@ class Window(QWidget):
         self.logged_in_already = QLabel('Already logged in!')
         self.logged_in_already.setVisible(False)
         self.get_template_tip = QLabel()
-        self.pixmap = QPixmap('tooltip.svg')
+        self.pixmap = QPixmap('../icons/tooltip.svg')
         self.get_template_tip.setPixmap(self.pixmap)
         self.hbox_buttonsLayout1.addWidget(self.get_template_button, 3)
         self.hbox_buttonsLayout1.addWidget(self.get_template_tip)
@@ -181,14 +181,14 @@ class Window(QWidget):
         self.login_button.setToolTip('Login & Connect to VIPKid.')
         # self.student.setToolTip('Get template for specific student') //needed after search function implemented
         # Start global webdriver
-        if os.path.exists('cookie'):
+        if os.path.exists('../cookie'):
             options = Options()
             options.headless = True
             self.browser = webdriver.Chrome(options=options)
             print('driver connected')
         # Signals and slots
         self.login_button_counter = 0
-        if os.path.exists('cookie'):
+        if os.path.exists('../cookie'):
             self.login_button.clicked.connect(self.login_check_cookie)
         else:
             self.login_button.clicked.connect(self.login_nocookies)
@@ -225,7 +225,7 @@ class Window(QWidget):
     def feedback_script(self):
         student_name = self.student.text()
         # load currently saved signatures and replace student keywords with student_name.
-        with open('signature.json', 'r') as openfile:
+        with open('../backend_data/signature.json', 'r') as openfile:
             signatures = json.load(openfile)
             signature_default = signatures['default'].replace('(student)', student_name)
             signature_new = signatures['new_student'].replace('(student)', student_name)
@@ -298,17 +298,17 @@ class Window(QWidget):
             pass
 
     def login_check_cookie(self):
-        if os.path.exists('cookie'):
+        if os.path.exists('../cookie'):
             self.login_slots()
         else:
             self.login_nocookies()
 
     def login(self):
         print('LoginHERE')
-        if os.path.exists('cookie'):
+        if os.path.exists('../cookie'):
             self.login_button.setEnabled(False)
             self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
-            with open('cookie', 'rb') as cookiesfile:
+            with open('../cookie', 'rb') as cookiesfile:
                 cookies = pickle.load(cookiesfile)
                 for cookie in cookies:
                     self.browser.add_cookie(cookie)
@@ -319,8 +319,8 @@ class Window(QWidget):
                 print('Logged In!')
                 self.get_template_button.setEnabled(True)
                 self.login_button.setEnabled(True)
-            os.remove('cookie')
-            with open('cookie', 'wb') as file:
+            os.remove('../cookie')
+            with open('../cookie', 'wb') as file:
                 pickle.dump(self.browser.get_cookies(), file)
         else:
             print('Went to else statement.')
@@ -423,7 +423,7 @@ class Window(QWidget):
         WebDriverWait(self.browser, 2147483647).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__layout"]/div/div[2]/div/div/ul/li[2]/a')))
         time.sleep(1)
         # Save cookies file after login
-        with open('cookie', 'wb') as file:
+        with open('../cookie', 'wb') as file:
             pickle.dump(self.browser.get_cookies(), file)
         time.sleep(1)
         self.browser.quit()
@@ -432,7 +432,7 @@ class Window(QWidget):
         self.browser = webdriver.Chrome(options=options)
         self.browser.get('https://www.vipkid.com/login?prevUrl=https%3A%2F%2Fwww.vipkid.com%2Ftc%2Fmissing')
         try:
-            with open('cookie', 'rb') as cookiesfile:
+            with open('../cookie', 'rb') as cookiesfile:
                 cookies = pickle.load(cookiesfile)
                 for cookie in cookies:
                     self.browser.add_cookie(cookie)
@@ -574,8 +574,8 @@ class Window(QWidget):
                     progress_bar.setValue(95)
                     # load current liked teachers list
                     try:
-                        if os.path.exists('liked_teachers.json'):
-                            with open('liked_teachers.json', 'r') as file:
+                        if os.path.exists('../backend_data/liked_teachers.json'):
+                            with open('../backend_data/liked_teachers.json', 'r') as file:
                                 liked_teachers = json.load(file)
                     except Exception:
                         msgBox = QMessageBox(self)
@@ -732,7 +732,7 @@ class Window(QWidget):
         self.feedback_temp.insertPlainText(self.template_list[index_activated])
 
     def login_started(self):
-        gif = QMovie('loading.gif')
+        gif = QMovie('../icons/loading.gif')
         # tip = QLabel('ToolTip')
         self.loading.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.loading.setAttribute(Qt.WA_TranslucentBackground)
@@ -932,7 +932,7 @@ class QHline(QFrame):
 class Splashscreen:
     def __init__(self):
         start = time.time()
-        splash_pix = QPixmap('pencil_432x432.png')
+        splash_pix = QPixmap('../icons/pencil_432x432.png')
         self.splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
         self.splash.show()
         while time.time() - start < 2:

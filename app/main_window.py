@@ -117,8 +117,8 @@ class MainWindow(QMainWindow):
             'QPushButton:hover {border: 0.5px solid white}')
         result = msgBox.exec()
         if result == QMessageBox.Yes:
-            if os.path.exists('cookie'):
-                os.remove('cookie')
+            if os.path.exists('../cookie'):
+                os.remove('../cookie')
                 self.app_widget.login_button_counter = 0
                 print(self.app_widget.login_button_counter)
                 msgBox = QMessageBox(self)
@@ -275,13 +275,13 @@ class MainWindow(QMainWindow):
 
     def load_liked_teachers(self):
         try:
-            with open('liked_teachers.json', 'r') as file:
+            with open('../backend_data/liked_teachers.json', 'r') as file:
                 self.model.teachers_list = json.load(file)
         except Exception:
             pass
 
     def save_liked_teachers(self):
-        with open('liked_teachers.json', 'w') as file:
+        with open('../backend_data/liked_teachers.json', 'w') as file:
             json.dump(self.model.teachers_list, file)
 
     # Edit default feedback signature dialog.
@@ -366,7 +366,7 @@ class MainWindow(QMainWindow):
 
     def load_signature(self, sig_type: str):
         try:
-            with open('signature.json', 'r') as openfile:
+            with open('../backend_data/signature.json', 'r') as openfile:
                 self.signature = json.load(openfile)
                 if sig_type == 'default':
                     self.signature_textbox_default.setPlainText(self.signature['default'])
@@ -396,13 +396,13 @@ class MainWindow(QMainWindow):
         edited_signature = self.signature_textbox_default.toPlainText()
         self.signature['default'] = edited_signature
         # write updated data to json.
-        with open('signature.json', 'w') as outfile:
+        with open('../backend_data/signature.json', 'w') as outfile:
             json.dump(self.signature, outfile)
 
     def save_signature_new(self):
         edited_signature = self.signature_textbox_new.toPlainText()
         self.signature['new_student'] = edited_signature
-        with open('signature.json', 'w') as outfile:
+        with open('../backend_data/signature.json', 'w') as outfile:
             json.dump(self.signature, outfile)
 
     def saved_error_msg(self):
