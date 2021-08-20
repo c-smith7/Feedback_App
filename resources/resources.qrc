@@ -1,0 +1,11 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="icons">
+        <file alias="tooltip">icons/tooltip.svg</file>
+        <file alias="app_icon">icons/app_icon.ico</file>
+        <file alias="down_arrow">icons/drop_down_arrow.png</file>
+        <file alias="pencil_splash">icons/pencil_432x432.png</file>
+        <file alias="spinner">icons/loading.gif</file>
+        <file alias="windows_logo">icons/windows_logo.svg</file>
+    </qresource>
+</RCC>

@@ -4,18 +4,24 @@ import pickle
 import re
 import time
 
-from PyQt5 import QtGui, QtCore
+import enchant
+from PyQt5 import Qt, QtCore
+from PyQt5 import QtGui
 from PyQt5.QtCore import *
-from PyQt5.QtGui import QPixmap, QMovie
+from PyQt5.QtGui import QMovie
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QSyntaxHighlighter, QTextCharFormat
 from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QPlainTextEdit
+from PyQt5.QtWidgets import QSplashScreen, qApp
+from enchant import tokenize
+from enchant.errors import TokenizerNotFoundError
 from selenium import webdriver
 from selenium.common.exceptions import StaleElementReferenceException, TimeoutException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-
-from util.spell_checker import SpellTextEdit, SpellChecker
 
 
 # noinspection PyArgumentList,PyTypeChecker,PyBroadException,PyUnresolvedReferences
@@ -59,7 +65,7 @@ class Window(QWidget):
         self.logged_in_already = QLabel('Already logged in!')
         self.logged_in_already.setVisible(False)
         self.get_template_tip = QLabel()
-        self.pixmap = QPixmap(':/icons/tooltip')
+        self.pixmap = QPixmap('../icons/tooltip.svg')
         self.get_template_tip.setPixmap(self.pixmap)
         self.hbox_buttonsLayout1.addWidget(self.get_template_button, 3)
         self.hbox_buttonsLayout1.addWidget(self.get_template_tip)
@@ -148,7 +154,7 @@ class Window(QWidget):
                                                'font-family: "Segoe UI"; font-size: 14px;}'
                                                'QComboBox::drop-down {background-color: rgb(115, 115, 115); border-radius: 8.3px;'
                                                'padding-right: 12px;}'
-                                               'QComboBox::down-arrow {image: url(drop_down_arrow.png);}'
+                                               'QComboBox::down-arrow {image: url(../icons/drop_down_arrow.png);}'
                                                'QComboBox QAbstractItemView {background-color: rgb(53, 53, 53);'
                                                'color: rgb(235, 235, 235); selection-background-color: rgb(115, 115, 115);'
                                                'border: 1px solid rgb(53, 53, 53); font-family: "Segoe UI"; font-size: 14px;}')
@@ -174,7 +180,7 @@ class Window(QWidget):
                                          '</ul>')
         self.copy_output_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
                                         '<li>Copy feedback output to clipboard.</li>'
-                                        '<li>Use windows key <img src="windows_logo.svg"> + V to access clipboard.</li>'
+                                        '<li>Use windows key <img src="../icons/windows_logo.svg"> + V to access clipboard.</li>'
                                         '</ul>')
         self.generate_output.setToolTip('Generate feedback from template.')
         self.clear_form_button.setToolTip('Clear student name & template.')
@@ -223,30 +229,33 @@ class Window(QWidget):
             msgBox.exec()
 
     def feedback_script(self):
-        student_name = self.student.text()
-        # load currently saved signatures and replace student keywords with student_name.
-        with open('../backend_data/signature.json', 'r') as openfile:
-            signatures = json.load(openfile)
-            signature_default = signatures['default'].replace('(student)', student_name)
-            signature_new = signatures['new_student'].replace('(student)', student_name)
-        # get feedback template input
-        feedback_input = self.feedback_temp.toPlainText()
-        # produce feedback output
-        feedback_output = re.sub(' we |We ', f' {student_name} and I ', feedback_input, 1)
-        feedback_output = ' '.join(feedback_output.split())
-        if self.no_button.isChecked():
-            self.final_output = f'{feedback_output} {signature_default}'
-            if feedback_input.split(' ', 1)[0] in ['We', 'we']:
-                self.final_output = f'In this lesson, {self.final_output}'
-        elif self.yes_button.isChecked():
-            self.final_output = f'{feedback_output} {signature_new}'
-            if feedback_input.split(' ', 1)[0] in ['We', 'we']:
-                self.final_output = f'In this lesson, {self.final_output}'
-        if student_name == '':
-            self.feedback_output.clear()
-        else:
-            self.feedback_output.clear()
-            self.feedback_output.insertPlainText(self.final_output)
+        try:
+            student_name = self.student.text()
+            # load currently saved signatures and replace student keywords with student_name.
+            with open(r'backend_data/signature.json', 'r') as openfile:
+                signatures = json.load(openfile)
+                signature_default = signatures['default'].replace('(student)', student_name)
+                signature_new = signatures['new_student'].replace('(student)', student_name)
+            # get feedback template input
+            feedback_input = self.feedback_temp.toPlainText()
+            # produce feedback output
+            feedback_output = re.sub(' we |We ', f' {student_name} and I ', feedback_input, 1)
+            feedback_output = ' '.join(feedback_output.split())
+            if self.no_button.isChecked():
+                self.final_output = f'{feedback_output} {signature_default}'
+                if feedback_input.split(' ', 1)[0] in ['We', 'we']:
+                    self.final_output = f'In this lesson, {self.final_output}'
+            elif self.yes_button.isChecked():
+                self.final_output = f'{feedback_output} {signature_new}'
+                if feedback_input.split(' ', 1)[0] in ['We', 'we']:
+                    self.final_output = f'In this lesson, {self.final_output}'
+            if student_name == '':
+                self.feedback_output.clear()
+            else:
+                self.feedback_output.clear()
+                self.feedback_output.insertPlainText(self.final_output)
+        except Exception as e:
+            print(e)
         # # global new_student
         # # global output
         # # student_name = self.student.text()
@@ -368,6 +377,7 @@ class Window(QWidget):
 
     def login_nocookies(self):
         # try:
+        print(os.getcwd())
         print('NOCookiesHERE')
         if self.login_button_counter == 0:
             msgBox = QMessageBox(self)
@@ -574,8 +584,8 @@ class Window(QWidget):
                     progress_bar.setValue(95)
                     # load current liked teachers list
                     try:
-                        if os.path.exists('../backend_data/liked_teachers.json'):
-                            with open('../backend_data/liked_teachers.json', 'r') as file:
+                        if os.path.exists('backend_data/liked_teachers.json'):
+                            with open('backend_data/liked_teachers.json', 'r') as file:
                                 liked_teachers = json.load(file)
                     except Exception:
                         msgBox = QMessageBox(self)
@@ -858,66 +868,66 @@ class WorkerThreadAlreadyLogin(QRunnable):
         self.signal.finished.emit()
 
 
-# class SpellTextEdit(QPlainTextEdit):
-#     """QPlainTextEdit subclass which does spell-checking using PyEnchant"""
-#     def __init__(self, *args):
-#         QPlainTextEdit.__init__(self, *args)
-#
-#         # Start with a default dictionary based on the current locale.
-#         self.highlighter = SpellChecker(self.document())
-#         self.highlighter.setDict(enchant.Dict())
-#
-#
-# class SpellChecker(QSyntaxHighlighter):
-#     """QSyntaxHighlighter subclass which consults a PyEnchant dictionary"""
-#     tokenizer = None
-#     token_filters = (tokenize.EmailFilter, tokenize.URLFilter)
-#     err_format = QTextCharFormat()
-#     err_format.setUnderlineColor(Qt.red)
-#     err_format.setUnderlineStyle(QTextCharFormat.SpellCheckUnderline)
-#
-#     def __init__(self, *args):
-#         QSyntaxHighlighter.__init__(self, *args)
-#
-#         # Initialize private members
-#         self._sp_dict = None
-#         self._chunkers = []
-#
-#     def chunkers(self):
-#         """Gets the chunkers in use"""
-#         return self._chunkers
-#
-#     def dict(self):
-#         """Gets the spelling dictionary in use"""
-#         return self._sp_dict
-#
-#     def setChunkers(self, chunkers):
-#         """Sets the list of chunkers to be used"""
-#         self._chunkers = chunkers
-#         self.setDict(self.dict())
-#
-#     def setDict(self, sp_dict):
-#         """Sets the spelling dictionary to be used"""
-#         try:
-#             self.tokenizer = tokenize.get_tokenizer(sp_dict.tag, chunkers=self._chunkers, filters=self.token_filters)
-#         except TokenizerNotFoundError:
-#             # Fall back to English tokenizer
-#             self.tokenizer = tokenize.get_tokenizer(chunkers=self._chunkers, filters=self.token_filters)
-#         self._sp_dict = sp_dict
-#
-#         self.rehighlight()
-#
-#     def highlightBlock(self, text):
-#         """Overridden QSyntaxHighlighter method to apply the highlight"""
-#         if not self._sp_dict:
-#             return
-#
-#         # Build a list of all misspelled words and highlight them
-#         misspellings = []
-#         for (word, pos) in self.tokenizer(text):
-#             if not self._sp_dict.check(word):
-#                 self.setFormat(pos, len(word), self.err_format)
-#                 misspellings.append((pos, pos + len(word)))
+class SpellTextEdit(QPlainTextEdit):
+    """QPlainTextEdit subclass which does spell-checking using PyEnchant"""
+    def __init__(self, *args):
+        QPlainTextEdit.__init__(self, *args)
+
+        # Start with a default dictionary based on the current locale.
+        self.highlighter = SpellChecker(self.document())
+        self.highlighter.setDict(enchant.Dict())
+
+
+class SpellChecker(QSyntaxHighlighter):
+    """QSyntaxHighlighter subclass which consults a PyEnchant dictionary"""
+    tokenizer = None
+    token_filters = (tokenize.EmailFilter, tokenize.URLFilter)
+    err_format = QTextCharFormat()
+    err_format.setUnderlineColor(Qt.red)
+    err_format.setUnderlineStyle(QTextCharFormat.SpellCheckUnderline)
+
+    def __init__(self, *args):
+        QSyntaxHighlighter.__init__(self, *args)
+
+        # Initialize private members
+        self._sp_dict = None
+        self._chunkers = []
+
+    def chunkers(self):
+        """Gets the chunkers in use"""
+        return self._chunkers
+
+    def dict(self):
+        """Gets the spelling dictionary in use"""
+        return self._sp_dict
+
+    def setChunkers(self, chunkers):
+        """Sets the list of chunkers to be used"""
+        self._chunkers = chunkers
+        self.setDict(self.dict())
+
+    def setDict(self, sp_dict):
+        """Sets the spelling dictionary to be used"""
+        try:
+            self.tokenizer = tokenize.get_tokenizer(sp_dict.tag, chunkers=self._chunkers, filters=self.token_filters)
+        except TokenizerNotFoundError:
+            # Fall back to English tokenizer
+            self.tokenizer = tokenize.get_tokenizer(chunkers=self._chunkers, filters=self.token_filters)
+        self._sp_dict = sp_dict
+
+        self.rehighlight()
+
+    def highlightBlock(self, text):
+        """Overridden QSyntaxHighlighter method to apply the highlight"""
+        if not self._sp_dict:
+            return
+
+        # Build a list of all misspelled words and highlight them
+        misspellings = []
+        for (word, pos) in self.tokenizer(text):
+            if not self._sp_dict.check(word):
+                self.setFormat(pos, len(word), self.err_format)
+                misspellings.append((pos, pos + len(word)))
 
 
 # noinspection PyArgumentList
@@ -929,18 +939,18 @@ class QHline(QFrame):
         self.setStyleSheet('color: rgb(115, 115, 115)')
 
 
-# class Splashscreen:
-#     def __init__(self):
-#         start = time.time()
-#         splash_pix = QPixmap('../icons/pencil_432x432.png')
-#         self.splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
-#         self.splash.show()
-#         while time.time() - start < 2:
-#             time.sleep(0.001)
-#             qApp.processEvents()
-#
-#     def stop(self, widget):
-#         self.splash.finish(widget)
+class Splashscreen:
+    def __init__(self):
+        start = time.time()
+        splash_pix = QPixmap('../icons/pencil_432x432.png')
+        self.splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+        self.splash.show()
+        while time.time() - start < 2:
+            time.sleep(0.001)
+            qApp.processEvents()
+
+    def stop(self, widget):
+        self.splash.finish(widget)
 
 
 # if __name__ == "__main__":

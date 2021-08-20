@@ -9,9 +9,7 @@ from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import *
 from selenium.common.exceptions import SessionNotCreatedException
 
-from main_widget import Window
-from util.splashscreen import Splashscreen
-import resources
+from main_widget import Window, Splashscreen
 
 
 class TeachersModel(QtCore.QAbstractListModel):
@@ -44,7 +42,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('VIPKid Feedback App')
         self.resize(525, 725)
         self.app_icon = QtGui.QIcon()
-        self.app_icon.addFile(':/icons/app_icon', QtCore.QSize(16, 16))
+        self.app_icon.addFile('../icons/app_icon.ico', QtCore.QSize(16, 16))
         self.setWindowIcon(self.app_icon)
         palette = QPalette()
         palette.setColor(QPalette.Window, QColor(53, 53, 53))
@@ -279,13 +277,13 @@ class MainWindow(QMainWindow):
 
     def load_liked_teachers(self):
         try:
-            with open('../backend_data/liked_teachers.json', 'r') as file:
+            with open('backend_data/liked_teachers.json', 'r') as file:
                 self.model.teachers_list = json.load(file)
         except Exception:
             pass
 
     def save_liked_teachers(self):
-        with open('../backend_data/liked_teachers.json', 'w') as file:
+        with open('backend_data/liked_teachers.json', 'w') as file:
             json.dump(self.model.teachers_list, file)
 
     # Edit default feedback signature dialog.
@@ -370,7 +368,7 @@ class MainWindow(QMainWindow):
 
     def load_signature(self, sig_type: str):
         try:
-            with open('../backend_data/signature.json', 'r') as openfile:
+            with open('backend_data/signature.json', 'r') as openfile:
                 self.signature = json.load(openfile)
                 if sig_type == 'default':
                     self.signature_textbox_default.setPlainText(self.signature['default'])
@@ -400,13 +398,13 @@ class MainWindow(QMainWindow):
         edited_signature = self.signature_textbox_default.toPlainText()
         self.signature['default'] = edited_signature
         # write updated data to json.
-        with open('../backend_data/signature.json', 'w') as outfile:
+        with open('backend_data/signature.json', 'w') as outfile:
             json.dump(self.signature, outfile)
 
     def save_signature_new(self):
         edited_signature = self.signature_textbox_new.toPlainText()
         self.signature['new_student'] = edited_signature
-        with open('../backend_data/signature.json', 'w') as outfile:
+        with open('backend_data/signature.json', 'w') as outfile:
             json.dump(self.signature, outfile)
 
     def saved_error_msg(self):
