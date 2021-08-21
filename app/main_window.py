@@ -9,7 +9,8 @@ from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import *
 from selenium.common.exceptions import SessionNotCreatedException
 
-from main_widget import Window, Splashscreen
+from app.main_widget import Window
+import resources
 
 
 class TeachersModel(QtCore.QAbstractListModel):
@@ -42,7 +43,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('VIPKid Feedback App')
         self.resize(525, 725)
         self.app_icon = QtGui.QIcon()
-        self.app_icon.addFile('../icons/app_icon.ico', QtCore.QSize(16, 16))
+        self.app_icon.addFile(':/icons/app_icon', QtCore.QSize(16, 16))
         self.setWindowIcon(self.app_icon)
         palette = QPalette()
         palette.setColor(QPalette.Window, QColor(53, 53, 53))
@@ -277,13 +278,13 @@ class MainWindow(QMainWindow):
 
     def load_liked_teachers(self):
         try:
-            with open('backend_data/liked_teachers.json', 'r') as file:
+            with open(r'C:\Users\mcmco\Desktop\Python_scripts\Feedback_GUI\app\backend_data\liked_teachers.json', 'r') as file:
                 self.model.teachers_list = json.load(file)
         except Exception:
             pass
 
     def save_liked_teachers(self):
-        with open('backend_data/liked_teachers.json', 'w') as file:
+        with open(r'C:\Users\mcmco\Desktop\Python_scripts\Feedback_GUI\app\backend_data\liked_teachers.json', 'w') as file:
             json.dump(self.model.teachers_list, file)
 
     # Edit default feedback signature dialog.
@@ -368,7 +369,7 @@ class MainWindow(QMainWindow):
 
     def load_signature(self, sig_type: str):
         try:
-            with open('backend_data/signature.json', 'r') as openfile:
+            with open(r'C:\Users\mcmco\Desktop\Python_scripts\Feedback_GUI\app\backend_data\signature.json', 'r') as openfile:
                 self.signature = json.load(openfile)
                 if sig_type == 'default':
                     self.signature_textbox_default.setPlainText(self.signature['default'])
@@ -398,13 +399,13 @@ class MainWindow(QMainWindow):
         edited_signature = self.signature_textbox_default.toPlainText()
         self.signature['default'] = edited_signature
         # write updated data to json.
-        with open('backend_data/signature.json', 'w') as outfile:
+        with open(r'C:\Users\mcmco\Desktop\Python_scripts\Feedback_GUI\app\backend_data\signature.json', 'w') as outfile:
             json.dump(self.signature, outfile)
 
     def save_signature_new(self):
         edited_signature = self.signature_textbox_new.toPlainText()
         self.signature['new_student'] = edited_signature
-        with open('backend_data/signature.json', 'w') as outfile:
+        with open(r'C:\Users\mcmco\Desktop\Python_scripts\Feedback_GUI\app\backend_data\signature.json', 'w') as outfile:
             json.dump(self.signature, outfile)
 
     def saved_error_msg(self):
@@ -580,52 +581,52 @@ class SaveSignatureWorkerThreadNew(QRunnable):
             self.signal.saved_error.emit()
 
 
-if __name__ == "__main__":
-    try:
-        app = QApplication(sys.argv)
-        splash = Splashscreen()
-        window = MainWindow()
-        window.show()
-        splash.stop(window)
-        app.exec()
-    except SessionNotCreatedException as e:
-        # splash.stop()
-        msgBox = QMessageBox()
-        msgBox.setWindowModality(QtCore.Qt.WindowModal)
-        msgBox.setWindowFlags(QtCore.Qt.ToolTip | QtCore.Qt.WindowStaysOnTopHint)
-        msgBox.setIcon(QMessageBox.Information)
-        msgBox.setText('Update required!')
-        msgBox.setDetailedText(str(e))
-        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        ok_button = msgBox.button(QMessageBox.Ok)
-        ok_button.setText('Update')
-        msgBox.setDefaultButton(QMessageBox.Ok)
-        msgBox.setStyleSheet(
-            'QMessageBox {background-color: rgb(53, 53, 53); border-top: 1px solid rgb(115, 115, 115);'
-            'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-            'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-            'QLabel {color: rgb(235, 235, 235); padding-top: 10px; font-family: "Segoe UI";}'
-            'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-            'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI"; font-size: 12px;}'
-            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-            'QPushButton:hover {border: 0.5px solid white}')
-        msgBox.exec()
-    except Exception as e:
-        msgBox = QMessageBox()
-        msgBox.setWindowModality(QtCore.Qt.WindowModal)
-        msgBox.setWindowFlags(QtCore.Qt.ToolTip | QtCore.Qt.WindowStaysOnTopHint)
-        msgBox.setIcon(QMessageBox.Information)
-        msgBox.setText('Unknown error..')
-        msgBox.setDetailedText(str(e))
-        msgBox.setStandardButtons(QMessageBox.Ok)
-        msgBox.setDefaultButton(QMessageBox.Ok)
-        msgBox.setStyleSheet(
-            'QMessageBox {background-color: rgb(53, 53, 53); border-top: 1px solid rgb(115, 115, 115);'
-            'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-            'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-            'QLabel {color: rgb(235, 235, 235); padding-top: 10px; font-family: "Segoe UI";}'
-            'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-            'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI"; font-size: 12px;}'
-            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-            'QPushButton:hover {border: 0.5px solid white}')
-        msgBox.exec()
+# if __name__ == "__main__":
+#     try:
+#         app = QApplication(sys.argv)
+#         splash = Splashscreen()
+#         window = MainWindow()
+#         window.show()
+#         splash.stop(window)
+#         app.exec()
+#     except SessionNotCreatedException as e:
+#         # splash.stop()
+#         msgBox = QMessageBox()
+#         msgBox.setWindowModality(QtCore.Qt.WindowModal)
+#         msgBox.setWindowFlags(QtCore.Qt.ToolTip | QtCore.Qt.WindowStaysOnTopHint)
+#         msgBox.setIcon(QMessageBox.Information)
+#         msgBox.setText('Update required!')
+#         msgBox.setDetailedText(str(e))
+#         msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+#         ok_button = msgBox.button(QMessageBox.Ok)
+#         ok_button.setText('Update')
+#         msgBox.setDefaultButton(QMessageBox.Ok)
+#         msgBox.setStyleSheet(
+#             'QMessageBox {background-color: rgb(53, 53, 53); border-top: 1px solid rgb(115, 115, 115);'
+#             'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+#             'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+#             'QLabel {color: rgb(235, 235, 235); padding-top: 10px; font-family: "Segoe UI";}'
+#             'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+#             'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI"; font-size: 12px;}'
+#             'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+#             'QPushButton:hover {border: 0.5px solid white}')
+#         msgBox.exec()
+#     except Exception as e:
+#         msgBox = QMessageBox()
+#         msgBox.setWindowModality(QtCore.Qt.WindowModal)
+#         msgBox.setWindowFlags(QtCore.Qt.ToolTip | QtCore.Qt.WindowStaysOnTopHint)
+#         msgBox.setIcon(QMessageBox.Information)
+#         msgBox.setText('Unknown error..')
+#         msgBox.setDetailedText(str(e))
+#         msgBox.setStandardButtons(QMessageBox.Ok)
+#         msgBox.setDefaultButton(QMessageBox.Ok)
+#         msgBox.setStyleSheet(
+#             'QMessageBox {background-color: rgb(53, 53, 53); border-top: 1px solid rgb(115, 115, 115);'
+#             'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+#             'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+#             'QLabel {color: rgb(235, 235, 235); padding-top: 10px; font-family: "Segoe UI";}'
+#             'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+#             'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI"; font-size: 12px;}'
+#             'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+#             'QPushButton:hover {border: 0.5px solid white}')
+#         msgBox.exec()

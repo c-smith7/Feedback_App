@@ -65,7 +65,7 @@ class Window(QWidget):
         self.logged_in_already = QLabel('Already logged in!')
         self.logged_in_already.setVisible(False)
         self.get_template_tip = QLabel()
-        self.pixmap = QPixmap('../icons/tooltip.svg')
+        self.pixmap = QPixmap(':/icons/tooltip')
         self.get_template_tip.setPixmap(self.pixmap)
         self.hbox_buttonsLayout1.addWidget(self.get_template_button, 3)
         self.hbox_buttonsLayout1.addWidget(self.get_template_tip)
@@ -154,7 +154,7 @@ class Window(QWidget):
                                                'font-family: "Segoe UI"; font-size: 14px;}'
                                                'QComboBox::drop-down {background-color: rgb(115, 115, 115); border-radius: 8.3px;'
                                                'padding-right: 12px;}'
-                                               'QComboBox::down-arrow {image: url(../icons/drop_down_arrow.png);}'
+                                               'QComboBox::down-arrow {image: url(:/icons/down_arrow);}'
                                                'QComboBox QAbstractItemView {background-color: rgb(53, 53, 53);'
                                                'color: rgb(235, 235, 235); selection-background-color: rgb(115, 115, 115);'
                                                'border: 1px solid rgb(53, 53, 53); font-family: "Segoe UI"; font-size: 14px;}')
@@ -180,7 +180,7 @@ class Window(QWidget):
                                          '</ul>')
         self.copy_output_tip.setToolTip('<ul style="margin-left: 10px; -qt-list-indent: 0;">'
                                         '<li>Copy feedback output to clipboard.</li>'
-                                        '<li>Use windows key <img src="../icons/windows_logo.svg"> + V to access clipboard.</li>'
+                                        '<li>Use windows key <img src=":/icons/windows_logo"> + V to access clipboard.</li>'
                                         '</ul>')
         self.generate_output.setToolTip('Generate feedback from template.')
         self.clear_form_button.setToolTip('Clear student name & template.')
@@ -742,7 +742,7 @@ class Window(QWidget):
         self.feedback_temp.insertPlainText(self.template_list[index_activated])
 
     def login_started(self):
-        gif = QMovie('../icons/loading.gif')
+        gif = QMovie(':/icons/spinner')
         # tip = QLabel('ToolTip')
         self.loading.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.loading.setAttribute(Qt.WA_TranslucentBackground)
@@ -942,7 +942,7 @@ class QHline(QFrame):
 class Splashscreen:
     def __init__(self):
         start = time.time()
-        splash_pix = QPixmap('../icons/pencil_432x432.png')
+        splash_pix = QPixmap(':/icons/pencil_splash')
         self.splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
         self.splash.show()
         while time.time() - start < 2:
