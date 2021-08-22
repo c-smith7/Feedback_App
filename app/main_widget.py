@@ -559,12 +559,15 @@ class Window(QWidget):
                 materials_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__layout']/div/div[2]/div/div[1]/div/div[2]/div/div[3]/div[3]/table/tbody/tr[1]/td[7]/div/div/div[2]")))
                 self.browser.execute_script("arguments[0].click();", materials_button)
                 progress_bar.setValue(35)
+                print("Click materials button")
                 self.browser.switch_to.window(self.browser.window_handles[1])
                 progress_bar.setValue(50)
+                print("Switch windows to materials browser tab")
                 template_button = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.ID, 'tab-5')))
                 self.browser.execute_script("arguments[0].click();", template_button)
                 time.sleep(0.5)
                 progress_bar.setValue(65)
+                print("Click template tab on materials page")
                 # Click show 'more' button until all templates are shown.
                 try:
                     progress_bar.setValue(70)
@@ -584,8 +587,8 @@ class Window(QWidget):
                     progress_bar.setValue(95)
                     # load current liked teachers list
                     try:
-                        if os.path.exists('backend_data/liked_teachers.json'):
-                            with open('backend_data/liked_teachers.json', 'r') as file:
+                        if os.path.exists(r'C:\Users\mcmco\Desktop\Python_scripts\Feedback_GUI\app\backend_data\liked_teachers.json'):
+                            with open(r'C:\Users\mcmco\Desktop\Python_scripts\Feedback_GUI\app\backend_data\liked_teachers.json', 'r') as file:
                                 liked_teachers = json.load(file)
                     except Exception:
                         msgBox = QMessageBox(self)
