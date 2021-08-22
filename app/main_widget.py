@@ -232,7 +232,7 @@ class Window(QWidget):
         try:
             student_name = self.student.text()
             # load currently saved signatures and replace student keywords with student_name.
-            with open(r'backend_data/signature.json', 'r') as openfile:
+            with open(r'C:\Users\mcmco\Desktop\Python_scripts\Feedback_GUI\app\backend_data\signature.json', 'r') as openfile:
                 signatures = json.load(openfile)
                 signature_default = signatures['default'].replace('(student)', student_name)
                 signature_new = signatures['new_student'].replace('(student)', student_name)
