@@ -229,70 +229,30 @@ class Window(QWidget):
             msgBox.exec()
 
     def feedback_script(self):
-        try:
-            student_name = self.student.text()
-            # load currently saved signatures and replace student keywords with student_name.
-            with open(r'C:\Users\mcmco\Desktop\Python_scripts\Feedback_GUI\app\backend_data\signature.json', 'r') as openfile:
-                signatures = json.load(openfile)
-                signature_default = signatures['default'].replace('(student)', student_name)
-                signature_new = signatures['new_student'].replace('(student)', student_name)
-            # get feedback template input
-            feedback_input = self.feedback_temp.toPlainText()
-            # produce feedback output
-            feedback_output = re.sub(' we |We ', f' {student_name} and I ', feedback_input, 1)
-            feedback_output = ' '.join(feedback_output.split())
-            if self.no_button.isChecked():
-                self.final_output = f'{feedback_output} {signature_default}'
-                if feedback_input.split(' ', 1)[0] in ['We', 'we']:
-                    self.final_output = f'In this lesson, {self.final_output}'
-            elif self.yes_button.isChecked():
-                self.final_output = f'{feedback_output} {signature_new}'
-                if feedback_input.split(' ', 1)[0] in ['We', 'we']:
-                    self.final_output = f'In this lesson, {self.final_output}'
-            if student_name == '':
-                self.feedback_output.clear()
-            else:
-                self.feedback_output.clear()
-                self.feedback_output.insertPlainText(self.final_output)
-        except Exception as e:
-            print(e)
-        # # global new_student
-        # # global output
-        # # student_name = self.student.text()
-        # # # student name for signature
-        # # # student_name_signature = # input from dialog box.
-        # # feedback_input = self.feedback_temp.toPlainText()
-        # # feedback_output = re.sub(' we |We', f' {student_name} and I ', feedback_input, 1)
-        # # feedback_output = ' '.join(feedback_output.split())
-        # if self.yes_button.isChecked():
-        #     new_student = 'yes'
-        # elif self.no_button.isChecked():
-        #     new_student = 'no'
-        # if new_student == 'no':
-        #     output = f'{feedback_output} Fantastic job today {student_name}! ' \
-        #              f'Keep practicing your English and working hard, you are ' \
-        #              f'improving every class! See you next time {student_name}. ' \
-        #              f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
-        #              f'From, Teacher Carlos ZDG.'
-        #     # signature will come from the edit signature dialog. Have user input, (student), everytime they want to use
-        #     # the students name in their signature. After pressing the generate feedback button, the logic here will
-        #     # get signature text from dialog, replace all (student) instances with the variable student_name, and output
-        #     # the generated feedback.
-        #     if feedback_input.split(' ', 1)[0] in ['We', 'we']:
-        #         output = f'In this lesson, {output}'
-        # elif new_student == 'yes':
-        #     output = f'{feedback_output} Fantastic job today {student_name}! ' \
-        #              f'It was great meeting you. Keep up the great work, and I hope ' \
-        #              f'to see you in my class again soon. ' \
-        #              f'亲爱的父母，如果您喜欢今天的课程，请考虑给我一个5分的苹果评估。 这项评估对我的工作非常重要。 非常感谢! ' \
-        #              f'From, Teacher Carlos ZDG.'
-        #     if feedback_input.split(' ', 1)[0] in ['We', 'we']:
-        #         output = f'In this lesson, {output}'
-        # if student_name == '':
-        #     self.feedback_output.clear()
-        # else:
-        #     self.feedback_output.clear()
-        #     self.feedback_output.insertPlainText(output)
+        student_name = self.student.text()
+        # load currently saved signatures and replace student keywords with student_name.
+        with open(r'C:\Users\mcmco\Desktop\Python_scripts\Feedback_GUI\app\backend_data\signature.json', 'r') as openfile:
+            signatures = json.load(openfile)
+            signature_default = signatures['default'].replace('(student)', student_name)
+            signature_new = signatures['new_student'].replace('(student)', student_name)
+        # get feedback template input
+        feedback_input = self.feedback_temp.toPlainText()
+        # produce feedback output
+        feedback_output = re.sub(' we |We ', f' {student_name} and I ', feedback_input, 1)
+        feedback_output = ' '.join(feedback_output.split())
+        if self.no_button.isChecked():
+            self.final_output = f'{feedback_output} {signature_default}'
+            if feedback_input.split(' ', 1)[0] in ['We', 'we']:
+                self.final_output = f'In this lesson, {self.final_output}'
+        elif self.yes_button.isChecked():
+            self.final_output = f'{feedback_output} {signature_new}'
+            if feedback_input.split(' ', 1)[0] in ['We', 'we']:
+                self.final_output = f'In this lesson, {self.final_output}'
+        if student_name == '':
+            self.feedback_output.clear()
+        else:
+            self.feedback_output.clear()
+            self.feedback_output.insertPlainText(self.final_output)
 
     def clear_form(self):
         self.student.clear()
@@ -352,78 +312,45 @@ class Window(QWidget):
                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                              'QPushButton:hover {border: 0.5px solid white}')
         msgBox.exec()
-        # if result == QMessageBox.Ok:
-        #     try:
-        #         # print('Trying to login again..')
-        #         # os.remove('cookie')
-        #         # print('cookies removed.')
-        #         self.browser.quit()
-        #         # time.sleep(2)
-        #         # self.login_nocookies()
-        #     except Exception as e:
-        #         msgBox = QMessageBox(self)
-        #         msgBox.setIcon(QMessageBox.Critical)
-        #         msgBox.setText('Error')
-        #         msgBox.setDetailedText(e)
-        #         msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-        #                              'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-        #                              'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-        #                              'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-        #                              'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-        #                              'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-        #                              'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-        #                              'QPushButton:hover {border: 0.5px solid white}')
-        #         msgBox.exec()
 
     def login_nocookies(self):
-        # try:
-        print(os.getcwd())
-        print('NOCookiesHERE')
-        if self.login_button_counter == 0:
+        try:
+            if self.login_button_counter == 0:
+                msgBox = QMessageBox(self)
+                msgBox.setWindowModality(Qt.WindowModal)
+                msgBox.setWindowFlag(Qt.ToolTip)
+                msgBox.setIcon(QMessageBox.Information)
+                msgBox.setText('Click the "Login" button below.\nLog in to VIPKid in the window that opens.')
+                msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                ok_button = msgBox.button(QMessageBox.Ok)
+                ok_button.setText('Login')
+                msgBox.setDefaultButton(QMessageBox.Ok)
+                msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                                     'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                                     'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                                     'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                                     'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                                     'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                                     'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                                     'QPushButton:hover {border: 0.5px solid white}')
+                result = msgBox.exec()
+                if result == QMessageBox.Ok:
+                    self.login_nocookies_slots()
+        except Exception:
             msgBox = QMessageBox(self)
-            msgBox.setWindowModality(Qt.WindowModal)
-            msgBox.setWindowFlag(Qt.ToolTip)
-            msgBox.setIcon(QMessageBox.Information)
-            msgBox.setText('Click the "Login" button below.\nLog in to VIPKid in the window that opens.')
-            msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-            ok_button = msgBox.button(QMessageBox.Ok)
-            ok_button.setText('Login')
-            msgBox.setDefaultButton(QMessageBox.Ok)
-            msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-                                 'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-                                 'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-                                 'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-                                 'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-                                 'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-                                 'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-                                 'QPushButton:hover {border: 0.5px solid white}')
-            result = msgBox.exec()
-            if result == QMessageBox.Ok:
-                self.login_nocookies_slots()
-        else:
-            print('Went to else nocookies')
-            # elif self.login_button_counter == 1:
-            #     self.login_slots()
-        # except Exception:
-        #     msgBox = QMessageBox(self)
-        #     msgBox.setWindowModality(Qt.WindowModal)
-        #     msgBox.setWindowFlag(Qt.ToolTip)
-        #     msgBox.setIcon(QMessageBox.Information)
-        #     msgBox.setText('Click the "Login" button below.\nLog in to VIPKid in the window that opens.')
-        #     msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        #     ok_button = msgBox.button(QMessageBox.Ok)
-        #     ok_button.setText('Login')
-        #     msgBox.setDefaultButton(QMessageBox.Ok)
-        #     msgBox.setStyleSheet(
-        #         'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-        #         'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-        #         'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
-        #         'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
-        #         'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-        #         'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
-        #         'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-        #         'QPushButton:hover {border: 0.5px solid white}')
-        #     msgBox.exec()
+            msgBox.setIcon(QMessageBox.Critical)
+            msgBox.setText('Error')
+            msgBox.setDetailedText(e)
+            msgBox.setStyleSheet(
+                'QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
+                'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
+                'border-bottom: 1px solid rgb(115, 115, 115); font-family: "Segoe UI";}'
+                'QLabel {color: rgb(235, 235, 235); padding-top: 30px; font-family: "Segoe UI";}'
+                'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
+                'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI";}'
+                'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
+                'QPushButton:hover {border: 0.5px solid white}')
+            msgBox.exec()
 
     def login_nocookies_prompt(self):
         self.login_button.setEnabled(False)
@@ -467,23 +394,6 @@ class Window(QWidget):
                                  'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
                                  'QPushButton:hover {border: 0.5px solid white}')
             msgBox.exec()
-
-    # def login_first_msg(self):
-    #     msgBox = QMessageBox(self)
-    #     msgBox.setIcon(QMessageBox.Information)
-    #     msgBox.setWindowFlag(Qt.ToolTip)
-    #     msgBox.setText("<p align='center'>Please Login First!<br>")
-    #     msgBox.setStandardButtons(QMessageBox.Ok)
-    #     msgBox.setDefaultButton(QMessageBox.Ok)
-    #     msgBox.setStyleSheet('QMessageBox {background-color: rgb(53, 53, 53); border-top: 25px solid rgb(115, 115, 115);'
-    #                          'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
-    #                          'border-bottom: 1px solid rgb(115, 115, 115)}'
-    #                          'QLabel {color: rgb(235, 235, 235); padding-top: 30px}'
-    #                          'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
-    #                          'border-radius: 11px; padding: 5px; min-width: 5em}'
-    #                          'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
-    #                          'QPushButton:hover {border: 0.5px solid white}')
-    #     msgBox.exec()
 
     def feedback_automation(self):
         """Automatically retrieves feedback templates for missing CFs."""
@@ -620,9 +530,6 @@ class Window(QWidget):
                             continue
                     progress_bar.setValue(100)
                     if invalid_teacher_count != 0:
-                        # print(self.teacher_list)
-                        # print(self.template_list)
-                        # print(len(self.teacher_list))
                         self.available_templates.addItems(self.teacher_list)
                         self.available_templates.setVisible(True)
                         self.feedback_temp.insertPlainText(self.template_list[0])
@@ -710,7 +617,6 @@ class Window(QWidget):
                     self.browser.close()
                     self.browser.switch_to.window(self.browser.window_handles[0])
         except Exception as e:
-            print(e)  # put this message in details button of message box.
             progress_bar.close()
             progress_bar.setAttribute(Qt.WA_DeleteOnClose, True)
             msgBox = QMessageBox(self)
@@ -718,6 +624,7 @@ class Window(QWidget):
             msgBox.setWindowFlag(Qt.ToolTip)
             msgBox.setText('There was a problem getting student feedback.')
             msgBox.setInformativeText('Please try again by clicking the "Retry" button below.')
+            msgBox.setDetailedText(str(e))
             msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
             retry_button = msgBox.button(QMessageBox.Ok)
             retry_button.setText('Retry')
@@ -746,7 +653,6 @@ class Window(QWidget):
 
     def login_started(self):
         gif = QMovie(':/icons/spinner')
-        # tip = QLabel('ToolTip')
         self.loading.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.loading.setAttribute(Qt.WA_TranslucentBackground)
         self.loading.setMovie(gif)
@@ -955,14 +861,3 @@ class Splashscreen:
     def stop(self, widget):
         self.splash.finish(widget)
 
-
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     # style = 'style.qss'
-#     # with open(style, 'r') as qss:
-#     #     app.setStyleSheet(qss.read())
-#     splash = Splashscreen()
-#     window = Window()
-#     window.show()
-#     splash.stop(window)
-#     app.exec()

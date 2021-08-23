@@ -1,9 +1,8 @@
 import sys
-from PyQt5 import QtCore
+from PyQt5 import QtCore, Qt
 from PyQt5.QtWidgets import QMessageBox, QApplication
 from selenium.common.exceptions import SessionNotCreatedException
 
-from app import main_window
 from app.main_widget import Splashscreen
 from app.main_window import MainWindow
 
@@ -20,12 +19,10 @@ if __name__ == "__main__":
         msgBox.setWindowModality(QtCore.Qt.WindowModal)
         msgBox.setWindowFlags(QtCore.Qt.ToolTip | QtCore.Qt.WindowStaysOnTopHint)
         msgBox.setIcon(QMessageBox.Information)
-        msgBox.setText('Update required!')
+        msgBox.setTextFormat(QtCore.Qt.RichText)
+        msgBox.setText("You need to update Chromedriver!<br><a href='https://chromedriver.chromium.org/downloads'>UPDATE HERE</a>")
         msgBox.setDetailedText(str(e))
-        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        ok_button = msgBox.button(QMessageBox.Ok)
-        ok_button.setText('Update')
-        msgBox.setDefaultButton(QMessageBox.Ok)
+        msgBox.setStandardButtons(QMessageBox.Cancel)
         msgBox.setStyleSheet(
             'QMessageBox {background-color: rgb(53, 53, 53); border-top: 1px solid rgb(115, 115, 115);'
             'border-left: 1px solid rgb(115, 115, 115); border-right: 1px solid rgb(115, 115, 115);'
@@ -56,4 +53,4 @@ if __name__ == "__main__":
             'color: rgb(53, 53, 53)}'
             'QPushButton:hover {border: 0.5px solid white}')
         msgBox.exec()
-        print(e)
+
