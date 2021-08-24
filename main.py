@@ -5,6 +5,7 @@ from selenium.common.exceptions import SessionNotCreatedException
 
 from app.main_widget import Splashscreen
 from app.main_window import MainWindow
+import resources
 
 if __name__ == "__main__":
     try:
