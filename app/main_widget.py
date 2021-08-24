@@ -419,7 +419,7 @@ class Window(QWidget):
         bar.setFixedHeight(15)
         bar.setTextVisible(False)
         progress_bar.setBar(bar)
-        progress_bar.setWindowTitle('VIPKid Feedback App')
+        progress_bar.setWindowTitle('Feedback App')
         label = QLabel('  Getting feedback template...')
         label.setStyleSheet('color: rgb(235, 235, 235); font: 14px; font-family: "Segoe UI";')
         progress_bar.setLabel(label)

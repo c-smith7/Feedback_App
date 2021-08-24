@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
         self.model = TeachersModel()
         self.load_liked_teachers()
         # window config
-        self.setWindowTitle('VIPKid Feedback App')
+        self.setWindowTitle('Feedback App')
         self.resize(525, 725)
         self.app_icon = QtGui.QIcon()
         self.app_icon.addFile(':/icons/app_icon', QtCore.QSize(16, 16))
@@ -158,7 +158,7 @@ class MainWindow(QMainWindow):
 # Liked Teachers menubar function
     def teacher_list_widget(self):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
-        dialog.setWindowTitle('VIPKid Feedback App')
+        dialog.setWindowTitle('Feedback App')
         dialog.setMinimumWidth(450)
         # widget layout
         layout = QVBoxLayout()
@@ -286,7 +286,7 @@ class MainWindow(QMainWindow):
     # Edit default feedback signature dialog.
     def feedback_signature_default(self):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
-        dialog.setWindowTitle('VIPKid Feedback App')
+        dialog.setWindowTitle('Feedback App')
         dialog.setMinimumWidth(450)
         # widget layout
         layout = QVBoxLayout()
@@ -326,7 +326,7 @@ class MainWindow(QMainWindow):
     # Edit new student feedback signature dialog.
     def feedback_signature_new(self):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
-        dialog.setWindowTitle('VIPKid Feedback App')
+        dialog.setWindowTitle('Feedback App')
         dialog.setMinimumWidth(450)
         # widget layout
         layout = QVBoxLayout()
@@ -446,7 +446,7 @@ class MainWindow(QMainWindow):
 
     def help_widget(self):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
-        dialog.setWindowTitle('VIPKid Feedback App')
+        dialog.setWindowTitle('Feedback App')
         help_widget = QTextBrowser(dialog)
         help_widget.setMinimumSize(475, 425)
         help_widget.setHtml('<h2 style="margin-bottom: 2px";>Help Menu</h2>'
@@ -513,7 +513,7 @@ class MainWindow(QMainWindow):
 
     def contact_support_widget(self):
         dialog = QDialog(self, QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
-        dialog.setWindowTitle('VIPKid Feedback App')
+        dialog.setWindowTitle('Feedback App')
         help_widget = QTextBrowser(dialog)
         help_widget.setMinimumSize(375, 215)
         help_widget.setHtml('<h3>Contact Support</h3>'
