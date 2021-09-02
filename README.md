@@ -42,29 +42,30 @@
   </ol>
 </details>
 
-# About
+## About
 
 The Feedback App was created to automate my workflow during my time as an online freelance teacher. Specifically, I wanted to automate the process of providing daily feedback to students, which was very tedious and time consuming when doing by hand.  
 
 After creating the Feedback App, I was able to save about 1-2 hours of work per day. This translated into me earning about $4 extra on my hourly rate.  
 
 Ultimately, the goal was to save time and money. For me, it achieved this goal.  I hope it does the same for you.
-## Built With..
+
+### Built With..
 
 * [Python 3](https://www.python.org/downloads/)
 * [PyQt5](https://pypi.org/project/PyQt5/5.12.3/)
 * [Selenium](https://selenium-python.readthedocs.io/)
 
-# Getting Started
+## Getting Started
 
-## Google Chrome
+### Google Chrome
 This app currently requires [Google Chrome](https://www.google.com/chrome/) to run. Follow the link to download the latest version if needed.
 <br></br>
 (Chrome version used for this app was: 92.0.4515.159)
 <br></br>
 If the latest version of Chrome raises an issue when trying to run the app, this means that the [chromedriver](https://chromedriver.chromium.org/) needs to be updated to the latest version. Follow the link to download the latest version of chromedriver. 
 
-## Installation and Run
+### Installation and Run
 
 1. Clone the project
 
@@ -85,7 +86,7 @@ If the latest version of Chrome raises an issue when trying to run the app, this
     python main.py
     ```
 
-# Usage
+## Usage
 
 Here is a [usage tutorial](https://www.youtube.com/watch?v=nsJ5m8Drx-g) for the app, which shows how I use it in my daily workflow. 
 
@@ -104,7 +105,7 @@ Step-by-step guide of how to use the app:
 5. Press the "Copy Feedback" button.  
     * This will copy the generated feedback to your clipboard. Where you can then paste wherever you'd like. 
 
-# Contribute
+## Contribute
 1. Fork the project.
 2. Create a new branch for your feature: 
     ```
@@ -120,12 +121,12 @@ Step-by-step guide of how to use the app:
     ```
 5. Open a [Pull Request](https://github.com/c-smith7/Feedback_App/pulls).
 
-# License
+## License
 
 Distributed under the MIT License. See `License.txt` for more information.
 
   
-#  Contact
+##  Contact
 [![portfolio](https://img.shields.io/badge/my_portfolio-999?style=for-the-badge&logo=ko-fi&logoColor=white)](https://databycarl.com/)
 [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/)
 [![Gmail Badge](https://img.shields.io/badge/carlvsmith7-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:carlvsmith7@gmail.com)
