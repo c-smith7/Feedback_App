@@ -1,6 +1,7 @@
 import json
 import os
 import time
+
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QObject, pyqtSignal, QRunnable, pyqtSlot, QThreadPool
 from PyQt5.QtGui import QPalette, QColor

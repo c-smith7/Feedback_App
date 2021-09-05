@@ -1,10 +1,10 @@
+import enchant
 import json
 import os
 import pickle
 import re
 import time
 
-import enchant
 from PyQt5 import Qt, QtCore
 from PyQt5 import QtGui
 from PyQt5.QtCore import *
@@ -34,7 +34,7 @@ class Window(QWidget):
         self.threadpool = QThreadPool()
         self.layout = QVBoxLayout()
         # Widgets
-        self.feedback_temp = SpellTextEdit()
+        self.feedback_temp =SpellTextEdit()
         self.feedback_label = QLabel('Feedback :')
         self.feedback_output = QPlainTextEdit(self)
         self.generate_output = QPushButton('Generate Feedback')
@@ -821,7 +821,7 @@ class SpellChecker(QSyntaxHighlighter):
         """Sets the spelling dictionary to be used"""
         try:
             self.tokenizer = tokenize.get_tokenizer(sp_dict.tag, chunkers=self._chunkers, filters=self.token_filters)
-        except TokenizerNotFoundError:
+        except (TokenizerNotFoundError, Exception):
             # Fall back to English tokenizer
             self.tokenizer = tokenize.get_tokenizer(chunkers=self._chunkers, filters=self.token_filters)
         self._sp_dict = sp_dict

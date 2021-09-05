@@ -1,4 +1,5 @@
 import sys
+
 from PyQt5 import QtCore, Qt
 from PyQt5.QtWidgets import QMessageBox, QApplication
 from selenium.common.exceptions import SessionNotCreatedException
@@ -7,7 +8,8 @@ from app.main_widget import Splashscreen
 from app.main_window import MainWindow
 import resources
 
-if __name__ == "__main__":
+
+def main():
     try:
         app = QApplication(sys.argv)
         splash = Splashscreen()
@@ -50,8 +52,10 @@ if __name__ == "__main__":
             'QLabel {color: rgb(235, 235, 235); padding-top: 10px; font-family: "Segoe UI";}'
             'QPushButton {background-color: rgb(115, 115, 115); color: rgb(235, 235, 235);'
             'border-radius: 11px; padding: 5px; min-width: 5em; font-family: "Segoe UI"; font-size: 12px;}'
-            'QPushButton:pressed {background-c'
-            'color: rgb(53, 53, 53)}'
+            'QPushButton:pressed {background-color: rgb(53, 53, 53)}'
             'QPushButton:hover {border: 0.5px solid white}')
         msgBox.exec()
 
+
+if __name__ == "__main__":
+    main()
