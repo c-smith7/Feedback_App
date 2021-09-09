@@ -59,7 +59,7 @@ Ultimately, the goal was to save time and money. For me, it achieved this goal. 
 ## Getting Started
 
 ### Google Chrome
-This app currently requires [Google Chrome](https://www.google.com/chrome/) to run. Follow the link to download the latest version if needed.
+This app currently requires Google Chrome in order to perform the webscraping. However, Chrome does not need to be running when using the Feedback App, only installed on the machine. Follow the link to download the [latest version](https://www.google.com/chrome/) if needed.
 <br></br>
 (Chrome version used for this app was: 92.0.4515.159)
 <br></br>
